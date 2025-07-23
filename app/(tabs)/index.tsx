@@ -1,5 +1,6 @@
 import ActivityItem from "@/components/Home/ActivityItem";
 import ServiceCard from "@/components/Home/ServiceCard";
+import { router } from "expo-router";
 import React from "react";
 import {
   StyleSheet,
@@ -10,9 +11,9 @@ import {
 } from "react-native";
 import EllipseD from "../../assets/images/ellipse-d.svg";
 import Ellipse from "../../assets/images/ellipse.svg";
+import HomeBell from "../../assets/images/Home-bell.svg";
 import HomeRocket from "../../assets/images/home-rocket.svg";
 import HomeStar from "../../assets/images/home-start.svg";
-import HomeBell from "../../assets/images/Home-bell.svg";
 import BaseLayout from "../../components/BaseLayout";
 
 const HomeTab: React.FC = () => {
@@ -46,18 +47,8 @@ const HomeTab: React.FC = () => {
     <BaseLayout>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text
-            style={[
-              styles.greeting,
-            ]}
-          >
-            Hi, John
-          </Text>
-          <Text
-            style={[
-              styles.subtitle,
-            ]}
-          >
+          <Text style={[styles.greeting]}>Hi, John</Text>
+          <Text style={[styles.subtitle]}>
             What can I do to help you today?
           </Text>
         </View>
@@ -84,18 +75,18 @@ const HomeTab: React.FC = () => {
         <View style={styles.ellipseD}>
           <EllipseD />
         </View>
-        <View style={styles.premiumContent}>
+        <TouchableOpacity
+          style={styles.premiumContent}
+          onPress={() => router.push("/subscription/freeplan")}
+          activeOpacity={0.7}
+        >
           <View style={styles.premiumHeader}>
-            <Text style={[styles.premiumTitle]}>Premium Plan</Text>
+            <Text style={styles.premiumTitle}>Premium Plan</Text>
           </View>
-          <Text
-            style={[
-              styles.premiumDescription,
-            ]}
-          >
+          <Text style={styles.premiumDescription}>
             Unlock all the features & get all premium access on the platform
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -178,12 +169,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Poppins-SemiBold",
     marginBottom: 2,
-    color: "#ffffff"
+    color: "#ffffff",
   },
   subtitle: {
     fontSize: 14,
     fontFamily: "Poppins-Medium",
-    color: "#ffffff"
+    color: "#ffffff",
   },
   notificationButton: {
     padding: 8,

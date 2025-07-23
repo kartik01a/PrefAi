@@ -119,7 +119,7 @@ const AccountTab: React.FC = () => {
             icon={<AccountSubscription />}
             title="Subscription"
             subtitle="Manage your plan"
-            onPress={() => router.push("/account/general")}
+            onPress={() => router.push("/subscription/freeplan")}
           />
 
           <MenuItem
