@@ -82,6 +82,7 @@ const AccountTab: React.FC = () => {
                 <Menu.Item
                   onPress={() => {
                     closeMenu();
+                    router.push("/account/editProfile");
                   }}
                   style={{ height: 30 }}
                   title="Edit Profile"
@@ -104,14 +105,14 @@ const AccountTab: React.FC = () => {
             icon={<AccountInfo />}
             title="Terms & Condition"
             subtitle="Learn to know more about the platform"
-            onPress={() => router.push("/account/general")}
+            onPress={() => router.push("/account/privacy")}
           />
 
           <MenuItem
             icon={<AccountDisplay />}
             title="Display"
             subtitle="Light Mode"
-            onPress={() => router.push("/account/general")}
+            onPress={() => router.push("/account/display")}
           />
 
           <MenuItem
@@ -125,7 +126,7 @@ const AccountTab: React.FC = () => {
             icon={<AccountManage />}
             title="Account Management"
             subtitle="Hibernate or close your account"
-            onPress={() => router.push("/account/general")}
+            onPress={() => router.push("/account/management")}
           />
 
           <MenuItem
