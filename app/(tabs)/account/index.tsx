@@ -87,6 +87,14 @@ const AccountTab: React.FC = () => {
                   style={{ height: 30 }}
                   title="Edit Profile"
                 />
+                 <Menu.Item
+                  onPress={() => {
+                    closeMenu();
+                    router.push("/auth/signin");
+                  }}
+                  style={{ height: 30 }}
+                  title="LogOut"
+                />
               </Menu>
             </TouchableOpacity>
           </View>

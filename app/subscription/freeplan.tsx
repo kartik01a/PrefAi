@@ -118,7 +118,7 @@ const FreePlan = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.logo}>PrefAI</Text>
         <Image
-          source={require("../../assets/images/freePlan.png")}
+          source={require("../../assets/images/prefAI.png")}
           style={styles.icon}
           resizeMode="contain"
         />
