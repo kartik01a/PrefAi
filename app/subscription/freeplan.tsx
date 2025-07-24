@@ -44,7 +44,6 @@ const FreePlan = () => {
         },
       ];
     } else if (selectedPlan === 1) {
-      // Basic or Premium Plan
       return [
         {
           icon: "check-circle",
@@ -187,7 +186,6 @@ const FreePlan = () => {
           </View>
         ))}
 
-        {/* Terms & Privacy */}
         <Text style={styles.footerText}>
           • Terms of Use{"   "}• Privacy Policy
         </Text>
@@ -290,7 +288,7 @@ const styles = StyleSheet.create({
     bottom: 8,
     right: 12,
     backgroundColor: "#9046F1",
-    height: 50,
+    height: 35,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 16,
