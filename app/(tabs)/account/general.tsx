@@ -1,21 +1,78 @@
 import BaseLayout from "@/components/BaseLayout";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import RNPickerSelect from "react-native-picker-select";
 
-const languageData = [
-  { label: "English (US)", value: "en" },
-  { label: "Spanish", value: "es" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Chinese", value: "zh" },
-  { label: "Japanese", value: "ja" },
-];
+type NotificationOption = "none" | "network" | "all";
+
+const OPTION_LABELS: Record<NotificationOption, string> = {
+  none: "No One",
+  network: "Your Network",
+  all: "All Members",
+};
+
+const OptionCard = ({
+  label,
+  valueLabel,
+  onPress,
+}: {
+  label: string;
+  valueLabel?: string;
+  onPress?: () => void;
+}) => (
+  <View style={styles.optionCard}>
+    <TouchableOpacity style={styles.optionRow} onPress={onPress}>
+      <View>
+        <Text style={styles.optionLabel}>{label}</Text>
+        {valueLabel && <Text style={styles.optionValue}>{valueLabel}</Text>}
+      </View>
+      <Ionicons name="chevron-forward" size={20} color="#2479CF" />
+    </TouchableOpacity>
+  </View>
+);
+
+const LabeledSwitch = ({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: boolean;
+  onChange: (val: boolean) => void;
+}) => (
+  <View style={styles.switchRow}>
+    <Text style={styles.radioLabel}>{label}</Text>
+    <Switch
+      value={value}
+      onValueChange={onChange}
+      trackColor={{ false: "#DEDEDE", true: "#319F43" }}
+      thumbColor="#FFFFFF"
+    />
+  </View>
+);
 
 const GeneralScreen = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [language, setLanguage] = useState("en");
+  const [profilePhotoVisibility, setProfilePhotoVisibility] =
+    useState<NotificationOption>("network");
+  const [notificationVisible, setNotificationVisible] = useState(false);
+
+  const [notificationSettings, setNotificationSettings] = useState<
+    Record<NotificationOption, boolean>
+  >({
+    none: false,
+    network: true,
+    all: false,
+  });
 
   return (
     <BaseLayout>
@@ -39,48 +96,95 @@ const GeneralScreen = () => {
 
         {/* Content */}
         <View style={styles.content}>
-          <View style={styles.menuContainer}>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedLanguage}
-                onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
-                style={styles.picker}
-                itemStyle={styles.pickerItem}
-              >
-                <Picker.Item label="English" value="en" />
-                <Picker.Item label="Spanish" value="es" />
-                <Picker.Item label="French" value="fr" />
-                <Picker.Item label="Georgian" value="de" />
-                <Picker.Item label="Russian" value="zh" />
-                <Picker.Item label="Arabic" value="ja" />
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedLanguage}
-                onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
-                style={styles.picker}
-                itemStyle={styles.pickerItem}
-              >
-                <Picker.Item label="English" value="en" />
-                <Picker.Item label="Spanish" value="es" />
-                <Picker.Item label="French" value="fr" />
-                <Picker.Item label="Georgian" value="de" />
-                <Picker.Item label="Russian" value="zh" />
-                <Picker.Item label="Arabic" value="ja" />
-              </Picker>
-            </View>
-
-            {/* <MenuItem
-              title="Showing profile photos"
-              onPress={() => console.log("Profile photos pressed")}
+          {/* Language Selection */}
+          <RNPickerSelect
+            value={language}
+            onValueChange={setLanguage}
+            items={[
+              { label: "English (GB)", value: "en" },
+              { label: "French", value: "fr" },
+              { label: "Georgian", value: "ge" },
+              { label: "Arabic", value: "ar" },
+              { label: "Russian", value: "ru" },
+            ]}
+            style={{
+              inputIOS: { color: "transparent" },
+              inputAndroid: { color: "transparent" },
+              placeholder: { color: "#000" },
+            }}
+            useNativeAndroidPickerStyle={false}
+          >
+            <OptionCard
+              label={`Language Selection - ${
+                {
+                  en: "English (GB)",
+                  fr: "French",
+                  ge: "Georgian",
+                  ar: "Arabic",
+                  ru: "Russian",
+                }[language]
+              }`}
             />
+          </RNPickerSelect>
 
-            <MenuItem
-              title="Notifications management"
-              onPress={() => console.log("Notifications pressed")}
-            /> */}
-          </View>
+          {/* Profile Photo Visibility */}
+          <RNPickerSelect
+            value={profilePhotoVisibility}
+            onValueChange={setProfilePhotoVisibility}
+            items={[
+              { label: "No One", value: "none" },
+              { label: "Your Network", value: "network" },
+              { label: "All Members", value: "all" },
+            ]}
+            style={{
+              inputIOS: { color: "transparent" },
+              inputAndroid: { color: "transparent" },
+            }}
+            useNativeAndroidPickerStyle={false}
+          >
+            <OptionCard label="Showing profile photos" />
+          </RNPickerSelect>
+
+          {/* Notification Settings */}
+          <OptionCard
+            label="Notifications Management"
+            onPress={() => setNotificationVisible(true)}
+          />
+
+          {/* Modal for Notification Settings */}
+          <Modal
+            transparent
+            visible={notificationVisible}
+            animationType="fade"
+            onRequestClose={() => setNotificationVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                {(["none", "network", "all"] as NotificationOption[]).map(
+                  (opt) => (
+                    <LabeledSwitch
+                      key={opt}
+                      label={OPTION_LABELS[opt]}
+                      value={notificationSettings[opt]}
+                      onChange={(value) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          [opt]: value,
+                        }))
+                      }
+                    />
+                  )
+                )}
+
+                <TouchableOpacity
+                  onPress={() => setNotificationVisible(false)}
+                  style={styles.modalClose}
+                >
+                  <Text style={styles.modalCloseText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
       </View>
     </BaseLayout>
@@ -88,22 +192,14 @@ const GeneralScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 50,
-  },
+  container: { flex: 1, marginTop: 50 },
   header: {
     flexDirection: "column",
     alignItems: "flex-start",
     paddingBottom: 8,
     paddingHorizontal: 24,
   },
-  backButton: {
-    marginRight: 16,
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
+  backButton: { marginRight: 16 },
   headerTitle: {
     fontSize: 16,
     fontWeight: "600",
@@ -116,6 +212,13 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     color: "white",
   },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
+    color: "white",
+    marginTop: 16,
+  },
   content: {
     flex: 1,
     backgroundColor: "white",
@@ -124,39 +227,60 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingHorizontal: 24,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    fontFamily: "Poppins-SemiBold",
-    color: "white",
-    marginTop: 16,
-  },
-  menuContainer: {
-    backgroundColor: "white",
-  },
-  dropdownValue: {
-    fontSize: 14,
-    color: "#2479CF",
-    marginTop: 2,
-  },
-  pickerContainer: {
-    borderRadius: 10,
+  optionCard: {
     borderWidth: 1,
-    borderColor: "#D9D9D9",
-    paddingVertical: 3,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    marginBottom: 16,
+    overflow: "hidden",
   },
-  picker: {
-    height: 54,
+  optionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  optionLabel: {
+    fontSize: 16,
     color: "#2479CF",
-    fontSize: 14,
-    fontWeight: "600",
     fontFamily: "Poppins-SemiBold",
   },
-  pickerItem: {
+  optionValue: {
+    fontSize: 14,
     color: "#2479CF",
-    fontSize: 11,
-    fontWeight: "400",
+    marginTop: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "85%",
+    backgroundColor: "#FFF",
+    padding: 20,
+    borderRadius: 10,
+  },
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+    alignItems: "center",
+  },
+  radioLabel: {
+    fontSize: 14,
     fontFamily: "Poppins-Regular",
+  },
+  modalClose: {
+    alignSelf: "flex-end",
+    marginTop: 20,
+  },
+  modalCloseText: {
+    color: "#2479CF",
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 14,
   },
 });
 
