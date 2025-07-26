@@ -17,7 +17,6 @@ import {
   View,
 } from "react-native";
 
-// ... imports unchanged ...
 
 const CEFDeclarationForm = () => {
   const navigation = useNavigation();
