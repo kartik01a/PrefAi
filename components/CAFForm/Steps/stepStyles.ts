@@ -129,4 +129,80 @@ export const styles = StyleSheet.create({
     gap: 8,
     marginTop: 8,
   },
+
+
+  centeredContainer: {
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 20,
+},
+
+successImage: {
+  width: 120,
+  height: 120,
+},
+
+successTitle: {
+  fontSize: 16,
+  fontWeight: "bold",
+  textAlign: "center",
+  color: "#2479CF",
+},
+
+pdfButton: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 8,
+  backgroundColor: "#2479CF",
+  paddingVertical: 10,
+  paddingHorizontal: 16,
+  borderRadius: 8,
+},
+
+pdfButtonText: {
+  fontSize: 14,
+  color: "#fff",
+},
+
+bulletList: {
+  alignSelf: "flex-start",
+  marginVertical: 10,
+},
+
+bulletItem: {
+  fontSize: 14,
+  color: "#2479CF",
+  marginVertical: 2,
+},
+
+actionButton: {
+  backgroundColor: "#2479CF",
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+  width: "100%",
+  alignItems: "center",
+},
+
+actionButtonText: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "bold",
+},
+
+actionButtonSecondary: {
+  backgroundColor: "#2479CF",
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+  width: "100%",
+  alignItems: "center",
+  marginTop: 10,
+},
+
+actionButtonSecondaryText: {
+  color: "#fff",
+  fontSize: 16,
+},
+
 });

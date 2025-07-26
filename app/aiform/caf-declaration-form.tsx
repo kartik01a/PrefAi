@@ -7,6 +7,7 @@ import { Step4 } from "@/components/CAFForm/Steps/Step4";
 import { Step5 } from "@/components/CAFForm/Steps/Step5";
 import { Step6 } from "@/components/CAFForm/Steps/Step6";
 import { Step7 } from "@/components/CAFForm/Steps/Step7";
+import { Step8 } from "@/components/CAFForm/Steps/Step8";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
@@ -141,7 +142,7 @@ const CEFDeclarationForm = () => {
         />
       );
     }
-      if (activeStep === 7) {
+    if (activeStep === 7) {
       return (
         <Step7
           declaration={formData.declaration}
@@ -156,6 +157,9 @@ const CEFDeclarationForm = () => {
           }
         />
       );
+    }
+    if (activeStep === 8) {
+      return <Step8 />;
     }
 
     return <Text>{`Step ${activeStep} form goes here.`}</Text>;
@@ -257,24 +261,27 @@ const CEFDeclarationForm = () => {
               <View style={styles.contentWrapper}>
                 <View style={styles.contentInner}>
                   {renderStepForm()}
-                  <TouchableOpacity
-                    style={[
-                      styles.continueButton,
-                      !isCurrentStepValid && styles.continueButtonDisabled,
-                    ]}
-                    onPress={handleContinue}
-                    disabled={!isCurrentStepValid}
-                  >
-                    <Text
+
+                  {activeStep !== 8 && (
+                    <TouchableOpacity
                       style={[
-                        styles.continueButtonText,
-                        !isCurrentStepValid &&
-                          styles.continueButtonTextDisabled,
+                        styles.continueButton,
+                        !isCurrentStepValid && styles.continueButtonDisabled,
                       ]}
+                      onPress={handleContinue}
+                      disabled={!isCurrentStepValid}
                     >
-                      Continue
-                    </Text>
-                  </TouchableOpacity>
+                      <Text
+                        style={[
+                          styles.continueButtonText,
+                          !isCurrentStepValid &&
+                            styles.continueButtonTextDisabled,
+                        ]}
+                      >
+                        Continue
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             </View>

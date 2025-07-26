@@ -44,7 +44,7 @@ const ChatAssist: React.FC = () => {
   ];
 
   function serviceMethod(index: number): void {
-    if(index === 0) {
+    if(index === 0 || index === 1 || index === 2 || index === 3 || index === 4) {
       router.push('/aiform/caf-declaration-form')
     }
   }
