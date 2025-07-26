@@ -33,6 +33,13 @@ export type MsaRegistration = {
   organizationCountry: string;
   beneficiaryNumber: string;
 };
+export type ParentsInformation = {
+  isReceivingAid: boolean | null;
+  fullName: string;
+  fullAddress: string;
+  cafNumber: string;
+  socialSecurityNumber: string;
+};
 
 export type ContactInformation = {
   fullAddress: string;
@@ -48,11 +55,30 @@ export type ContactInformation = {
   partnerAbroadSince: string;
 };
 
+export type EmploymentSituation = {
+  currentStatus: string;
+  contractType: string;
+  startDate: string;
+  endDate: string;
+  socialContribution: string;
+  foreignContributionCountry: string;
+};
+
+export type Declaration = {
+  placeOfSignature: string;
+  dateOfSignature: string;
+  signature: string;
+  declarationAccepted: boolean;
+};
+
 export type FormData = {
   personalDetails: PersonalDetails;
   partnerSpouse: PartnerSpouse;
   msaRegistration: MsaRegistration;
   contactInformation: ContactInformation;
+  parentsInformation: ParentsInformation;
+  employmentSituation: EmploymentSituation;
+  declaration: Declaration;
 };
 
 export const getInitialFormData = (): FormData => ({
@@ -100,6 +126,27 @@ export const getInitialFormData = (): FormData => ({
     partnerAbroadCountry: "",
     partnerAbroadSince: "",
   },
+  parentsInformation: {
+    isReceivingAid: null,
+    fullName: "",
+    fullAddress: "",
+    cafNumber: "",
+    socialSecurityNumber: "",
+  },
+  employmentSituation: {
+    currentStatus: "",
+    contractType: "",
+    startDate: "",
+    endDate: "",
+    socialContribution: "",
+    foreignContributionCountry: "",
+  },
+  declaration: {
+    placeOfSignature: "",
+    dateOfSignature: "",
+    signature: "",
+    declarationAccepted: false,
+  },
 });
 
 export const isStepValid = (step: number, data: FormData): boolean => {
@@ -139,34 +186,48 @@ export const isStepValid = (step: number, data: FormData): boolean => {
         p3.beneficiaryNumber.trim() !== ""
       );
 
-  case 4:
-  return (
-    p4.fullAddress.trim() !== "" &&
-    p4.city.trim() !== "" &&
-    p4.postCode.trim() !== "" &&
-    p4.phone.trim() !== "" &&
-    p4.email.trim() !== "" &&
-    p4.addressSince.trim() !== "" &&
-    p4.isCouple !== null &&
-    p4.numberOfChildren.trim() !== "" &&
-    p4.householdSize.trim() !== "" &&
-    (p4.partnerAbroadCountry.trim() === "" || p4.partnerAbroadSince.trim() !== "")
-  );
-
+    case 4:
+      return (
+        p4.fullAddress.trim() !== "" &&
+        p4.city.trim() !== "" &&
+        p4.postCode.trim() !== "" &&
+        p4.phone.trim() !== "" &&
+        p4.email.trim() !== "" &&
+        p4.addressSince.trim() !== "" &&
+        p4.isCouple !== null &&
+        p4.numberOfChildren.trim() !== "" &&
+        p4.householdSize.trim() !== "" &&
+        (p4.partnerAbroadCountry.trim() === "" ||
+          p4.partnerAbroadSince.trim() !== "")
+      );
 
     case 5:
-    // return (
-    //   data.employmentStatus !== "" &&
-    //   data.employerName.trim() !== "" &&
-    //   data.income.trim() !== ""
-    // );
+      const p5 = data.parentsInformation;
+      return (
+        p5.isReceivingAid !== null &&
+        p5.fullName.trim() !== "" &&
+        p5.fullAddress.trim() !== "" &&
+        p5.cafNumber.trim() !== "" &&
+        p5.socialSecurityNumber.trim() !== ""
+      );
 
     case 6:
-    // return data.housingType.trim() !== "" && data.rentAmount.trim() !== "";
-
+      const p6 = data.employmentSituation;
+      return (
+        p6.currentStatus.trim() !== "" &&
+        p6.contractType.trim() !== "" &&
+        p6.startDate.trim() !== "" &&
+        p6.socialContribution.trim() !== "" &&
+        p6.foreignContributionCountry.trim() !== ""
+      );
     case 7:
-    // return data.bankName.trim() !== "" && data.accountNumber.trim() !== "";
-
+      const p7 = data.declaration;
+      return (
+        p7.placeOfSignature.trim() !== "" &&
+        p7.dateOfSignature.trim() !== "" &&
+        p7.signature.trim() !== "" &&
+        p7.declarationAccepted === true
+      );
     case 8:
     // return data.declarationAccepted;
 

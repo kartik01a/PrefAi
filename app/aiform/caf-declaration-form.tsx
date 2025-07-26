@@ -4,6 +4,9 @@ import { Step1 } from "@/components/CAFForm/Steps/Step1";
 import { Step2 } from "@/components/CAFForm/Steps/Step2";
 import { Step3 } from "@/components/CAFForm/Steps/Step3";
 import { Step4 } from "@/components/CAFForm/Steps/Step4";
+import { Step5 } from "@/components/CAFForm/Steps/Step5";
+import { Step6 } from "@/components/CAFForm/Steps/Step6";
+import { Step7 } from "@/components/CAFForm/Steps/Step7";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
@@ -16,7 +19,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 
 const CEFDeclarationForm = () => {
   const navigation = useNavigation();
@@ -99,6 +101,55 @@ const CEFDeclarationForm = () => {
               ...prev,
               contactInformation: {
                 ...prev.contactInformation,
+                ...updatedDetails,
+              },
+            }))
+          }
+        />
+      );
+    }
+
+    if (activeStep === 5) {
+      return (
+        <Step5
+          parentsInfo={formData.parentsInformation}
+          setParentsInfo={(updatedDetails) =>
+            setFormData((prev) => ({
+              ...prev,
+              parentsInformation: {
+                ...prev.parentsInformation,
+                ...updatedDetails,
+              },
+            }))
+          }
+        />
+      );
+    }
+    if (activeStep === 6) {
+      return (
+        <Step6
+          employment={formData.employmentSituation}
+          setEmployment={(updatedDetails) =>
+            setFormData((prev) => ({
+              ...prev,
+              employmentSituation: {
+                ...prev.employmentSituation,
+                ...updatedDetails,
+              },
+            }))
+          }
+        />
+      );
+    }
+      if (activeStep === 7) {
+      return (
+        <Step7
+          declaration={formData.declaration}
+          setDeclaration={(updatedDetails) =>
+            setFormData((prev) => ({
+              ...prev,
+              declaration: {
+                ...prev.declaration,
                 ...updatedDetails,
               },
             }))
@@ -194,7 +245,9 @@ const CEFDeclarationForm = () => {
                 </View>
 
                 <View style={styles.stepTextContainer}>
-                  <Text style={styles.stepTextTitle}>{`Step ${activeStep}`}</Text>
+                  <Text
+                    style={styles.stepTextTitle}
+                  >{`Step ${activeStep}`}</Text>
                   <Text style={styles.stepTextSubtitle}>
                     {getStepSubtitle(activeStep)}
                   </Text>
@@ -215,7 +268,8 @@ const CEFDeclarationForm = () => {
                     <Text
                       style={[
                         styles.continueButtonText,
-                        !isCurrentStepValid && styles.continueButtonTextDisabled,
+                        !isCurrentStepValid &&
+                          styles.continueButtonTextDisabled,
                       ]}
                     >
                       Continue
@@ -329,4 +383,3 @@ const styles = StyleSheet.create({
 });
 
 export default CEFDeclarationForm;
-

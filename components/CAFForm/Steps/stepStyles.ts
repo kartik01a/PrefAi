@@ -51,7 +51,7 @@ export const styles = StyleSheet.create({
     top: 14,
   },
 
-radioOption: {
+  radioOption: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 10,
@@ -86,4 +86,47 @@ radioOption: {
     color: "#2479CF",
   },
 
+  dividerWithText: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 8,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#ccc",
+  },
+  dividerText: {
+    marginHorizontal: 8,
+    fontSize: 14,
+    color: "#555",
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    marginTop: 8,
+  },
+  checkboxLabel: {
+    flex: 1,
+    fontSize: 14,
+    color: "#333",
+  },
+
+  checkboxCustom: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 8,
+  },
 });
