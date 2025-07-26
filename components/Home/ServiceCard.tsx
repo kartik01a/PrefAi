@@ -33,7 +33,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ icon, title, onPress }) => {
     <TouchableOpacity
       style={[
         styles.serviceCard,
-        { backgroundColor: colorScheme === "dark" ? "#1C1C1E" : "#FFFFFF" },
+        { backgroundColor: colorScheme === "light" ? "#1C1C1E" : "#FFFFFF" },
       ]}
       onPress={onPress}
       activeOpacity={0.7}

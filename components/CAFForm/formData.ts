@@ -1,0 +1,176 @@
+export type ChildDetail = {
+  name: string;
+  dob: string;
+};
+
+export type PersonalDetails = {
+  title: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  dob: string | null;
+  countryOfBirth: string;
+  maritalStatus: string;
+  socialSecurityNumber: string;
+  dateOfArrival: string | null;
+};
+
+export type PartnerSpouse = {
+  title: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  dob: string | null;
+  countryOfBirth: string;
+  maritalStatus: string;
+  socialSecurityNumber: string;
+  dateOfArrival: string | null;
+};
+
+export type MsaRegistration = {
+  isPreviouslyRegistered: boolean | null;
+  organizationName: string;
+  organizationCountry: string;
+  beneficiaryNumber: string;
+};
+
+export type ContactInformation = {
+  fullAddress: string;
+  city: string;
+  postCode: string;
+  phone: string;
+  email: string;
+  addressSince: string;
+  isCouple: boolean | null;
+  numberOfChildren: string;
+  householdSize: string;
+  partnerAbroadCountry: string;
+  partnerAbroadSince: string;
+};
+
+export type FormData = {
+  personalDetails: PersonalDetails;
+  partnerSpouse: PartnerSpouse;
+  msaRegistration: MsaRegistration;
+  contactInformation: ContactInformation;
+};
+
+export const getInitialFormData = (): FormData => ({
+  personalDetails: {
+    title: "",
+    firstName: "",
+    lastName: "",
+    userName: "",
+    dob: null,
+    countryOfBirth: "",
+    maritalStatus: "",
+    socialSecurityNumber: "",
+    dateOfArrival: null,
+  },
+
+  partnerSpouse: {
+    title: "",
+    firstName: "",
+    lastName: "",
+    userName: "",
+    dob: null,
+    countryOfBirth: "",
+    maritalStatus: "",
+    socialSecurityNumber: "",
+    dateOfArrival: null,
+  },
+
+  msaRegistration: {
+    isPreviouslyRegistered: null,
+    organizationName: "",
+    organizationCountry: "",
+    beneficiaryNumber: "",
+  },
+
+  contactInformation: {
+    fullAddress: "",
+    city: "",
+    postCode: "",
+    phone: "",
+    email: "",
+    addressSince: "",
+    isCouple: null,
+    numberOfChildren: "",
+    householdSize: "",
+    partnerAbroadCountry: "",
+    partnerAbroadSince: "",
+  },
+});
+
+export const isStepValid = (step: number, data: FormData): boolean => {
+  const p = data.personalDetails;
+  const p2 = data.partnerSpouse;
+  const p3 = data.msaRegistration;
+  const p4 = data.contactInformation;
+
+  switch (step) {
+    case 1:
+      return (
+        p.title.trim() !== "" &&
+        p.firstName.trim() !== "" &&
+        p.lastName.trim() !== "" &&
+        p.dob !== null &&
+        p.countryOfBirth.trim() !== "" &&
+        p.maritalStatus.trim() !== "" &&
+        p.socialSecurityNumber.trim() !== "" &&
+        p.dateOfArrival !== null
+      );
+    case 2:
+      return (
+        p2.title.trim() !== "" &&
+        p2.firstName.trim() !== "" &&
+        p2.lastName.trim() !== "" &&
+        p2.dob !== null &&
+        p2.countryOfBirth.trim() !== "" &&
+        p2.maritalStatus.trim() !== "" &&
+        p2.socialSecurityNumber.trim() !== "" &&
+        p2.dateOfArrival !== null
+      );
+
+    case 3:
+      return (
+        p3.organizationName.trim() !== "" &&
+        p3.organizationCountry.trim() !== "" &&
+        p3.beneficiaryNumber.trim() !== ""
+      );
+
+  case 4:
+  return (
+    p4.fullAddress.trim() !== "" &&
+    p4.city.trim() !== "" &&
+    p4.postCode.trim() !== "" &&
+    p4.phone.trim() !== "" &&
+    p4.email.trim() !== "" &&
+    p4.addressSince.trim() !== "" &&
+    p4.isCouple !== null &&
+    p4.numberOfChildren.trim() !== "" &&
+    p4.householdSize.trim() !== "" &&
+    (p4.partnerAbroadCountry.trim() === "" || p4.partnerAbroadSince.trim() !== "")
+  );
+
+
+    case 5:
+    // return (
+    //   data.employmentStatus !== "" &&
+    //   data.employerName.trim() !== "" &&
+    //   data.income.trim() !== ""
+    // );
+
+    case 6:
+    // return data.housingType.trim() !== "" && data.rentAmount.trim() !== "";
+
+    case 7:
+    // return data.bankName.trim() !== "" && data.accountNumber.trim() !== "";
+
+    case 8:
+    // return data.declarationAccepted;
+
+    default:
+      return false;
+  }
+};

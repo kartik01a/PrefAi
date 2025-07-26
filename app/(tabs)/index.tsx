@@ -43,6 +43,12 @@ const HomeTab: React.FC = () => {
     "Appointment Guide - Préfecture (Paris 13)",
   ];
 
+  function cardPress(key: number): void {
+    if (key === 0) {
+      router.push("/aiform/chatassist");
+    }
+  }
+
   return (
     <BaseLayout>
       <View style={styles.header}>
@@ -104,7 +110,7 @@ const HomeTab: React.FC = () => {
               key={index}
               icon={service.icon}
               title={service.title}
-              onPress={() => console.log(`Pressed ${service.title}`)}
+              onPress={() => cardPress(index)}
             />
           ))}
         </View>
