@@ -10,7 +10,7 @@ interface OptionCardProps {
 const OptionCard = ({ label, onPress }: OptionCardProps) => (
   <View style={styles.card}>
     <TouchableOpacity style={styles.optionRow} onPress={onPress}>
-      <Text style={styles.optionLabel}>{label}</Text>
+      <Text style={styles.optionLabel} lineBreakMode="tail">{label}</Text>
       <Ionicons name="chevron-forward" size={20} color="#888" />
     </TouchableOpacity>
   </View>

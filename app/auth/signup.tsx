@@ -2,17 +2,21 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect } from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SignUp = () => {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -20,22 +24,29 @@ const SignUp = () => {
 
   return (
     <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
-      <View style={styles.innerContainer}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text style={styles.logo}>PrefAI</Text>
+      <KeyboardAvoidingView 
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <View style={[styles.innerContainer, { paddingTop: insets.top }]}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            enableOnAndroid={true}
+          >
+            <Text style={styles.logo}>PrefAI</Text>
           <Image
             source={require("../../assets/images/prefAI.png")}
             style={styles.icon}
             resizeMode="contain"
           />
           <Text style={styles.title}>Sign Up Account</Text>
-          <Text style={styles.subtitle}>Enter your personal data to create your account.</Text>
+                      <Text style={styles.subtitle}>Enter your personal data to create your account.</Text>
 
-          {/* Social Buttons */}
-          <View style={styles.socialButtonsContainer}>
+            {/* Social Buttons */}
+            <View style={styles.socialButtonsContainer}>
             <TouchableOpacity style={styles.socialButton}>
               <Image
                 source={require("../../assets/images/google.png")}
@@ -51,17 +62,17 @@ const SignUp = () => {
               />
               <Text style={styles.socialButtonText}>Facebook</Text>
             </TouchableOpacity>
-          </View>
+                      </View>
 
-          {/* Divider */}
-          <View style={styles.divider}>
+            {/* Divider */}
+            <View style={styles.divider}>
             <View style={styles.line} />
             <Text style={styles.orText}>or</Text>
             <View style={styles.line} />
-          </View>
+                      </View>
 
-          {/* Input Fields */}
-          <View style={styles.inputContainer}>
+            {/* Input Fields */}
+            <View style={styles.inputContainer}>
             <View style={styles.row}>
               <View style={styles.halfInputWrapper}>
                 <Text style={styles.inputLabel}>First Name</Text>
@@ -69,6 +80,7 @@ const SignUp = () => {
                   placeholder="e.g. John"
                   placeholderTextColor="#ccc"
                   style={styles.input}
+                  autoCapitalize="words"
                 />
               </View>
               <View style={styles.halfInputWrapper}>
@@ -77,6 +89,7 @@ const SignUp = () => {
                   placeholder="e.g. Doe"
                   placeholderTextColor="#ccc"
                   style={styles.input}
+                  autoCapitalize="words"
                 />
               </View>
             </View>
@@ -86,6 +99,8 @@ const SignUp = () => {
               placeholder="e.g. Johndoe@mail.com"
               placeholderTextColor="#ccc"
               style={styles.input}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
 
             <Text style={styles.inputLabel}>Passport Number</Text>
@@ -93,6 +108,7 @@ const SignUp = () => {
               placeholder="e.g. XAU000"
               placeholderTextColor="#ccc"
               style={styles.input}
+              autoCapitalize="characters"
             />
 
             <Text style={styles.inputLabel}>Create Password</Text>
@@ -101,14 +117,16 @@ const SignUp = () => {
               placeholderTextColor="#ccc"
               secureTextEntry
               style={styles.input}
+              autoCapitalize="none"
             />
           </View>
         </ScrollView>
 
         {/* Action Buttons */}
-        <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity style={styles.bottomButtonSignUp}
-          onPress={() => router.push("/auth/welcomepage")}
+        <View style={[styles.actionButtonsContainer, { paddingBottom: insets.bottom + 10 }]}>
+          <TouchableOpacity 
+            style={styles.bottomButtonSignUp}
+            onPress={() => router.push("/auth/welcomepage")}
           >
             <Text style={styles.bottomButtonTextSignUp}>Sign Up</Text>
           </TouchableOpacity>
@@ -120,7 +138,8 @@ const SignUp = () => {
             <Text style={styles.bottomButtonTextLogIn}>Log In</Text>
           </TouchableOpacity>
         </View>
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </LinearGradient>
   );
 };
@@ -131,15 +150,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   innerContainer: {
     flex: 1,
     justifyContent: "space-between",
   },
   scrollContainer: {
     padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 20,
     alignItems: "center",
     flexGrow: 1,
+    minHeight: '100%',
   },
   logo: {
     fontSize: 24,
@@ -213,7 +236,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "100%",
-    marginBottom: 24,
+    marginBottom: 100,
   },
   inputLabel: {
     color: "white",
@@ -244,8 +267,9 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: "row",
     gap: 12,
-    padding: 24,
-    marginBottom: 30,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    backgroundColor: "transparent",
   },
   bottomButtonLogIn: {
     flex: 1,

@@ -3,6 +3,8 @@ import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect } from "react";
 import {
   Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,8 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 const SignIn = () => {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -19,79 +24,90 @@ const SignIn = () => {
 
   return (
     <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
-      <View style={styles.innerContainer}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text style={styles.logo}>PrefAI</Text>
-          <Image
-            source={require("../../assets/images/prefAI.png")}
-            style={styles.icon}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Sign In</Text>
-          <Text style={styles.subtitle}>
-            Enter your personal data to enter the platform
-          </Text>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <View style={[styles.innerContainer, { paddingTop: insets.top }]}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.logo}>PrefAI</Text>
+            <Image
+              source={require("../../assets/images/prefAI.png")}
+              style={styles.icon}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Sign In</Text>
+            <Text style={styles.subtitle}>
+              Enter your personal data to enter the platform
+            </Text>
 
-          <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("../../assets/images/google.png")}
-                style={styles.socialIcon}
+            <View style={styles.socialButtonsContainer}>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={require("../../assets/images/google.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialButtonText}>Google</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={require("../../assets/images/facebook.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialButtonText}>Facebook</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.divider}>
+              <View style={styles.line} />
+              <Text style={styles.orText}>or</Text>
+              <View style={styles.line} />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                placeholder="e.g. Johndoe@mail.com"
+                placeholderTextColor="#ccc"
+                style={styles.input}
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
-              <Text style={styles.socialButtonText}>Google</Text>
+
+              <Text style={styles.inputLabel}>Password</Text>
+              <TextInput
+                placeholder="enter your password"
+                placeholderTextColor="#ccc"
+                secureTextEntry
+                style={styles.input}
+                autoCapitalize="none"
+              />
+            </View>
+          </ScrollView>
+
+          <View style={[styles.actionButtonsContainer, { paddingBottom: insets.bottom + 10 }]}>
+            <TouchableOpacity
+              style={styles.bottomButtonSignUp}
+              onPress={() => router.push("/auth/signup")}
+            >
+              <Text style={styles.bottomButtonTextSignUp}>Sign Up</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("../../assets/images/facebook.png")}
-                style={styles.socialIcon}
-              />
-              <Text style={styles.socialButtonText}>Facebook</Text>
+            <TouchableOpacity
+              style={styles.bottomButtonLogIn}
+              onPress={() => router.push("/")}
+            >
+              <Text style={styles.bottomButtonTextLogIn}>Log In</Text>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.divider}>
-            <View style={styles.line} />
-            <Text style={styles.orText}>or</Text>
-            <View style={styles.line} />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Email</Text>
-            <TextInput
-              placeholder="e.g. Johndoe@mail.com"
-              placeholderTextColor="#ccc"
-              style={styles.input}
-            />
-
-            <Text style={styles.inputLabel}>Password</Text>
-            <TextInput
-              placeholder="enter your password"
-              placeholderTextColor="#ccc"
-              secureTextEntry
-              style={styles.input}
-            />
-          </View>
-        </ScrollView>
-
-        <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity
-            style={styles.bottomButtonSignUp}
-            onPress={() => router.push("/auth/signup")}
-          >
-            <Text style={styles.bottomButtonTextSignUp}>Sign Up</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.bottomButtonLogIn}
-            onPress={() => router.push("/")}
-          >
-            <Text style={styles.bottomButtonTextLogIn}>Log In</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </LinearGradient>
   );
 };
@@ -99,13 +115,10 @@ const SignIn = () => {
 export default SignIn;
 
 const styles = StyleSheet.create({
-  socialIcon: {
-    width: 18,
-    height: 18,
-    marginRight: 8,
-    resizeMode: "contain",
-  },
   container: {
+    flex: 1,
+  },
+  keyboardAvoidingView: {
     flex: 1,
   },
   innerContainer: {
@@ -114,7 +127,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 20,
     alignItems: "center",
     flexGrow: 1,
   },
@@ -149,7 +162,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: "100%",
   },
-
   socialButton: {
     flex: 1,
     flexDirection: "row",
@@ -162,13 +174,16 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     justifyContent: "center",
   },
+  socialIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 8,
+    resizeMode: "contain",
+  },
   socialButtonText: {
     color: "#fff",
     fontFamily: "Poppins-Medium",
     fontSize: 16,
-  },
-  iconMargin: {
-    marginRight: 8,
   },
   divider: {
     flexDirection: "row",
@@ -211,8 +226,9 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: "row",
     gap: 12,
-    padding: 24,
-    marginBottom: 30,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    backgroundColor: "transparent",
   },
   bottomButtonLogIn: {
     flex: 1,

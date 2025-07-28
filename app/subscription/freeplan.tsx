@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 const FreePlan = () => {
   const navigation = useNavigation();
@@ -109,101 +110,112 @@ const FreePlan = () => {
     { title: "Monthly Plan - Full Access", price: "€4.99 / month" },
     { title: "Yearly Plan - Best Value", price: "€59.99 / year" },
   ];
+  
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, []);
+
   return (
-    <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.logo}>PrefAI</Text>
-        <Image
-          source={require("../../assets/images/prefAI.png")}
-          style={styles.icon}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Pricing</Text>
-        <Text style={styles.subtitle}>
-          Get unlimited access to all features
-        </Text>
-
-        {/* Plan Options */}
-        <View style={styles.planList}>
-          {plans.map((plan, index) => {
-            const isSelected = selectedPlan === index;
-            const isTop = index === 0;
-            const isBottom = index === plans.length - 1;
-            const isYearly = index === 2;
-
-            return (
-              <TouchableOpacity
-                key={index}
-                activeOpacity={0.7}
-                onPress={() => setSelectedPlan(index)}
-                style={[
-                  styles.planBox,
-                  isTop && styles.planTop,
-                  isBottom && styles.planBottom,
-                  isSelected && styles.selectedPlanBox,
-                ]}
-              >
-                <View style={styles.planContent}>
-                  <Checkbox
-                    status={isSelected ? "checked" : "unchecked"}
-                    onPress={() => setSelectedPlan(index)}
-                    color="#00FFB3"
-                  />
-                  <View style={styles.planTextContainer}>
-                    <Text style={styles.planTitle}>{plan.title}</Text>
-                    <Text style={styles.planPrice}>{plan.price}</Text>
-                  </View>
-                </View>
-
-                {isYearly && selectedPlan === 2 && (
-                  <View style={styles.bestValueWrapper}>
-                    <Text style={styles.bestValueText}>Best Value!</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <Text style={styles.includedTitle}>What’s included</Text>
-
-        {getIncludedItems().map((item, index) => (
-          <View key={index} style={styles.includedItem}>
-            <View style={styles.includedIcon}>
-              <Feather name={item.icon as any} size={18} color="white" />
-            </View>
-            <Text
-              style={[
-                styles.includedText,
-                item.text === "Save 14% over monthly" && styles.semiBoldText,
-              ]}
-            >
-              {item.text}
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.logo}>PrefAI</Text>
+            <Image
+              source={require("../../assets/images/prefAI.png")}
+              style={styles.icon}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Pricing</Text>
+            <Text style={styles.subtitle}>
+              Get unlimited access to all features
             </Text>
-          </View>
-        ))}
 
-        <Text style={styles.footerText}>
-          • Terms of Use{"   "}• Privacy Policy
-        </Text>
+            <View style={styles.planList}>
+              {plans.map((plan, index) => {
+                const isSelected = selectedPlan === index;
+                const isTop = index === 0;
+                const isBottom = index === plans.length - 1;
+                const isYearly = index === 2;
 
-        <TouchableOpacity
-          style={styles.selectButton}
-          onPress={() => console.log("Plan Selected:", plans[selectedPlan])}
-        >
-          <Text style={styles.selectButtonText}>Select Plan</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </LinearGradient>
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    activeOpacity={0.7}
+                    onPress={() => setSelectedPlan(index)}
+                    style={[
+                      styles.planBox,
+                      isTop && styles.planTop,
+                      isBottom && styles.planBottom,
+                      isSelected && styles.selectedPlanBox,
+                    ]}
+                  >
+                    <View style={styles.planContent}>
+                      <Checkbox
+                        status={isSelected ? "checked" : "unchecked"}
+                        onPress={() => setSelectedPlan(index)}
+                        color="#00FFB3"
+                      />
+                      <View style={styles.planTextContainer}>
+                        <Text style={styles.planTitle}>{plan.title}</Text>
+                        <Text style={styles.planPrice}>{plan.price}</Text>
+                      </View>
+                    </View>
+
+                    {isYearly && selectedPlan === 2 && (
+                      <View style={styles.bestValueWrapper}>
+                        <Text style={styles.bestValueText}>Best Value!</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <Text style={styles.includedTitle}>What&apos;s included</Text>
+
+            {getIncludedItems().map((item, index) => (
+              <View key={index} style={styles.includedItem}>
+                <View style={styles.includedIcon}>
+                  <Feather name={item.icon as any} size={18} color="white" />
+                </View>
+                <Text
+                  style={[
+                    styles.includedText,
+                    item.text === "Save 14% over monthly" && styles.semiBoldText,
+                  ]}
+                >
+                  {item.text}
+                </Text>
+              </View>
+            ))}
+
+            <Text style={styles.footerText}>
+              • Terms of Use{"   "}• Privacy Policy
+            </Text>
+
+            <TouchableOpacity
+              style={styles.selectButton}
+              onPress={() => console.log("Plan Selected:", plans[selectedPlan])}
+            >
+              <Text style={styles.selectButtonText}>Select Plan</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </LinearGradient>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
 export default FreePlan;
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   semiBoldText: {
     fontFamily: "Poppins-SemiBold",
   },

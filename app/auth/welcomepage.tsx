@@ -1,14 +1,15 @@
-import BaseLayout from "@/components/BaseLayout";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const languages = [
   {
@@ -64,6 +65,7 @@ const languages = [
 const WelcomePage = () => {
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -107,7 +109,9 @@ const WelcomePage = () => {
   };
 
   return (
-    <BaseLayout>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" backgroundColor="#2479CF" />
+      
       <View style={styles.topSection}>
         <View style={styles.logoSection}>
           <Image
@@ -121,49 +125,59 @@ const WelcomePage = () => {
         <View style={styles.introTextContainer}>
           <Text style={styles.welcomeTitle}>Bienvenue!</Text>
           <Text style={styles.description}>
-            We&apos;re here to help you with forms, documents, and appointments.
-            Please choose your preferred language to get started:
+            We&apos;re here to help you with forms, documents, and
+            appointments. Please choose your preferred language to get
+            started:
           </Text>
         </View>
       </View>
 
-      <FlatList
-        data={languages}
-        keyExtractor={(item, index) => `${item.code}-${index}`}
-        renderItem={renderLanguageItem}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        scrollEnabled={false}
-        ListFooterComponent={
-          <TouchableOpacity
+      <View style={styles.languageSection}>
+        <FlatList
+          data={languages}
+          keyExtractor={(item, index) => `${item.code}-${index}`}
+          renderItem={renderLanguageItem}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+        <TouchableOpacity
+          style={[
+            styles.continueButton,
+            !selectedLang && styles.continueButtonDisabled,
+          ]}
+          onPress={handleContinue}
+          disabled={!selectedLang}
+        >
+          <Text
             style={[
-              styles.continueButton,
-              !selectedLang && styles.continueButtonDisabled,
+              styles.continueButtonText,
+              !selectedLang && styles.continueButtonTextDisabled,
             ]}
-            onPress={handleContinue}
-            disabled={!selectedLang}
           >
-            <Text
-              style={[
-                styles.continueButtonText,
-                !selectedLang && styles.continueButtonTextDisabled,
-              ]}
-            >
-              Continue
-            </Text>
-          </TouchableOpacity>
-        }
-      />
-    </BaseLayout>
+            Continue
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 export default WelcomePage;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#2479CF",
+  },
+
   topSection: {
-    marginTop: 20,
+    backgroundColor: "#2479CF",
     paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
 
   logoSection: {
@@ -202,13 +216,17 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
 
-  listContainer: {
+  languageSection: {
+    flex: 1,
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 24,
     paddingTop: 30,
-    paddingBottom: 40,
+  },
+
+  listContainer: {
+    paddingBottom: 20,
     gap: 6,
   },
 
@@ -265,12 +283,19 @@ const styles = StyleSheet.create({
     color: "#2479CF",
   },
 
+  footer: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderColor: "#eee",
+  },
+
   continueButton: {
     backgroundColor: "#2479CF",
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 10,
   },
 
   continueButtonDisabled: {
