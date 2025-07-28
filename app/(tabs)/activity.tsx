@@ -1,106 +1,18 @@
 import React from "react";
-import { StyleSheet, Text, View, useColorScheme } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import BaseLayout from "../../components/BaseLayout";
 
 const ActivityTab = () => {
-  const colorScheme = useColorScheme();
   return (
-    <BaseLayout edges={["left", "right"]}>
+    <BaseLayout edges={["left", "right", "top"]}>
       <Text
         style={[
           styles.title,
-          { color: colorScheme === "dark" ? "#fff" : "#000" },
+          { color: "#fff" },
         ]}
       >
-        Explore
+        Activity
       </Text>
-
-      <View
-        style={[
-          styles.searchContainer,
-          {
-            backgroundColor: colorScheme === "dark" ? "#1C1C1E" : "#F2F2F7",
-            borderColor: colorScheme === "dark" ? "#333" : "#E5E5EA",
-          },
-        ]}
-      ></View>
-
-      <View style={styles.categoryContainer}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            { color: colorScheme === "dark" ? "#fff" : "#000" },
-          ]}
-        >
-          Categories
-        </Text>
-
-        <View style={styles.categoryGrid}>
-          {["Travel", "Food", "Tech", "Sports", "Music", "Art"].map(
-            (category) => (
-              <View
-                key={category}
-                style={[
-                  styles.categoryCard,
-                  {
-                    backgroundColor:
-                      colorScheme === "dark" ? "#1C1C1E" : "#F2F2F7",
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.categoryText,
-                    { color: colorScheme === "dark" ? "#fff" : "#000" },
-                  ]}
-                >
-                  {category}
-                </Text>
-              </View>
-            )
-          )}
-        </View>
-      </View>
-
-      <View style={styles.trendsContainer}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            { color: colorScheme === "dark" ? "#fff" : "#000" },
-          ]}
-        >
-          Trending
-        </Text>
-
-        {[1, 2, 3].map((item) => (
-          <View
-            key={item}
-            style={[
-              styles.trendCard,
-              {
-                backgroundColor: colorScheme === "dark" ? "#1C1C1E" : "#F2F2F7",
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.trendTitle,
-                { color: colorScheme === "dark" ? "#fff" : "#000" },
-              ]}
-            >
-              Trending Item {item}
-            </Text>
-            <Text
-              style={[
-                styles.trendDescription,
-                { color: colorScheme === "dark" ? "#8E8E93" : "#8E8E93" },
-              ]}
-            >
-              This is a trending item that you might be interested in exploring.
-            </Text>
-          </View>
-        ))}
-      </View>
     </BaseLayout>
   );
 };

@@ -2,7 +2,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 import { SvgProps } from "react-native-svg";
@@ -26,14 +25,13 @@ const IconMapping: Record<string, React.FC<SvgProps>> = {
 };
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ icon, title, onPress }) => {
-  const colorScheme = useColorScheme();
   const IconImage = IconMapping[icon];
 
   return (
     <TouchableOpacity
       style={[
         styles.serviceCard,
-        { backgroundColor: colorScheme === "light" ? "#1C1C1E" : "#FFFFFF" },
+        { backgroundColor:"#FFFFFF" },
       ]}
       onPress={onPress}
       activeOpacity={0.7}

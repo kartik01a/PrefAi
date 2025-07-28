@@ -66,7 +66,7 @@ const HomeTab: React.FC = () => {
       <View
         style={[
           styles.premiumCard,
-          { backgroundColor: colorScheme === "dark" ? "#1C1C1E" : "#FFFFFF" },
+          { backgroundColor: "#FFFFFF" },
         ]}
       >
         <View style={styles.star}>
@@ -99,7 +99,7 @@ const HomeTab: React.FC = () => {
         <Text
           style={[
             styles.sectionTitle,
-            { color: colorScheme === "dark" ? "#FFFFFF" : "#FFFFFF" },
+            { color: "#FFFFFF" },
           ]}
         >
           Our Services
@@ -211,7 +211,6 @@ const styles = StyleSheet.create({
   },
   premiumTitle: {
     fontSize: 20,
-    lineHeight: 16,
     fontFamily: "Poppins-SemiBold",
     color: "#2479CF",
   },

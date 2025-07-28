@@ -211,9 +211,9 @@ const styles = StyleSheet.create({
 
   textInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 11,
     fontFamily: "Poppins-Regular",
-    color: "#000",
+    color: "#2479CF",
     paddingVertical: 8,
     paddingHorizontal: 8,
     maxHeight: 120,
