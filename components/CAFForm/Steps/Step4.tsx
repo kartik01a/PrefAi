@@ -2,11 +2,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import {
-    Platform,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { ContactInformation } from "../formData";
@@ -34,7 +34,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
 
   return (
     <View style={{ gap: 16 }}>
-      {/* Full Address */}
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>Full Address</Text>
         <TextInput
@@ -44,8 +43,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
           onChangeText={(text) => setContactInfo({ fullAddress: text })}
         />
       </View>
-
-      {/* City & Post Code */}
       <View style={styles.row}>
         <View style={styles.inputHalf}>
           <Text style={styles.label}>City</Text>
@@ -66,8 +63,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
           />
         </View>
       </View>
-
-      {/* Phone & Email */}
       <View style={styles.row}>
         <View style={styles.inputHalf}>
           <Text style={styles.label}>Phone</Text>
@@ -90,8 +85,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
           />
         </View>
       </View>
-
-      {/* Since when do you live at this address? */}
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>Since when do you live at this address?</Text>
         <TouchableOpacity
@@ -130,8 +123,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
           />
         )}
       </View>
-
-      {/* Do you live as a couple? */}
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>Do you live as a couple?</Text>
         <View style={styles.row}>
@@ -155,8 +146,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Children Count */}
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>How many children do you have?</Text>
         <TextInput
@@ -167,8 +156,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
           onChangeText={(text) => setContactInfo({ numberOfChildren: text })}
         />
       </View>
-
-      {/* Household Size */}
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>Number of people in the household</Text>
         <TextInput
@@ -179,8 +166,6 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
           onChangeText={(text) => setContactInfo({ householdSize: text })}
         />
       </View>
-
-      {/* Partner Abroad: Country and Date */}
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>
           If partner lives abroad: Country and Since when?

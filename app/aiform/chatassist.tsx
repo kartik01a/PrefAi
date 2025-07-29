@@ -24,12 +24,18 @@ const ChatAssist: React.FC = () => {
   }, [navigation]);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardHeight(0);
-    });
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
 
     return () => {
       keyboardDidShowListener?.remove();
@@ -53,7 +59,8 @@ const ChatAssist: React.FC = () => {
   const services1 = [
     {
       icon: "home-document",
-      title: "Demande d'ouverture des droits à l'assurance maladie (Cerfa S1106)",
+      title:
+        "Demande d'ouverture des droits à l'assurance maladie (Cerfa S1106)",
     },
     {
       icon: "home-document",
@@ -62,7 +69,9 @@ const ChatAssist: React.FC = () => {
   ];
 
   function serviceMethod(index: number): void {
-    if ([0, 1, 2, 3, 4].includes(index)) {
+    if (index === 1) {
+      router.push("/aiform/apl-form");
+    } else if ([0, 2, 3, 4].includes(index)) {
       router.push("/aiform/caf-declaration-form");
     }
   }
@@ -72,7 +81,8 @@ const ChatAssist: React.FC = () => {
       style={[
         styles.container,
         {
-          paddingTop: Platform.OS === "android" ? StatusBar.currentHeight ?? 0 : 20,
+          paddingTop:
+            Platform.OS === "android" ? StatusBar.currentHeight ?? 0 : 20,
         },
       ]}
     >
@@ -156,7 +166,11 @@ const ChatAssist: React.FC = () => {
           />
 
           <TouchableOpacity style={styles.iconButton}>
-            <MaterialCommunityIcons name="microphone" size={22} color="#2479CF" />
+            <MaterialCommunityIcons
+              name="microphone"
+              size={22}
+              color="#2479CF"
+            />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton}>
             <MaterialCommunityIcons name="send" size={22} color="#2479CF" />

@@ -1,11 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { MsaRegistration } from "../formData";
 import { styles } from "./stepStyles";
@@ -15,13 +10,13 @@ interface Step3Props {
   setMsaRegistration: (data: Partial<MsaRegistration>) => void;
 }
 
-
 export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
   return (
     <View style={{ gap: 16 }}>
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>
-          Have you or your spouse been previously registered in CAF/MSA in the last 2 years?
+          Have you or your spouse been previously registered in CAF/MSA in the
+          last 2 years?
         </Text>
         <View style={styles.row}>
           <TouchableOpacity
@@ -44,7 +39,9 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
                 borderWidth: 1,
               },
             ]}
-            onPress={() => setMsaRegistration({ isPreviouslyRegistered: false })}
+            onPress={() =>
+              setMsaRegistration({ isPreviouslyRegistered: false })
+            }
           >
             <Text style={styles.input}>No</Text>
           </TouchableOpacity>
@@ -98,9 +95,12 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
           placeholder="Enter number"
           placeholderTextColor="#A0A0A0"
           value={msaRegistration.beneficiaryNumber}
-          onChangeText={(text) =>
-            setMsaRegistration({ beneficiaryNumber: text })
-          }
+          onChangeText={(text) => {
+            const numericText = text.replace(/[^0-9]/g, ""); 
+            setMsaRegistration({ beneficiaryNumber: numericText });
+          }}
+          keyboardType="numeric" 
+          maxLength={15} 
         />
       </View>
     </View>

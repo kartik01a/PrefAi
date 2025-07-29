@@ -203,7 +203,13 @@ const CEFDeclarationForm = () => {
             <View style={styles.container}>
               <View style={styles.header}>
                 <TouchableOpacity
-                  onPress={() => router.back()}
+                  onPress={() => {
+                    if (activeStep > 1) {
+                      setActiveStep((prev) => prev - 1);
+                    } else {
+                      router.back();
+                    }
+                  }}
                   accessibilityLabel="Go back"
                   accessibilityRole="button"
                 >

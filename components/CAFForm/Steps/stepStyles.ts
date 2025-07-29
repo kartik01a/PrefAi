@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     height: 48,
     fontSize: 14,
-    fontFamily: "Poppins-SemiBold",
+    fontFamily: "Poppins-regular",
     color: "#2479CF",
     backgroundColor: "#F2F2F2",
   },
