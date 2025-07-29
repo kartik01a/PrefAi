@@ -207,7 +207,7 @@ const CEFDeclarationForm = () => {
                   />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>
-                  Formulaire de demande d’aide financière
+                  Financial Aid Application Form
                 </Text>
               </View>
 

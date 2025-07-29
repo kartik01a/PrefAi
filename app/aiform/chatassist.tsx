@@ -50,22 +50,10 @@ const ChatAssist: React.FC = () => {
     },
     {
       icon: "home-document",
-      title: "Demande d'Aide au Logement (APL)",
+      title: "Application for Housing Assistance  (APL)",
     },
-    { icon: "home-document", title: "Formulaire de demande d'aide financière" },
-    { icon: "home-document", title: "Prêt équipement" },
-  ];
-
-  const services1 = [
-    {
-      icon: "home-document",
-      title:
-        "Demande d'ouverture des droits à l'assurance maladie (Cerfa S1106)",
-    },
-    {
-      icon: "home-document",
-      title: "Demande de rattachement enfant–parents (Cerfa S3705)",
-    },
+    { icon: "home-document", title: "Financial Aid Application Form" },
+    { icon: "home-document", title: "Equipment loan" },
   ];
 
   function serviceMethod(index: number): void {
@@ -127,7 +115,7 @@ const ChatAssist: React.FC = () => {
           </View>
         </View>
 
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Other Forms</Text>
           <View style={styles.servicesGrid}>
             {services1.map((service, index) => (
@@ -139,7 +127,7 @@ const ChatAssist: React.FC = () => {
               />
             ))}
           </View>
-        </View>
+        </View> */}
       </ScrollView>
 
       {/* Fixed Chat Input Area */}
