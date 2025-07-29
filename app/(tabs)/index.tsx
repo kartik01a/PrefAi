@@ -43,9 +43,19 @@ const HomeTab: React.FC = () => {
     "Appointment Guide - Préfecture (Paris 13)",
   ];
 
+  const routes = {
+    0: "/chat",
+    1: "/aiform/chatassist",
+    3: "/document",
+  } as const;
+
+  type RouteKey = keyof typeof routes;
+
   function cardPress(key: number): void {
-    if (key === 0) {
-      router.push("/aiform/chatassist");
+    if (key in routes) {
+      router.push(routes[key as RouteKey]);
+    } else {
+      router.push("/");
     }
   }
 
@@ -63,12 +73,7 @@ const HomeTab: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <View
-        style={[
-          styles.premiumCard,
-          { backgroundColor: "#FFFFFF" },
-        ]}
-      >
+      <View style={[styles.premiumCard, { backgroundColor: "#FFFFFF" }]}>
         <View style={styles.star}>
           <HomeStar />
         </View>
@@ -96,12 +101,7 @@ const HomeTab: React.FC = () => {
       </View>
 
       <View style={styles.section}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            { color: "#FFFFFF" },
-          ]}
-        >
+        <Text style={[styles.sectionTitle, { color: "#FFFFFF" }]}>
           Our Services
         </Text>
         <View style={styles.servicesGrid}>
