@@ -101,7 +101,7 @@ const GeneralScreen = () => {
             value={language}
             onValueChange={setLanguage}
             items={[
-              { label: "English (GB)", value: "en" },
+              { label: "English", value: "en" },
               { label: "French", value: "fr" },
               { label: "Georgian", value: "ge" },
               { label: "Arabic", value: "ar" },
@@ -117,7 +117,7 @@ const GeneralScreen = () => {
             <OptionCard
               label={`Language Selection - ${
                 {
-                  en: "English (GB)",
+                  en: "English",
                   fr: "French",
                   ge: "Georgian",
                   ar: "Arabic",
@@ -192,7 +192,7 @@ const GeneralScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: 50 },
+  container: { flex: 1, marginTop: 20 },
   header: {
     flexDirection: "column",
     alignItems: "flex-start",

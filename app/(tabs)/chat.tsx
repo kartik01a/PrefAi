@@ -1,15 +1,37 @@
 import ChatBar from "@/components/Chat/Chatbar";
+import ChatCover from "@/components/Chat/ChatCover";
 import ChatHeader from "@/components/Chat/ChatHeader";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { ScrollView, StyleSheet, useColorScheme, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+export interface ChatType {
+  message: string;
+  time: string;
+  messageBy?: number;
+}
 
 const ChatTab = () => {
   const colorScheme = useColorScheme();
+  const [chat, setChat] = useState<ChatType[]>([]);
+
+  const addChat = (newChat: ChatType) => {
+    let prevChat = [...chat];
+    prevChat.push(newChat);
+    setChat(prevChat);
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <LinearGradient
         colors={["#0072BB", "#4fa4f3ff"]}
@@ -18,17 +40,51 @@ const ChatTab = () => {
         style={[styles.gradient]}
       >
         <View style={styles.outerView}>
-          <ChatHeader showDate={false} />
-
-          <ScrollView
-            style={styles.scrollArea}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          ></ScrollView>
+          <ChatHeader showDate={chat.length !== 0} />
+          {chat.length === 0 ? (
+            <ChatCover />
+          ) : (
+            <ScrollView
+              style={styles.scrollArea}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {chat.map((item, index) => {
+                return (
+                  <View
+                    key={index}
+                    style={[
+                      styles.outerContainer,
+                      {
+                        alignItems:
+                          item?.messageBy === 1 ? "flex-end" : "flex-start",
+                      },
+                    ]}
+                  >
+                    <View style={styles.timeRow}>
+                      <Text style={styles.timeText}>{item.time}</Text>
+                      {item?.messageBy === 1 && (
+                        <Text style={styles.timeText}>You</Text>
+                      )}
+                      <Image
+                        source={{
+                          uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+                        }}
+                        style={styles.avatar}
+                      />
+                    </View>
+                    <View style={styles.singleChatContainer}>
+                      <Text style={styles.singleChat}>{item.message}</Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          )}
 
           <View style={styles.chatAssistant}>
-            <ChatBar />
+            <ChatBar addChat={addChat} />
           </View>
         </View>
       </LinearGradient>
@@ -42,6 +98,7 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
+    paddingTop: 30,
   },
   outerView: {
     flex: 1,
@@ -50,7 +107,7 @@ const styles = StyleSheet.create({
   },
   scrollArea: {
     flex: 1,
-    marginBottom: 10,
+    marginBottom: 60,
   },
   scrollContent: {
     paddingVertical: 10,
@@ -62,6 +119,39 @@ const styles = StyleSheet.create({
     right: 0,
     left: 0,
     paddingHorizontal: 20,
+  },
+  outerContainer: {
+    flexDirection: "column",
+    gap: 8,
+  },
+  timeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  avatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 25,
+  },
+  singleChatContainer: {
+    maxWidth: "75%",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    padding: 6,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  timeText: {
+    fontSize: 8,
+    fontFamily: "Poppins-Medium",
+    fontWeight: 500,
+    color: "white",
+  },
+  singleChat: {
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    fontWeight: 400,
+    color: "white",
   },
 });
 

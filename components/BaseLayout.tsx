@@ -18,32 +18,42 @@ export default function BaseLayout({
   safeAreaStyle,
 }: BaseLayoutProps) {
   const colorScheme = useColorScheme();
+
   return (
-    <SafeAreaView style={[styles.safeArea, safeAreaStyle]} edges={edges}>
+    <LinearGradient
+      colors={["#0072BB", "#4fa4f3ff"]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={styles.container}
+    >
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
-        style={styles.scrollView}
-      >
-        <LinearGradient
-          colors={["#0072BB", "#4fa4f3ff"]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={[styles.gradient, style]}
+      <SafeAreaView style={[styles.safeArea, safeAreaStyle]} edges={edges}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            {
+              flexGrow: 1,
+            },
+            style,
+          ]}
+          style={styles.scrollView}
         >
           {children}
-        </LinearGradient>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
   },
-  gradient: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
+  content: {
     flex: 1,
   },
   scrollView: {

@@ -1,7 +1,7 @@
 // app/freeplan.tsx
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation, useRouter } from "expo-router";
+import { useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
 import {
   Image,
@@ -16,7 +16,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 const FreePlan = () => {
   const navigation = useNavigation();
-  const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState(0);
 
   const getIncludedItems = () => {
@@ -110,16 +109,16 @@ const FreePlan = () => {
     { title: "Monthly Plan - Full Access", price: "€4.99 / month" },
     { title: "Yearly Plan - Best Value", price: "€59.99 / year" },
   ];
-  
+
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, []);
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
-          <ScrollView 
+      <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
+        <SafeAreaView style={styles.safeArea} edges={["top"]}>
+          <ScrollView
             contentContainerStyle={styles.scrollContainer}
             showsVerticalScrollIndicator={false}
           >
@@ -185,7 +184,8 @@ const FreePlan = () => {
                 <Text
                   style={[
                     styles.includedText,
-                    item.text === "Save 14% over monthly" && styles.semiBoldText,
+                    item.text === "Save 14% over monthly" &&
+                      styles.semiBoldText,
                   ]}
                 >
                   {item.text}
@@ -204,8 +204,8 @@ const FreePlan = () => {
               <Text style={styles.selectButtonText}>Select Plan</Text>
             </TouchableOpacity>
           </ScrollView>
-        </LinearGradient>
-      </SafeAreaView>
+        </SafeAreaView>
+      </LinearGradient>
     </SafeAreaProvider>
   );
 };

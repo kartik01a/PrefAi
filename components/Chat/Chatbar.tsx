@@ -1,3 +1,4 @@
+import { ChatType } from "@/app/(tabs)/chat";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
@@ -9,9 +10,37 @@ import {
   View,
 } from "react-native";
 
-const ChatBar: React.FC = () => {
+interface IProps {
+  addChat: (chat: ChatType) => void;
+}
+
+function getCurrentTime(): string {
+  const now = new Date();
+
+  let hours = now.getHours();
+  const minutes = now.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+
+  return `${hours}.${formattedMinutes} ${ampm}`;
+}
+
+const ChatBar = ({ addChat }: IProps) => {
   const navigation = useNavigation();
+  const [message, setMessage] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  const handleAddChat = () => {
+    const time = getCurrentTime();
+    if (message && time) {
+      addChat({ message, time, messageBy: 1 });
+      setMessage("");
+    }
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -54,6 +83,8 @@ const ChatBar: React.FC = () => {
 
         <TextInput
           style={styles.textInput}
+          value={message}
+          onChangeText={(text) => setMessage(text)}
           placeholder="Ask me all about immigration topic"
           placeholderTextColor="#888"
           multiline
@@ -63,7 +94,7 @@ const ChatBar: React.FC = () => {
         <TouchableOpacity style={styles.iconButton}>
           <MaterialCommunityIcons name="microphone" size={22} color="#2479CF" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity onPress={handleAddChat} style={styles.iconButton}>
           <MaterialCommunityIcons name="send" size={22} color="#2479CF" />
         </TouchableOpacity>
       </View>
@@ -95,7 +126,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 25,
     paddingHorizontal: 12,
-    backgroundColor: "#F1F1F1",
     paddingVertical: 10,
     minHeight: 44,
   },

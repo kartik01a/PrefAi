@@ -44,7 +44,7 @@ const EditProfileScreen = () => {
       <View style={styles.container}>
         {/* Profile Header */}
         <View style={styles.header}>
-             <TouchableOpacity
+          <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backButton}
           >
@@ -88,7 +88,11 @@ const EditProfileScreen = () => {
                 useNativeAndroidPickerStyle={false}
                 placeholder={{ label: "Select title", value: null }}
                 Icon={() => (
-                  <Ionicons name="caret-down-outline" size={20} color="#A0A0A0" />
+                  <Ionicons
+                    name="caret-down-outline"
+                    size={20}
+                    color="#A0A0A0"
+                  />
                 )}
               />
             </View>
@@ -177,8 +181,12 @@ const EditProfileScreen = () => {
                 style={pickerSelectStyles}
                 useNativeAndroidPickerStyle={false}
                 placeholder={{ label: "Select country", value: null }}
-                 Icon={() => (
-                  <Ionicons name="caret-down-outline" size={20} color="#A0A0A0" />
+                Icon={() => (
+                  <Ionicons
+                    name="caret-down-outline"
+                    size={20}
+                    color="#A0A0A0"
+                  />
                 )}
               />
             </View>
@@ -198,9 +206,9 @@ const EditProfileScreen = () => {
             style={pickerSelectStyles}
             useNativeAndroidPickerStyle={false}
             placeholder={{ label: "Select your email", value: null }}
-             Icon={() => (
-                  <Ionicons name="caret-down-outline" size={20} color="#A0A0A0" />
-                )}
+            Icon={() => (
+              <Ionicons name="caret-down-outline" size={20} color="#A0A0A0" />
+            )}
           />
 
           <Text style={styles.label}>Marital Status</Text>
@@ -214,9 +222,9 @@ const EditProfileScreen = () => {
             style={pickerSelectStyles}
             useNativeAndroidPickerStyle={false}
             placeholder={{ label: "Select marital status", value: null }}
-             Icon={() => (
-                  <Ionicons name="caret-down-outline" size={20} color="#A0A0A0" />
-                )}
+            Icon={() => (
+              <Ionicons name="caret-down-outline" size={20} color="#A0A0A0" />
+            )}
           />
 
           {/* Social Security Number */}
@@ -273,14 +281,14 @@ const EditProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
-      backButton: {
+  backButton: {
     marginRight: 16,
   },
   container: {
     flex: 1,
   },
   header: {
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 16,
     paddingHorizontal: 24,
   },
