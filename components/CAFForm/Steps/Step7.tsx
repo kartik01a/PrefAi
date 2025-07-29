@@ -2,11 +2,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import {
-    Platform,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Declaration } from "../formData";
 import { styles } from "./stepStyles";
@@ -41,29 +41,45 @@ export const Step7 = ({ declaration, setDeclaration }: Step7Props) => {
 
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>Date of Signature</Text>
-        <TouchableOpacity
-          style={styles.datePickerTouchable}
-          onPress={() => setShowDatePicker(true)}
-        >
-          <Text style={styles.datePickerText}>
-            {declaration.dateOfSignature || "Select Date"}
-          </Text>
-          <MaterialCommunityIcons
-            name="calendar-month-outline"
-            size={20}
-            color="#555"
-          />
+        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+          <View style={styles.inputWithIcon}>
+            <TextInput
+              style={[styles.input, { paddingRight: 35 }]}
+              editable={false}
+              value={
+                declaration.dateOfSignature
+                  ? new Date(declaration.dateOfSignature).toLocaleDateString()
+                  : ""
+              }
+              placeholder="DD/MM/YYYY"
+              placeholderTextColor="#A0A0A0"
+            />
+            <MaterialCommunityIcons
+              name="calendar-month-outline"
+              size={20}
+              color="#555"
+              style={styles.icon}
+            />
+          </View>
         </TouchableOpacity>
+
         {showDatePicker && (
           <DateTimePicker
-            mode="date"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
             value={
               declaration.dateOfSignature
                 ? new Date(declaration.dateOfSignature)
                 : new Date()
             }
-            onChange={handleDateChange}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                setDeclaration({
+                  dateOfSignature: selectedDate.toISOString(),
+                });
+              }
+            }}
           />
         )}
       </View>
@@ -95,7 +111,9 @@ export const Step7 = ({ declaration, setDeclaration }: Step7Props) => {
       <TouchableOpacity
         style={styles.checkboxCustom}
         onPress={() =>
-          setDeclaration({ declarationAccepted: !declaration.declarationAccepted })
+          setDeclaration({
+            declarationAccepted: !declaration.declarationAccepted,
+          })
         }
       >
         <MaterialCommunityIcons

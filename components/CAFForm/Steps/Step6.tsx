@@ -2,10 +2,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import {
-    Platform,
-    Text,
-    TouchableOpacity,
-    View,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { EmploymentSituation } from "../formData";
@@ -45,10 +46,16 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
             { label: "Apprentice", value: "Apprentice" },
             { label: "Self-employed", value: "Self-employed" },
             { label: "Student", value: "Student" },
-            { label: "Unemployed (receiving aid?)", value: "Unemployed (receiving aid?)" },
+            {
+              label: "Unemployed (receiving aid?)",
+              value: "Unemployed (receiving aid?)",
+            },
             { label: "Retired", value: "Retired" },
             { label: "On sick leave", value: "On sick leave" },
-            { label: "On parental/maternity leave", value: "On parental/maternity leave" },
+            {
+              label: "On parental/maternity leave",
+              value: "On parental/maternity leave",
+            },
             { label: "Other", value: "Other" },
           ]}
           useNativeAndroidPickerStyle={false}
@@ -97,8 +104,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
         />
       </View>
 
-      {/* Start Date & End Date */}
-      <View style={styles.row}>
+      {/* <View style={styles.row}>
         <View style={styles.inputHalf}>
           <Text style={styles.label}>Start Date</Text>
           <TouchableOpacity
@@ -160,13 +166,96 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
             />
           )}
         </View>
+      </View> */}
+
+      <View style={styles.row}>
+        <View style={styles.inputHalf}>
+          <Text style={styles.label}>Start Date</Text>
+          <TouchableOpacity onPress={() => setShowStartPicker(true)}>
+            <View style={styles.inputWithIcon}>
+              <TextInput
+                style={[styles.input, { paddingRight: 35 }]}
+                editable={false}
+                value={
+                  employment.startDate
+                    ? new Date(employment.startDate).toLocaleDateString()
+                    : ""
+                }
+                placeholder="DD/MM/YYYY"
+                placeholderTextColor="#A0A0A0"
+              />
+              <MaterialCommunityIcons
+                name="calendar-month-outline"
+                size={20}
+                color="#555"
+                style={styles.icon}
+              />
+            </View>
+          </TouchableOpacity>
+          {showStartPicker && (
+            <DateTimePicker
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              value={
+                employment.startDate
+                  ? new Date(employment.startDate)
+                  : new Date()
+              }
+              onChange={(e, date) => {
+                setShowStartPicker(Platform.OS === "ios");
+                handleDateChange("startDate", e, date);
+              }}
+            />
+          )}
+        </View>
+
+        {/* End Date */}
+        <View style={styles.inputHalf}>
+          <Text style={styles.label}>End Date (if fixed)</Text>
+          <TouchableOpacity onPress={() => setShowEndPicker(true)}>
+            <View style={styles.inputWithIcon}>
+              <TextInput
+                style={[styles.input, { paddingRight: 35 }]}
+                editable={false}
+                value={
+                  employment.endDate
+                    ? new Date(employment.endDate).toLocaleDateString()
+                    : ""
+                }
+                placeholder="DD/MM/YYYY"
+                placeholderTextColor="#A0A0A0"
+              />
+              <MaterialCommunityIcons
+                name="calendar-month-outline"
+                size={20}
+                color="#555"
+                style={styles.icon}
+              />
+            </View>
+          </TouchableOpacity>
+          {showEndPicker && (
+            <DateTimePicker
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              value={
+                employment.endDate ? new Date(employment.endDate) : new Date()
+              }
+              onChange={(e, date) => {
+                setShowEndPicker(Platform.OS === "ios");
+                handleDateChange("endDate", e, date);
+              }}
+            />
+          )}
+        </View>
       </View>
 
       {/* Social Contribution */}
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>Social Contribution</Text>
         <RNPickerSelect
-          onValueChange={(value) => setEmployment({ socialContribution: value })}
+          onValueChange={(value) =>
+            setEmployment({ socialContribution: value })
+          }
           value={employment.socialContribution}
           placeholder={{ label: "Select option", value: "" }}
           items={[

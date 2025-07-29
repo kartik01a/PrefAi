@@ -18,35 +18,80 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
           Have you or your spouse been previously registered in CAF/MSA in the
           last 2 years?
         </Text>
+
         <View style={styles.row}>
           <TouchableOpacity
             style={[
               styles.inputHalf,
-              msaRegistration.isPreviouslyRegistered === true && {
-                borderColor: "#2479CF",
+              {
+                backgroundColor:
+                  msaRegistration.isPreviouslyRegistered === true
+                    ? "#E6F0FC"
+                    : "#fff",
+                borderColor:
+                  msaRegistration.isPreviouslyRegistered === true
+                    ? "#2479CF"
+                    : "#ccc",
                 borderWidth: 1,
+                borderRadius: 8,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingVertical: 12,
               },
             ]}
             onPress={() => setMsaRegistration({ isPreviouslyRegistered: true })}
           >
-            <Text style={styles.input}>Yes</Text>
+            <Text
+              style={{
+                color:
+                  msaRegistration.isPreviouslyRegistered === true
+                    ? "#2479CF"
+                    : "#333",
+                fontWeight: "500",
+              }}
+            >
+              Yes
+            </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={[
               styles.inputHalf,
-              msaRegistration.isPreviouslyRegistered === false && {
-                borderColor: "#2479CF",
+              {
+                backgroundColor:
+                  msaRegistration.isPreviouslyRegistered === false
+                    ? "#E6F0FC"
+                    : "#fff",
+                borderColor:
+                  msaRegistration.isPreviouslyRegistered === false
+                    ? "#2479CF"
+                    : "#ccc",
                 borderWidth: 1,
+                borderRadius: 8,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingVertical: 12,
               },
             ]}
             onPress={() =>
               setMsaRegistration({ isPreviouslyRegistered: false })
             }
           >
-            <Text style={styles.input}>No</Text>
+            <Text
+              style={{
+                color:
+                  msaRegistration.isPreviouslyRegistered === false
+                    ? "#2479CF"
+                    : "#333",
+                fontWeight: "500",
+              }}
+            >
+              No
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
+
       <View style={styles.inputContainerFull}>
         <Text style={styles.label}>Name of the organization</Text>
         <TextInput
@@ -96,11 +141,11 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
           placeholderTextColor="#A0A0A0"
           value={msaRegistration.beneficiaryNumber}
           onChangeText={(text) => {
-            const numericText = text.replace(/[^0-9]/g, ""); 
+            const numericText = text.replace(/[^0-9]/g, "");
             setMsaRegistration({ beneficiaryNumber: numericText });
           }}
-          keyboardType="numeric" 
-          maxLength={15} 
+          keyboardType="numeric"
+          maxLength={15}
         />
       </View>
     </View>

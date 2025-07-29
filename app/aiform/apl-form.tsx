@@ -207,7 +207,7 @@ const CEFDeclarationForm = () => {
                   />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>
-                  Financial Aid Application Form
+                  Demande d’Aide au Logement (APL)
                 </Text>
               </View>
 
