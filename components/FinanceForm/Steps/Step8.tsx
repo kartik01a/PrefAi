@@ -10,7 +10,13 @@ import {
 } from "react-native";
 import { styles } from "./stepStyles";
 
-export const Step8 = () => {
+export const Step8 = ({
+  exportToPDF,
+  downloadPDF,
+}: {
+  exportToPDF: (formData: any) => Promise<void>;
+  downloadPDF: (formData: any) => Promise<void>;
+}) => {
     function handleNewForm(event: GestureResponderEvent): void {
         router.push('/');
     }
@@ -36,11 +42,11 @@ export const Step8 = () => {
         <Text style={styles.bulletItem}>✔️ Ready to send or print.</Text>
       </View>
 
-      <TouchableOpacity style={styles.actionButton}>
+      <TouchableOpacity onPress={downloadPDF} style={styles.actionButton}>
         <Text style={styles.actionButtonText}>Download PDF</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionButton}>
+      <TouchableOpacity onPress={exportToPDF} style={styles.actionButton}>
         <Text style={styles.actionButtonText}>Share PDF</Text>
       </TouchableOpacity>
 

@@ -10,10 +10,13 @@ import { Step4 } from "@/components/FinanceForm/Steps/Step4";
 import { Step5 } from "@/components/FinanceForm/Steps/Step5";
 import { Step7 } from "@/components/FinanceForm/Steps/Step7";
 import { Step8 } from "@/components/FinanceForm/Steps/Step8";
+import { saveToDownloads } from "@/components/PDF/DownloadPdf";
+import { handleFormToPDF } from "@/components/PDF/ExportPdf";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -34,6 +37,24 @@ const FinanceForm = () => {
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, []);
+
+  const exportToPDF = async () => {
+    try {
+      await handleFormToPDF(formData);
+      Alert.alert("Success", "PDF generated successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to generate PDF. Please try again.");
+    }
+  };
+  const downloadPDF = async () => {
+    console.log(formData, "formData");
+    try {
+      await saveToDownloads(formData);
+      Alert.alert("Success", "PDF downloaded successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to download PDF. Please try again.");
+    }
+  };
 
   const handleContinue = () => {
     if (activeStep < steps.length) {
@@ -133,7 +154,7 @@ const FinanceForm = () => {
       );
     }
     if (activeStep === 7) {
-      return <Step8 />;
+      return <Step8 exportToPDF={exportToPDF} downloadPDF={downloadPDF} />;
     }
 
     return <Text>{`Step ${activeStep} form goes here.`}</Text>;

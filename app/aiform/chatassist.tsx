@@ -63,6 +63,8 @@ const ChatAssist: React.FC = () => {
       router.push("/aiform/apl-form");
     } else if (index === 2) {
       router.push("/aiform/finance-form");
+    } else if (index === 3) {
+      router.push("/aiform/equipment-form");
     } else if ([0, 2, 3, 4].includes(index)) {
       router.push("/aiform/caf-declaration-form");
     }
