@@ -8,10 +8,13 @@ import { Step6 } from "@/components/APLForm/Steps/Step6";
 import { Step7 } from "@/components/APLForm/Steps/Step7";
 import { Step8 } from "@/components/APLForm/Steps/Step8";
 import BaseLayout from "@/components/BaseLayout";
+import { saveToDownloads } from "@/components/PDF/DownloadPdf";
+import { handleFormToPDF } from "@/components/PDF/ExportPdf";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -38,6 +41,24 @@ const CEFDeclarationForm = () => {
       setActiveStep(activeStep + 1);
     } else {
       console.log("Submitting form data:", formData);
+    }
+  };
+
+  const exportToPDF = async () => {
+    try {
+      await handleFormToPDF(formData);
+      Alert.alert("Success", "PDF generated successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to generate PDF. Please try again.");
+    }
+  };
+  const downloadPDF = async () => {
+    console.log(formData, "formData");
+    try {
+      await saveToDownloads(formData);
+      Alert.alert("Success", "PDF downloaded successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to download PDF. Please try again.");
     }
   };
 
@@ -146,7 +167,7 @@ const CEFDeclarationForm = () => {
       );
     }
     if (activeStep === 8) {
-      return <Step8 />;
+      return <Step8 exportToPDF={exportToPDF} downloadPDF={downloadPDF} />;
     }
 
     return <Text>{`Step ${activeStep} form goes here.`}</Text>;

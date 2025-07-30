@@ -34,7 +34,14 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow access to save PDFs to your device",
+          "savePhotosPermission": "Allow access to save PDFs to your device"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

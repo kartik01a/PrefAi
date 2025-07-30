@@ -2,18 +2,24 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import {
-    GestureResponderEvent,
-    Image,
-    Text,
-    TouchableOpacity,
-    View,
+  GestureResponderEvent,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { styles } from "./stepStyles";
 
-export const Step8 = () => {
-    function handleNewForm(event: GestureResponderEvent): void {
-        router.push('/');
-    }
+export const Step8 = ({
+  exportToPDF,
+  downloadPDF,
+}: {
+  exportToPDF: (formData: any) => Promise<void>;
+  downloadPDF: (formData: any) => Promise<void>;
+}) => {
+  function handleNewForm(event: GestureResponderEvent): void {
+    router.push("/");
+  }
 
   return (
     <View style={[styles.centeredContainer, { gap: 20 }]}>
@@ -31,16 +37,18 @@ export const Step8 = () => {
       </TouchableOpacity>
 
       <View style={styles.bulletList}>
-        <Text style={styles.bulletItem}>✔️ All required fields have been filled.</Text>
+        <Text style={styles.bulletItem}>
+          ✔️ All required fields have been filled.
+        </Text>
         <Text style={styles.bulletItem}>✔️ Signature section is included.</Text>
         <Text style={styles.bulletItem}>✔️ Ready to send or print.</Text>
       </View>
 
-      <TouchableOpacity style={styles.actionButton}>
+      <TouchableOpacity onPress={downloadPDF} style={styles.actionButton}>
         <Text style={styles.actionButtonText}>Download PDF</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionButton}>
+      <TouchableOpacity onPress={exportToPDF} style={styles.actionButton}>
         <Text style={styles.actionButtonText}>Share PDF</Text>
       </TouchableOpacity>
 
@@ -48,8 +56,10 @@ export const Step8 = () => {
         <Text style={styles.actionButtonText}>Save to My Document Vault</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionButtonSecondary}
-      onPress={handleNewForm}>
+      <TouchableOpacity
+        style={styles.actionButtonSecondary}
+        onPress={handleNewForm}
+      >
         <Text style={styles.actionButtonSecondaryText}>Start New Form</Text>
       </TouchableOpacity>
     </View>
