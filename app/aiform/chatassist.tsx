@@ -61,7 +61,7 @@ const ChatAssist: React.FC = () => {
       router.push("/aiform/caf-declaration-form");
     } else if (index === 1) {
       router.push("/aiform/apl-form");
-    }else if(index === 2) {
+    } else if (index === 2) {
       router.push("/aiform/finance-form");
     } else if ([0, 2, 3, 4].includes(index)) {
       router.push("/aiform/caf-declaration-form");
@@ -74,7 +74,7 @@ const ChatAssist: React.FC = () => {
         styles.container,
         {
           paddingTop:
-            Platform.OS === "android" ? StatusBar.currentHeight ?? 0 : 20,
+            Platform.OS === "android" ? StatusBar.currentHeight ?? 0 : 60,
         },
       ]}
     >

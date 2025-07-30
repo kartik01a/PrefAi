@@ -1,7 +1,7 @@
 import BaseLayout from "@/components/BaseLayout";
 import {
-    getInitialFormData,
-    isStepValid,
+  getInitialFormData,
+  isStepValid,
 } from "@/components/FinanceForm/formData";
 import { Step1 } from "@/components/FinanceForm/Steps/Step1";
 import { Step2 } from "@/components/FinanceForm/Steps/Step2";
@@ -14,13 +14,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const FinanceForm = () => {
@@ -278,7 +278,7 @@ const FinanceForm = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: 50 },
+  container: { flex: 1, marginTop: 20 },
   header: {
     flexDirection: "row",
     alignItems: "center",
