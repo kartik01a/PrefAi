@@ -8,15 +8,36 @@ export interface RegisterRequest {
   password: string;
   confirmPassword: string;
   passportNumber: string;
-  role: 'USER';
-  provider: 'manual';
+  role: "USER";
+  provider: "manual";
 }
 
 export interface AuthResponse {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  role: "USER" | "ADMIN";
+  passportNumber: string;
+  provider: "manual" | "facebook" | "google" | "linkedin" | "apple";
   token: string;
+
+  // Optional fields
+  name?: string;
+  refreshToken?: string;
+  active?: boolean;
+  blocked?: boolean;
+  blockReason?: string;
+  facebookId?: string;
+  linkedinId?: string;
+  image?: string;
+  userName?: string;
+  securityNumber?: string;
+  title?: string;
+  country?: string;
+  maritalStatus?: string;
+  dob?: string;
+  arrivalDate?: string;
 }
 
 export interface LoginRequest {
@@ -29,28 +50,25 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     login: builder.mutation<AuthResponse, LoginRequest>({
       query: (data) => ({
         url: `${USERS_URL}/login`,
-        method: 'POST',
+        method: "POST",
         body: data,
       }),
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
         url: `${USERS_URL}/logout`,
-        method: 'POST',
+        method: "POST",
       }),
     }),
     register: builder.mutation<void, RegisterRequest>({
       query: (data) => ({
         url: `${USERS_URL}/register`,
-        method: 'POST',
+        method: "POST",
         body: data,
       }),
     }),
   }),
 });
 
-export const {
-  useLoginMutation,
-  useLogoutMutation,
-  useRegisterMutation,
-} = usersApiSlice;
+export const { useLoginMutation, useLogoutMutation, useRegisterMutation } =
+  usersApiSlice;

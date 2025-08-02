@@ -1,7 +1,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
-import React, { useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -13,15 +14,50 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
+import { persistUser } from "../../utils/authLoader";
+import { AppDispatch, RootState } from "../store";
+import { useLoginMutation } from "./usersApiSlice";
 
 const SignIn = () => {
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+  const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [login, { isLoading }] = useLoginMutation();
+
+  useEffect(() => {
+    if (userInfo) {
+      router.replace("/");
+    }
+  }, [userInfo]);
+
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
-  }, []);
+  }, [navigation]);
 
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter email and password.");
+      return;
+    }
+    try {
+      const user = await login({ email, password }).unwrap();
+      await dispatch(persistUser(user));
+      router.replace("/");
+    } catch (error: any) {
+      console.error("Login error:", error);
+      Alert.alert(
+        "Login Failed",
+        error?.data?.message || "Invalid credentials. Please try again."
+      );
+    }
+  };
+
+  
   return (
     <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
       <KeyboardAvoidingView
@@ -73,6 +109,8 @@ const SignIn = () => {
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
+                value={email}
+                onChangeText={setEmail}
                 placeholder="e.g. Johndoe@mail.com"
                 placeholderTextColor="#ccc"
                 style={styles.input}
@@ -82,6 +120,8 @@ const SignIn = () => {
 
               <Text style={styles.inputLabel}>Password</Text>
               <TextInput
+                value={password}
+                onChangeText={setPassword}
                 placeholder="enter your password"
                 placeholderTextColor="#ccc"
                 secureTextEntry
@@ -91,7 +131,12 @@ const SignIn = () => {
             </View>
           </ScrollView>
 
-          <View style={[styles.actionButtonsContainer, { paddingBottom: insets.bottom + 10 }]}>
+          <View
+            style={[
+              styles.actionButtonsContainer,
+              { paddingBottom: insets.bottom + 10 },
+            ]}
+          >
             <TouchableOpacity
               style={styles.bottomButtonSignUp}
               onPress={() => router.push("/auth/signup")}
@@ -101,9 +146,12 @@ const SignIn = () => {
 
             <TouchableOpacity
               style={styles.bottomButtonLogIn}
-              onPress={() => router.push("/")}
+              onPress={handleLogin}
+              disabled={isLoading}
             >
-              <Text style={styles.bottomButtonTextLogIn}>Log In</Text>
+              <Text style={styles.bottomButtonTextLogIn}>
+                {isLoading ? "Logging In..." : "Log In"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

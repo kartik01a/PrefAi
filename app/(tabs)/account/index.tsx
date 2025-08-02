@@ -1,9 +1,13 @@
+import { useLogoutMutation } from "@/app/auth/usersApiSlice";
+import { AppDispatch } from "@/app/store";
 import BaseLayout from "@/components/BaseLayout";
+import { clearUser } from "@/utils/authLoader";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Menu } from "react-native-paper";
+import { useDispatch } from "react-redux";
 import AccountDisplay from "../../../assets/images/account-display.svg";
 import AccountInfo from "../../../assets/images/account-info.svg";
 import AccountManage from "../../../assets/images/account-manage.svg";
@@ -42,7 +46,19 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
 const AccountTab: React.FC = () => {
   const [visible, setVisible] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const [triggerLogout] = useLogoutMutation();
 
+  const handleLogout = async () => {
+    try {
+      await triggerLogout();
+    } catch (error) {
+      console.warn("Logout API call failed:", error);
+    } finally {
+      await dispatch(clearUser());
+      router.replace("/auth/signin");
+    }
+  };
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
@@ -87,10 +103,10 @@ const AccountTab: React.FC = () => {
                   style={{ height: 30 }}
                   title="Edit Profile"
                 />
-                 <Menu.Item
+                <Menu.Item
                   onPress={() => {
                     closeMenu();
-                    router.push("/auth/signin");
+                    handleLogout();
                   }}
                   style={{ height: 30 }}
                   title="LogOut"

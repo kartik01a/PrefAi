@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { useSelector } from "react-redux";
 import EllipseD from "../../assets/images/ellipse-d.svg";
 import Ellipse from "../../assets/images/ellipse.svg";
 import HomeBell from "../../assets/images/Home-bell.svg";
@@ -15,10 +16,19 @@ import HomeStar from "../../assets/images/home-start.svg";
 import BaseLayout from "../../components/BaseLayout";
 import ActivityItem from "../../components/Home/ActivityItem";
 import ServiceCard from "../../components/Home/ServiceCard";
+import { RootState } from "../store";
 
 const HomeTab: React.FC = () => {
   const colorScheme = useColorScheme();
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
 
+  useEffect(() => {
+    if (!userInfo) {
+      router.replace("/auth/signin");
+    }
+  }, [userInfo]);
+
+  if (!userInfo) return null;
   const services = [
     {
       icon: "home-mic",

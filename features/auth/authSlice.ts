@@ -1,10 +1,31 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserInfo {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  role: "USER" | "ADMIN";
+  passportNumber: string;
+  provider: "manual" | "facebook" | "google" | "linkedin" | "apple"; 
   token: string;
+
+  // Optional fields
+  name?: string;
+  refreshToken?: string;
+  active?: boolean;
+  blocked?: boolean;
+  blockReason?: string;
+  facebookId?: string;
+  linkedinId?: string;
+  image?: string;
+  userName?: string;
+  securityNumber?: string;
+  title?: string;
+  country?: string;
+  maritalStatus?: string;
+  dob?: string; 
+  arrivalDate?: string;
 }
 
 interface AuthState {
@@ -16,7 +37,7 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setCredentials: (state, action: PayloadAction<UserInfo>) => {
