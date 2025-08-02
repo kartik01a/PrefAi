@@ -1,3 +1,4 @@
+import { logout } from "@/features/auth/authSlice";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
 import {
@@ -10,6 +11,9 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store";
+import { useUpdateUserLanguageMutation } from "./usersApiSlice";
 
 const languages = [
   {
@@ -63,17 +67,25 @@ const languages = [
 ];
 
 const WelcomePage = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
+  const userId = useSelector((state: RootState) => state.auth.userInfo?.id);
+  const [updateUserInfo] = useUpdateUserLanguageMutation();
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
-  }, []);
+  }, [navigation]);
 
-  const handleContinue = () => {
-    if (selectedLang) {
-      router.push("/");
+  const handleContinue = async () => {
+    if (!selectedLang || !userId) return;
+    try {
+      await updateUserInfo({ language: selectedLang, id: userId }).unwrap();
+      dispatch(logout());
+      router.replace("/auth/signin");
+    } catch (error) {
+      console.error("Failed to update language:", error);
     }
   };
 
@@ -111,7 +123,7 @@ const WelcomePage = () => {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="light-content" backgroundColor="#2479CF" />
-      
+
       <View style={styles.topSection}>
         <View style={styles.logoSection}>
           <Image
@@ -125,9 +137,8 @@ const WelcomePage = () => {
         <View style={styles.introTextContainer}>
           <Text style={styles.welcomeTitle}>Bienvenue!</Text>
           <Text style={styles.description}>
-            We&apos;re here to help you with forms, documents, and
-            appointments. Please choose your preferred language to get
-            started:
+            We&apos;re here to help you with forms, documents, and appointments.
+            Please choose your preferred language to get started:
           </Text>
         </View>
       </View>
@@ -142,7 +153,9 @@ const WelcomePage = () => {
         />
       </View>
 
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+      <View
+        style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}
+      >
         <TouchableOpacity
           style={[
             styles.continueButton,

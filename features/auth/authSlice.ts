@@ -46,8 +46,24 @@ const authSlice = createSlice({
     logout: (state) => {
       state.userInfo = null;
     },
+     setUserIdOnly: (state, action: PayloadAction<string>) => {
+      if (!state.userInfo) {
+        state.userInfo = {
+          id: action.payload,
+          firstName: "",
+          lastName: "",
+          email: "",
+          role: "USER",
+          passportNumber: "",
+          provider: "manual",
+          token: "",
+        };
+      } else {
+        state.userInfo.id = action.payload;
+      }
+    },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, setUserIdOnly } = authSlice.actions;
 export default authSlice.reducer;

@@ -38,11 +38,31 @@ export interface AuthResponse {
   maritalStatus?: string;
   dob?: string;
   arrivalDate?: string;
+  language?: string;
 }
 
 export interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface updateRequest {
+  name?: string;
+  refreshToken?: string;
+  active?: boolean;
+  blocked?: boolean;
+  blockReason?: string;
+  facebookId?: string;
+  linkedinId?: string;
+  image?: string;
+  userName?: string;
+  securityNumber?: string;
+  title?: string;
+  country?: string;
+  maritalStatus?: string;
+  dob?: string;
+  arrivalDate?: string;
+  language?: string;
 }
 
 export const usersApiSlice = apiSlice.injectEndpoints({
@@ -60,15 +80,26 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "POST",
       }),
     }),
-    register: builder.mutation<void, RegisterRequest>({
+    register: builder.mutation<any, RegisterRequest>({
       query: (data) => ({
         url: `${USERS_URL}/register`,
         method: "POST",
         body: data,
       }),
     }),
+    updateUserLanguage: builder.mutation<void,{ id: string; language: string }>({
+      query: ({ id, language }) => ({
+        url: `${USERS_URL}/language/${id}`,
+        method: "PATCH",
+        body: { language },
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation, useRegisterMutation } =
-  usersApiSlice;
+export const {
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
+  useUpdateUserLanguageMutation,
+} = usersApiSlice;

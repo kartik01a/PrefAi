@@ -1,3 +1,4 @@
+import { setUserIdOnly } from "@/features/auth/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
@@ -14,9 +15,12 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store";
 import { useRegisterMutation } from "./usersApiSlice";
 
 const SignUp = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -44,9 +48,12 @@ const SignUp = () => {
         role: "USER",
         provider: "manual",
       }).unwrap();
-      router.push("/auth/signin");
+      console.log("register", response )
+      const userId = response?.data?._id;
+      await dispatch(setUserIdOnly(userId));
+      router.push("/auth/welcomepage");
     } catch (error: any) {
-       console.error("❌ Register failed:", JSON.stringify(error, null, 2));
+      console.error("❌ Register failed:", JSON.stringify(error, null, 2));
       Alert.alert(
         "Registration Error",
         error?.data?.message || "Something went wrong."
