@@ -1,17 +1,16 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { store } from "@/app/store"; // ✅ make sure this path is correct
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Provider as PaperProvider } from "react-native-paper";
-import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Provider as ReduxProvider } from "react-redux";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [fontsLoaded] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
@@ -27,25 +26,18 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <SafeAreaProvider>
-      <PaperProvider>
-        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="upload-document"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="upload-location"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="document-files"
-            options={{ headerShown: false }}
-          />
-        </Stack>
-      </PaperProvider>
-    </SafeAreaProvider>
+    <ReduxProvider store={store}>
+      <SafeAreaProvider>
+        <PaperProvider>
+          <StatusBar />
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="upload-document" options={{ headerShown: false }} />
+            <Stack.Screen name="upload-location" options={{ headerShown: false }} />
+            <Stack.Screen name="document-files" options={{ headerShown: false }} />
+          </Stack>
+        </PaperProvider>
+      </SafeAreaProvider>
+    </ReduxProvider>
   );
 }

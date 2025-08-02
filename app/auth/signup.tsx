@@ -1,7 +1,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -13,18 +14,49 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRegisterMutation } from "./usersApiSlice";
 
 const SignUp = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [register, { isLoading }] = useRegisterMutation();
+
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
-  }, []);
+  }, [navigation]);
+
+  const handleSignUp = async () => {
+    try {
+      const response = await register({
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword: password,
+        passportNumber,
+        role: "USER",
+        provider: "manual",
+      }).unwrap();
+      router.push("/auth/signin");
+    } catch (error: any) {
+       console.error("❌ Register failed:", JSON.stringify(error, null, 2));
+      Alert.alert(
+        "Registration Error",
+        error?.data?.message || "Something went wrong."
+      );
+    }
+  };
 
   return (
     <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
@@ -34,110 +66,128 @@ const SignUp = () => {
             contentContainerStyle={styles.scrollContainer}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
-            enableOnAndroid={true}
           >
             <Text style={styles.logo}>PrefAI</Text>
-          <Image
-            source={require("../../assets/images/prefAI.png")}
-            style={styles.icon}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Sign Up Account</Text>
-                      <Text style={styles.subtitle}>Enter your personal data to create your account.</Text>
+            <Image
+              source={require("../../assets/images/prefAI.png")}
+              style={styles.icon}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Sign Up Account</Text>
+            <Text style={styles.subtitle}>
+              Enter your personal data to create your account.
+            </Text>
 
-            {/* Social Buttons */}
             <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("../../assets/images/google.png")}
-                style={styles.socialIcon}
-              />
-              <Text style={styles.socialButtonText}>Google</Text>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={require("../../assets/images/google.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialButtonText}>Google</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("../../assets/images/facebook.png")}
-                style={styles.socialIcon}
-              />
-              <Text style={styles.socialButtonText}>Facebook</Text>
-            </TouchableOpacity>
-                      </View>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={require("../../assets/images/facebook.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialButtonText}>Facebook</Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Divider */}
             <View style={styles.divider}>
-            <View style={styles.line} />
-            <Text style={styles.orText}>or</Text>
-            <View style={styles.line} />
-                      </View>
+              <View style={styles.line} />
+              <Text style={styles.orText}>or</Text>
+              <View style={styles.line} />
+            </View>
 
             {/* Input Fields */}
             <View style={styles.inputContainer}>
-            <View style={styles.row}>
-              <View style={styles.halfInputWrapper}>
-                <Text style={styles.inputLabel}>First Name</Text>
-                <TextInput
-                  placeholder="e.g. John"
-                  placeholderTextColor="#ccc"
-                  style={styles.input}
-                  autoCapitalize="words"
-                />
+              <View style={styles.row}>
+                <View style={styles.halfInputWrapper}>
+                  <Text style={styles.inputLabel}>First Name</Text>
+                  <TextInput
+                    placeholder="e.g. John"
+                    placeholderTextColor="#ccc"
+                    style={styles.input}
+                    autoCapitalize="words"
+                    value={firstName}
+                    onChangeText={setFirstName}
+                  />
+                </View>
+                <View style={styles.halfInputWrapper}>
+                  <Text style={styles.inputLabel}>Last Name</Text>
+                  <TextInput
+                    placeholder="e.g. Doe"
+                    placeholderTextColor="#ccc"
+                    style={styles.input}
+                    autoCapitalize="words"
+                    value={lastName}
+                    onChangeText={setLastName}
+                  />
+                </View>
               </View>
-              <View style={styles.halfInputWrapper}>
-                <Text style={styles.inputLabel}>Last Name</Text>
-                <TextInput
-                  placeholder="e.g. Doe"
-                  placeholderTextColor="#ccc"
-                  style={styles.input}
-                  autoCapitalize="words"
-                />
-              </View>
+
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                placeholder="e.g. Johndoe@mail.com"
+                placeholderTextColor="#ccc"
+                style={styles.input}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+
+              <Text style={styles.inputLabel}>Passport Number</Text>
+              <TextInput
+                placeholder="e.g. XAU000"
+                placeholderTextColor="#ccc"
+                style={styles.input}
+                autoCapitalize="characters"
+                value={passportNumber}
+                onChangeText={setPassportNumber}
+              />
+
+              <Text style={styles.inputLabel}>Create Password</Text>
+              <TextInput
+                placeholder="create your password"
+                placeholderTextColor="#ccc"
+                secureTextEntry
+                style={styles.input}
+                autoCapitalize="none"
+                value={password}
+                onChangeText={setPassword}
+              />
             </View>
+          </ScrollView>
 
-            <Text style={styles.inputLabel}>Email</Text>
-            <TextInput
-              placeholder="e.g. Johndoe@mail.com"
-              placeholderTextColor="#ccc"
-              style={styles.input}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+          {/* Action Buttons */}
+          <View
+            style={[
+              styles.actionButtonsContainer,
+              { paddingBottom: insets.bottom + 10 },
+            ]}
+          >
+            <TouchableOpacity
+              style={styles.bottomButtonSignUp}
+              onPress={handleSignUp}
+              disabled={isLoading}
+            >
+              <Text style={styles.bottomButtonTextSignUp}>
+                {isLoading ? "Signing Up..." : "Sign Up"}
+              </Text>
+            </TouchableOpacity>
 
-            <Text style={styles.inputLabel}>Passport Number</Text>
-            <TextInput
-              placeholder="e.g. XAU000"
-              placeholderTextColor="#ccc"
-              style={styles.input}
-              autoCapitalize="characters"
-            />
-
-            <Text style={styles.inputLabel}>Create Password</Text>
-            <TextInput
-              placeholder="create your password"
-              placeholderTextColor="#ccc"
-              secureTextEntry
-              style={styles.input}
-              autoCapitalize="none"
-            />
+            <TouchableOpacity
+              style={styles.bottomButtonLogIn}
+              onPress={() => router.push("/auth/signin")}
+            >
+              <Text style={styles.bottomButtonTextLogIn}>Log In</Text>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
-
-        {/* Action Buttons */}
-        <View style={[styles.actionButtonsContainer, { paddingBottom: insets.bottom + 10 }]}>
-          <TouchableOpacity 
-            style={styles.bottomButtonSignUp}
-            onPress={() => router.push("/auth/welcomepage")}
-          >
-            <Text style={styles.bottomButtonTextSignUp}>Sign Up</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.bottomButtonLogIn}
-            onPress={() => router.push("/auth/signin")}
-          >
-            <Text style={styles.bottomButtonTextLogIn}>Log In</Text>
-          </TouchableOpacity>
-        </View>
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -162,7 +212,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     alignItems: "center",
     flexGrow: 1,
-    minHeight: '100%',
+    minHeight: "100%",
   },
   logo: {
     fontSize: 24,
@@ -281,7 +331,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bottomButtonTextLogIn: {
-   color: "#2479CF",
+    color: "#2479CF",
     fontSize: 14,
     fontFamily: "Poppins-SemiBold",
   },
@@ -295,7 +345,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bottomButtonTextSignUp: {
-     color: "#fff",
+    color: "#fff",
     fontSize: 14,
     fontFamily: "Poppins-SemiBold",
   },

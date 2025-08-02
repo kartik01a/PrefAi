@@ -1,5 +1,3 @@
-import ActivityItem from "@/components/Home/ActivityItem";
-import ServiceCard from "@/components/Home/ServiceCard";
 import { router } from "expo-router";
 import React from "react";
 import {
@@ -15,6 +13,8 @@ import HomeBell from "../../assets/images/Home-bell.svg";
 import HomeRocket from "../../assets/images/home-rocket.svg";
 import HomeStar from "../../assets/images/home-start.svg";
 import BaseLayout from "../../components/BaseLayout";
+import ActivityItem from "../../components/Home/ActivityItem";
+import ServiceCard from "../../components/Home/ServiceCard";
 
 const HomeTab: React.FC = () => {
   const colorScheme = useColorScheme();
