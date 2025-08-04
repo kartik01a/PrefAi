@@ -1,4 +1,5 @@
 import { store } from "@/app/store";
+import { initI18n } from "@/i18n";
 import { loadUserFromStorage } from "@/utils/authLoader";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -12,13 +13,29 @@ import { Provider as ReduxProvider } from "react-redux";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [isI18nReady, setIsI18nReady] = useState<boolean>(false);
   const [fontsLoaded] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
   });
-
   const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const setupI18n = async () => {
+      try {
+        await initI18n();
+        console.log("i18n setup completed");
+      } catch (error) {
+        console.error("Failed to initialize i18n:", error);
+      } finally {
+        setIsI18nReady(true);
+      }
+    };
+
+    setupI18n();
+  }, []);
+
   useEffect(() => {
     const prepare = async () => {
       await store.dispatch(loadUserFromStorage() as any);
@@ -30,7 +47,9 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded || !ready) return null;
+  if (!fontsLoaded || !isI18nReady) {
+    return null;
+  }
   return (
     <ReduxProvider store={store}>
       <SafeAreaProvider>
