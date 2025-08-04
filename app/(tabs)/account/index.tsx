@@ -5,6 +5,7 @@ import { clearUser } from "@/utils/authLoader";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Menu } from "react-native-paper";
 import { useDispatch } from "react-redux";
@@ -59,6 +60,7 @@ const AccountTab: React.FC = () => {
       router.replace("/auth/signin");
     }
   };
+  const { t } = useTranslation();
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
@@ -67,7 +69,7 @@ const AccountTab: React.FC = () => {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Account Management</Text>
+          <Text style={styles.headerTitle}>{t("accountManagement")}</Text>
         </View>
 
         {/* Profile Section */}
@@ -101,7 +103,7 @@ const AccountTab: React.FC = () => {
                     router.push("/account/editProfile");
                   }}
                   style={{ height: 30 }}
-                  title="Edit Profile"
+                  title={t("editProfile")}
                 />
                 <Menu.Item
                   onPress={() => {
@@ -109,7 +111,7 @@ const AccountTab: React.FC = () => {
                     handleLogout();
                   }}
                   style={{ height: 30 }}
-                  title="LogOut"
+                  title={t("logout")}
                 />
               </Menu>
             </TouchableOpacity>
@@ -120,43 +122,43 @@ const AccountTab: React.FC = () => {
         <View style={styles.menuSection}>
           <MenuItem
             icon={<AccountPerson />}
-            title="General"
-            subtitle="Profile, notifications & language"
+            title={t("general")}
+            subtitle={t("profileNotificationLanguage")}
             onPress={() => router.push("/account/general")}
           />
 
           <MenuItem
             icon={<AccountInfo />}
-            title="Terms & Condition"
-            subtitle="Learn to know more about the platform"
+            title={t("termsAndCondition")}
+            subtitle={t("learnToKnowMoreAboutThePlatform")}
             onPress={() => router.push("/account/privacy")}
           />
 
           <MenuItem
             icon={<AccountDisplay />}
-            title="Display"
-            subtitle="Light Mode"
+            title={t("display")}
+            subtitle={t("lightMode")}
             onPress={() => router.push("/account/display")}
           />
 
           <MenuItem
             icon={<AccountSubscription />}
-            title="Subscription"
-            subtitle="Manage your plan"
+            title={t("subscription")}
+            subtitle={t("manageYourPlan")}
             onPress={() => router.push("/subscription/freeplan")}
           />
 
           <MenuItem
             icon={<AccountManage />}
-            title="Account Management"
-            subtitle="Hibernate or close your account"
+            title={t("accountManagement")}
+            subtitle={t("hibernateOrCloseYourAccount")}
             onPress={() => router.push("/account/management")}
           />
 
           <MenuItem
             icon={<AccountSupport />}
-            title="Contact Support"
-            subtitle="Contact our support team"
+            title={t("contactSupport")}
+            subtitle={t("contactOurSupportTeam")}
             onPress={() => router.push("/account/general")}
           />
 

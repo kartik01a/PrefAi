@@ -4,6 +4,7 @@ import SettingCard from "@/components/SettingCard";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface Option {
@@ -54,7 +55,7 @@ const renderOptionModal = (
 
 const PrivacyScreen = () => {
   const navigation = useNavigation();
-
+  const { t } = useTranslation();
   const [isPrivate, setIsPrivate] = useState(false);
   const [showRetentionModal, setShowRetentionModal] = useState(false);
   const [notificationVisible, setNotificationVisible] = useState(false);
@@ -101,29 +102,29 @@ const PrivacyScreen = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Account Management</Text>
-          <Text style={styles.headerSubtitle}>Account {">"} Privacy</Text>
-          <Text style={styles.sectionTitle}>Account Privacy</Text>
+          <Text style={styles.headerTitle}>{t("accountManagement")}</Text>
+          <Text style={styles.headerSubtitle}>{t("account")} {">"} {t('privacy')}</Text>
+          <Text style={styles.sectionTitle}>{t('accountPrivacy')}</Text>
         </View>
 
         {/* Content */}
         <View style={styles.content}>
           <SettingCard
-            label="Private account"
+            label={t('privateAccount')}
             value={isPrivate}
             onChange={setIsPrivate}
           />
 
           <OptionCard
-            label="Data Retention Preferences"
+            label={t('dataRetentionPreferences')}
             onPress={() => setShowRetentionModal(true)}
           />
           <OptionCard
-            label="Consent For Document Usage"
+            label={t('consentForDocumentUsage')}
             onPress={() => setNotificationVisible(true)}
           />
           <OptionCard
-            label="Clear My Data"
+            label={t('clearMyData')}
             onPress={() => router.push("/account/clearMyData")}
           />
         </View>

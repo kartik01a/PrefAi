@@ -1,10 +1,10 @@
-import { store } from "@/app/store"; // ✅ make sure this path is correct
+import { store } from "@/app/store";
 import { loadUserFromStorage } from "@/utils/authLoader";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider as ReduxProvider } from "react-redux";

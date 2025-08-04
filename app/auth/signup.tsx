@@ -2,6 +2,7 @@ import { setUserIdOnly } from "@/features/auth/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Image,
@@ -23,6 +24,7 @@ const SignUp = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -48,7 +50,7 @@ const SignUp = () => {
         role: "USER",
         provider: "manual",
       }).unwrap();
-      console.log("register", response )
+      console.log("register", response);
       const userId = response?.data?._id;
       await dispatch(setUserIdOnly(userId));
       router.push("/auth/welcomepage");
@@ -74,15 +76,15 @@ const SignUp = () => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.logo}>PrefAI</Text>
+            <Text style={styles.logo}>{t("prefai")}</Text>
             <Image
               source={require("../../assets/images/prefAI.png")}
               style={styles.icon}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Sign Up Account</Text>
+            <Text style={styles.title}>{t("signUpAccount")}</Text>
             <Text style={styles.subtitle}>
-              Enter your personal data to create your account.
+              {t("enterYourPersonalDataToCreateYourAccount")}
             </Text>
 
             <View style={styles.socialButtonsContainer}>
@@ -91,7 +93,7 @@ const SignUp = () => {
                   source={require("../../assets/images/google.png")}
                   style={styles.socialIcon}
                 />
-                <Text style={styles.socialButtonText}>Google</Text>
+                <Text style={styles.socialButtonText}>{t("google")}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.socialButton}>
@@ -99,14 +101,14 @@ const SignUp = () => {
                   source={require("../../assets/images/facebook.png")}
                   style={styles.socialIcon}
                 />
-                <Text style={styles.socialButtonText}>Facebook</Text>
+                <Text style={styles.socialButtonText}>{t("facebook")}</Text>
               </TouchableOpacity>
             </View>
 
             {/* Divider */}
             <View style={styles.divider}>
               <View style={styles.line} />
-              <Text style={styles.orText}>or</Text>
+              <Text style={styles.orText}>{t("or")}</Text>
               <View style={styles.line} />
             </View>
 
@@ -114,7 +116,7 @@ const SignUp = () => {
             <View style={styles.inputContainer}>
               <View style={styles.row}>
                 <View style={styles.halfInputWrapper}>
-                  <Text style={styles.inputLabel}>First Name</Text>
+                  <Text style={styles.inputLabel}>{t("firstName")}</Text>
                   <TextInput
                     placeholder="e.g. John"
                     placeholderTextColor="#ccc"
@@ -124,8 +126,9 @@ const SignUp = () => {
                     onChangeText={setFirstName}
                   />
                 </View>
+
                 <View style={styles.halfInputWrapper}>
-                  <Text style={styles.inputLabel}>Last Name</Text>
+                  <Text style={styles.inputLabel}>{t("lastName")}</Text>
                   <TextInput
                     placeholder="e.g. Doe"
                     placeholderTextColor="#ccc"
@@ -137,7 +140,7 @@ const SignUp = () => {
                 </View>
               </View>
 
-              <Text style={styles.inputLabel}>Email</Text>
+              <Text style={styles.inputLabel}>{t("email")}</Text>
               <TextInput
                 placeholder="e.g. Johndoe@mail.com"
                 placeholderTextColor="#ccc"
@@ -148,7 +151,7 @@ const SignUp = () => {
                 onChangeText={setEmail}
               />
 
-              <Text style={styles.inputLabel}>Passport Number</Text>
+              <Text style={styles.inputLabel}>{t("passportNumber")}</Text>
               <TextInput
                 placeholder="e.g. XAU000"
                 placeholderTextColor="#ccc"
@@ -158,9 +161,9 @@ const SignUp = () => {
                 onChangeText={setPassportNumber}
               />
 
-              <Text style={styles.inputLabel}>Create Password</Text>
+              <Text style={styles.inputLabel}>{t("createPassword")}</Text>
               <TextInput
-                placeholder="create your password"
+                placeholder={t("createYourPassword")}
                 placeholderTextColor="#ccc"
                 secureTextEntry
                 style={styles.input}
@@ -184,7 +187,7 @@ const SignUp = () => {
               disabled={isLoading}
             >
               <Text style={styles.bottomButtonTextSignUp}>
-                {isLoading ? "Signing Up..." : "Sign Up"}
+                {isLoading ? "Signing Up..." : t("signup")}
               </Text>
             </TouchableOpacity>
 
@@ -192,7 +195,7 @@ const SignUp = () => {
               style={styles.bottomButtonLogIn}
               onPress={() => router.push("/auth/signin")}
             >
-              <Text style={styles.bottomButtonTextLogIn}>Log In</Text>
+              <Text style={styles.bottomButtonTextLogIn}>{t("login")}</Text>
             </TouchableOpacity>
           </View>
         </View>

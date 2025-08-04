@@ -3,26 +3,22 @@ import SettingCard from "@/components/SettingCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
-import {
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { useTranslation } from "react-i18next";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ClearMyData = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [isClear, setIsClear] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [rating, setRating] = useState(4); 
+  const [rating, setRating] = useState(4);
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, []);
 
   const handleToggle = (value: boolean) => {
     if (value) {
-      setShowDialog(true); 
+      setShowDialog(true);
     }
     setIsClear(value);
   };
@@ -33,7 +29,7 @@ const ClearMyData = () => {
   };
 
   const handleCancel = () => {
-    setIsClear(false); 
+    setIsClear(false);
     setShowDialog(false);
   };
 
@@ -42,38 +38,41 @@ const ClearMyData = () => {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <MaterialCommunityIcons name="arrow-left-top" size={20} color="white" />
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left-top"
+              size={20}
+              color="white"
+            />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Account Management</Text>
+          <Text style={styles.headerTitle}>{t("accountManagement")}</Text>
           <Text style={styles.headerSubtitle}>
-            Account {">"} Privacy {">"} Clear My Data
+            {t("account")} {">"} {t("privacy")} {">"} {t("clearMyData")}
           </Text>
-          <Text style={styles.sectionTitle}>Account Privacy</Text>
+          <Text style={styles.sectionTitle}>{t("accountPrivacy")}</Text>
         </View>
 
         {/* Content */}
         <View style={styles.content}>
-            <SettingCard
+          <SettingCard
             label="Clear My Data"
             value={isClear}
             onChange={handleToggle}
           />
-          <Text style={styles.textStyle}>
-            This action is irreversible and will remove all your saved documents,
-            preferences, and form history.
-          </Text>
+          <Text style={styles.textStyle}>{t("accountWarning")}</Text>
         </View>
 
         {/* Confirmation Dialog */}
         <Modal visible={showDialog} transparent animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Are you sure you want to delete your account?</Text>
-              <Text style={styles.modalSub}>How are you feeling?</Text>
+              <Text style={styles.modalTitle}>{t("deleteWarning")}</Text>
+              <Text style={styles.modalSub}>{t("howAreYouFeeling")}</Text>
               <Text style={styles.modalDesc}>
-                Your input is valuable in helping us better understand your needs
-                and tailor our service accordingly
+                {t("deleteWarningDescription")}
               </Text>
 
               {/* Star Rating */}
@@ -91,12 +90,20 @@ const ClearMyData = () => {
               </View>
 
               {/* Buttons */}
-              <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-                <Text style={styles.deleteButtonText}>Delete My Account & All Data</Text>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDelete}
+              >
+                <Text style={styles.deleteButtonText}>
+                  {t("deleteMyAccountAndAllData")}
+                </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancel}
+              >
+                <Text style={styles.cancelButtonText}>{t("cancel")}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -217,7 +224,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#999",
-    backgroundColor: "#2479CF"
+    backgroundColor: "#2479CF",
   },
   cancelButtonText: {
     color: "#FFFFFF",

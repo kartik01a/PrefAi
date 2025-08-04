@@ -2,6 +2,7 @@ import BaseLayout from "@/components/BaseLayout";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Modal,
   StyleSheet,
@@ -62,6 +63,7 @@ const LabeledSwitch = ({
 
 const GeneralScreen = () => {
   const [language, setLanguage] = useState("en");
+  const { t } = useTranslation();
   const [profilePhotoVisibility, setProfilePhotoVisibility] =
     useState<NotificationOption>("network");
   const [notificationVisible, setNotificationVisible] = useState(false);
@@ -89,9 +91,9 @@ const GeneralScreen = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Account Management</Text>
-          <Text style={styles.headerSubtitle}>Account {">"} General</Text>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Text style={styles.headerTitle}>{t("accountManagement")}</Text>
+          <Text style={styles.headerSubtitle}>{t("account")} {">"} {t('general')}</Text>
+          <Text style={styles.sectionTitle}>{t('personalInformation')}</Text>
         </View>
 
         {/* Content */}
@@ -102,10 +104,11 @@ const GeneralScreen = () => {
             onValueChange={setLanguage}
             items={[
               { label: "English", value: "en" },
-              { label: "French", value: "fr" },
-              { label: "Georgian", value: "ge" },
+              { label: "Chinese ", value: "zh" },
+              { label: "Georgian", value: "ka" },
               { label: "Arabic", value: "ar" },
               { label: "Russian", value: "ru" },
+              { label: "Portuguese", value: "pt" },
             ]}
             style={{
               inputIOS: { color: "transparent" },
@@ -119,9 +122,10 @@ const GeneralScreen = () => {
                 {
                   en: "English",
                   fr: "French",
-                  ge: "Georgian",
+                  ka: "Georgian",
                   ar: "Arabic",
                   ru: "Russian",
+                  pt: "Portuguese",
                 }[language]
               }`}
             />
@@ -180,7 +184,7 @@ const GeneralScreen = () => {
                   onPress={() => setNotificationVisible(false)}
                   style={styles.modalClose}
                 >
-                  <Text style={styles.modalCloseText}>Close</Text>
+                  <Text style={styles.modalCloseText}>{t('close')}</Text>
                 </TouchableOpacity>
               </View>
             </View>

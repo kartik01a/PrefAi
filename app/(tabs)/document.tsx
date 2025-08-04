@@ -5,7 +5,15 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Menu } from "react-native-paper";
 import DocumentFolder from "../../assets/images/document-folder.svg";
 import DocumentPdf from "../../assets/images/document-pdf.svg";
@@ -16,13 +24,10 @@ import useFileStore, {
   StoredFolder,
 } from "../hooks/useDocumentStore";
 
-// interface DocumentManagementScreenProps {
-//   navigation: any;
-// }
-
 const DocumentTab = () => {
   const { setSelectedFile, setCurrentFolder, files, folders, addFolder } =
     useFileStore();
+  const { t } = useTranslation();
   const [isAddFolder, setIsAddFolder] = useState(false);
   const [visible, setVisible] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -33,8 +38,8 @@ const DocumentTab = () => {
   const handleAddFolder = () => {
     if (folderName) {
       addFolder({ name: folderName });
-      setIsAddFolder(false)
-      setCurrentFolder("")
+      setIsAddFolder(false);
+      setCurrentFolder("");
     }
   };
 
@@ -63,19 +68,19 @@ const DocumentTab = () => {
 
   const handleUploadPress = () => {
     Alert.alert(
-      "Upload Document",
-      "Choose an option",
+      t("uploadDocument"),
+      t("chooseAnOption"),
       [
         {
-          text: "Cancel",
+          text: t("cancel"),
           style: "cancel",
         },
         {
-          text: "Choose File",
+          text: t("chooseFile"),
           onPress: selectDocument,
         },
         {
-          text: "Select from Gallery",
+          text: t("selectFromGallery"),
           onPress: selectFromGallery,
         },
       ],
@@ -90,8 +95,8 @@ const DocumentTab = () => {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          "Permission Required",
-          "Please grant gallery access to select images"
+          t("permissionRequired"),
+          t("pleaseGrantGalleryAccessToSelectImages")
         );
         return;
       }
@@ -125,7 +130,7 @@ const DocumentTab = () => {
       }
     } catch (error) {
       console.error("Error selecting image:", error);
-      Alert.alert("Error", "Failed to select image");
+      Alert.alert("Error", t("failedToSelectImage"));
     }
   };
 
@@ -162,13 +167,15 @@ const DocumentTab = () => {
       }
     } catch (error) {
       console.error("Error selecting document:", error);
-      Alert.alert("Error", "Failed to select document");
+      Alert.alert("Error", t("failedToSelectDocument"));
     }
   };
 
   const renderFolderItem = (folder: StoredFolder, files: StoredFile[]) => {
-    const count = files.filter((item) => item.folderName === folder.name).length;
-    console.log(count,"count")
+    const count = files.filter(
+      (item) => item.folderName === folder.name
+    ).length;
+    console.log(count, "count");
     return (
       <TouchableOpacity
         key={folder.id}
@@ -179,7 +186,9 @@ const DocumentTab = () => {
           <DocumentFolder color="#2479CF" />
         </View>
         <Text style={styles.folderName}>{folder.name}</Text>
-        <Text style={styles.folderCount}>{count || 0} items</Text>
+        <Text style={styles.folderCount}>
+          {count || 0} {t("items")}
+        </Text>
       </TouchableOpacity>
     );
   };
@@ -212,7 +221,7 @@ const DocumentTab = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Document Management</Text>
+          <Text style={styles.headerTitle}>{t("documentManagement")}</Text>
         </View>
 
         {/* Upload Section */}
@@ -223,17 +232,16 @@ const DocumentTab = () => {
           <View style={styles.uploadIcon}>
             <UploadAdd />
           </View>
-          <Text style={styles.uploadTitle}>Upload Documents</Text>
+          <Text style={styles.uploadTitle}>{t("uploadDocuments")}</Text>
           <Text style={styles.uploadSubtitle}>
-            You can upload document by importing{"\n"}or scanning with your
-            camera
+            {t("uploadDocumentsDescription")}
           </Text>
         </TouchableOpacity>
 
         {/* My Folder Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>My Folder</Text>
+            <Text style={styles.sectionTitle}>{t("myFolder")}</Text>
             <TouchableOpacity onPress={openMenu}>
               <Menu
                 visible={visible}
@@ -248,13 +256,13 @@ const DocumentTab = () => {
                     setIsAddFolder(true);
                   }}
                   style={{ height: 30 }}
-                  title="Add Folder"
+                  title={t("addFolder")}
                 />
               </Menu>
             </TouchableOpacity>
           </View>
 
-          {folders.length === 0 && <NotFoundComp text="No Folder Found" />}
+          {folders.length === 0 && <NotFoundComp text={t("noFolderFound")} />}
           {folders.length !== 0 && (
             <View style={styles.folderGrid}>
               {folders.map((folder) => renderFolderItem(folder, files))}
@@ -265,25 +273,23 @@ const DocumentTab = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recent Document</Text>
           <View style={styles.documentsContainer}>
-            {files.length === 0 && <NotFoundComp text="No Files Found" />}
+            {files.length === 0 && <NotFoundComp text={t("noFilesFound")} />}
             {files.map((document) => renderDocumentItem(document))}
           </View>
         </View>
       </View>
       <CustomModal visible={isAddFolder} onClose={() => setIsAddFolder(false)}>
         <View>
-          <Text style={{ color: "#2479CF" }}>Enter folder name</Text>
+          <Text style={{ color: "#2479CF" }}>{t("enterFolderName")}</Text>
           <TextInput
             style={styles.textInput}
             value={folderName}
             onChangeText={setFolderName}
-            placeholder="Enter file name"
+            placeholder={t("enterFileName")}
             placeholderTextColor="#999"
           />
           <TouchableOpacity style={styles.button} onPress={handleAddFolder}>
-            <Text style={{ color: "white" }}>
-              Add Folder
-            </Text>
+            <Text style={{ color: "white" }}>{t("addFolder")}</Text>
           </TouchableOpacity>
         </View>
       </CustomModal>
@@ -319,7 +325,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#2479CF",
     borderRadius: 12,
-    marginTop: 10
+    marginTop: 10,
   },
   uploadSection: {
     backgroundColor: "white",
