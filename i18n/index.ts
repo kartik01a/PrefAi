@@ -1,45 +1,49 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getLocales } from 'expo-localization';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Localization from 'expo-localization';
-import { resources, supportedLanguages } from './resources';
+import { I18nManager } from 'react-native';
+import { resources, rtlLanguages, supportedLanguages } from './resources';
 
 const LANGUAGE_STORAGE_KEY = 'selectedLanguage';
 const DEFAULT_LANGUAGE = 'en';
-
-// Simple, safer initialization
 let isInitialized = false;
 
-const getDeviceLanguage = (): string => {
+const getDeviceLanguage = async (): Promise<string> => {
   try {
-    const locales = Localization.getLocales();
-    const deviceLanguage = locales[0]?.languageCode || DEFAULT_LANGUAGE;
+    const locales = getLocales();
+    const languageCode = locales?.[0]?.languageCode || DEFAULT_LANGUAGE;
     const supportedCodes = supportedLanguages.map(lang => lang.code);
-    return supportedCodes.includes(deviceLanguage) ? deviceLanguage : DEFAULT_LANGUAGE;
+    return supportedCodes.includes(languageCode) ? languageCode : DEFAULT_LANGUAGE;
   } catch (error) {
-    console.log('Error getting device language:', error);
+    console.log("Error getting device language:", error);
     return DEFAULT_LANGUAGE;
   }
 };
 
 export const initI18n = async (): Promise<void> => {
-  if (isInitialized) {
-    return;
-  }
+  console.log("⚙️ i18n: isInitialized =", isInitialized);
+  if (isInitialized) return;
 
   let savedLanguage = DEFAULT_LANGUAGE;
-  
+
   try {
     const storedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (storedLanguage) {
-      const supportedCodes = supportedLanguages.map(lang => lang.code);
-      savedLanguage = supportedCodes.includes(storedLanguage) ? storedLanguage : getDeviceLanguage();
+    const supportedCodes = supportedLanguages.map(lang => lang.code);
+
+    if (storedLanguage && supportedCodes.includes(storedLanguage)) {
+      savedLanguage = storedLanguage;
     } else {
-      savedLanguage = getDeviceLanguage();
+      savedLanguage = await getDeviceLanguage();
     }
   } catch (error) {
     console.log('Error loading saved language:', error);
-    savedLanguage = getDeviceLanguage();
+    savedLanguage = await getDeviceLanguage();
+  }
+
+  const isRTL = rtlLanguages.includes(savedLanguage);
+  if (I18nManager.isRTL !== isRTL) {
+    console.warn(`⚠️ RTL layout mismatch for "${savedLanguage}". Restart app to apply layout direction.`);
   }
 
   try {
@@ -49,39 +53,15 @@ export const initI18n = async (): Promise<void> => {
         resources,
         lng: savedLanguage,
         fallbackLng: DEFAULT_LANGUAGE,
-        debug: false, // Set to false to avoid potential issues
-        
-        interpolation: {
-          escapeValue: false,
-        },
-        
-        react: {
-          useSuspense: false,
-        },
+        debug: false,
+        interpolation: { escapeValue: false },
+        react: { useSuspense: false },
       });
-    
+
     isInitialized = true;
-    console.log('i18n initialized successfully with language:', savedLanguage);
+    console.log('✅ i18n initialized with language:', savedLanguage);
   } catch (error) {
-    console.error('Failed to initialize i18n:', error);
+    console.error('❌ Failed to initialize i18n:', error);
     throw error;
   }
 };
-
-export const saveLanguage = async (language: string): Promise<void> => {
-  try {
-    const supportedCodes = supportedLanguages.map(lang => lang.code);
-    if (supportedCodes.includes(language)) {
-      await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-      if (isInitialized) {
-        await i18next.changeLanguage(language);
-      }
-    } else {
-      console.warn(`Language ${language} is not supported`);
-    }
-  } catch (error) {
-    console.log('Error saving language:', error);
-  }
-};
-
-export default i18next;

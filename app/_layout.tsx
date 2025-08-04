@@ -13,21 +13,20 @@ import { Provider as ReduxProvider } from "react-redux";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [isI18nReady, setIsI18nReady] = useState<boolean>(false);
+  const [isI18nReady, setIsI18nReady] = useState(false);
   const [fontsLoaded] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
   });
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const setupI18n = async () => {
       try {
         await initI18n();
-        console.log("i18n setup completed");
+        console.log("✅ i18n initialized");
       } catch (error) {
-        console.error("Failed to initialize i18n:", error);
+        console.error("❌ Failed to initialize i18n:", error);
       } finally {
         setIsI18nReady(true);
       }
@@ -37,19 +36,20 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    const prepare = async () => {
+    const prepareApp = async () => {
       await store.dispatch(loadUserFromStorage() as any);
-      setReady(true);
-      SplashScreen.hideAsync();
+      await SplashScreen.hideAsync();
     };
-    if (fontsLoaded) {
-      prepare();
+
+    if (fontsLoaded && isI18nReady) {
+      prepareApp();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, isI18nReady]);
 
   if (!fontsLoaded || !isI18nReady) {
-    return null;
+    return null; 
   }
+
   return (
     <ReduxProvider store={store}>
       <SafeAreaProvider>
@@ -57,18 +57,9 @@ export default function RootLayout() {
           <StatusBar />
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="upload-document"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="upload-location"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="document-files"
-              options={{ headerShown: false }}
-            />
+            <Stack.Screen name="upload-document" options={{ headerShown: false }} />
+            <Stack.Screen name="upload-location" options={{ headerShown: false }} />
+            <Stack.Screen name="document-files" options={{ headerShown: false }} />
           </Stack>
         </PaperProvider>
       </SafeAreaProvider>
