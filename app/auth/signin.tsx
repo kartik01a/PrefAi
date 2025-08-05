@@ -1,6 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Image,
@@ -24,6 +25,7 @@ const SignIn = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,7 +59,6 @@ const SignIn = () => {
     }
   };
 
-  
   return (
     <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
       <KeyboardAvoidingView
@@ -71,15 +72,15 @@ const SignIn = () => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.logo}>PrefAI</Text>
+            <Text style={styles.logo}>{t("prefai")}</Text>
             <Image
               source={require("../../assets/images/prefAI.png")}
               style={styles.icon}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Sign In</Text>
+            <Text style={styles.title}>{t("signin")}</Text>
             <Text style={styles.subtitle}>
-              Enter your personal data to enter the platform
+              {t("enterYourPersonalDataToEnterThePlatform")}
             </Text>
 
             <View style={styles.socialButtonsContainer}>
@@ -88,7 +89,7 @@ const SignIn = () => {
                   source={require("../../assets/images/google.png")}
                   style={styles.socialIcon}
                 />
-                <Text style={styles.socialButtonText}>Google</Text>
+                <Text style={styles.socialButtonText}>{t("google")}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.socialButton}>
@@ -96,18 +97,18 @@ const SignIn = () => {
                   source={require("../../assets/images/facebook.png")}
                   style={styles.socialIcon}
                 />
-                <Text style={styles.socialButtonText}>Facebook</Text>
+                <Text style={styles.socialButtonText}>{t("facebook")}</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.divider}>
               <View style={styles.line} />
-              <Text style={styles.orText}>or</Text>
+              <Text style={styles.orText}>{t("or")}</Text>
               <View style={styles.line} />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
+              <Text style={styles.inputLabel}>{t("email")}</Text>
               <TextInput
                 value={email}
                 onChangeText={setEmail}
@@ -118,11 +119,11 @@ const SignIn = () => {
                 autoCapitalize="none"
               />
 
-              <Text style={styles.inputLabel}>Password</Text>
+              <Text style={styles.inputLabel}>{t("password")}</Text>
               <TextInput
                 value={password}
                 onChangeText={setPassword}
-                placeholder="enter your password"
+                placeholder={t("enterYourPassword")}
                 placeholderTextColor="#ccc"
                 secureTextEntry
                 style={styles.input}
@@ -141,7 +142,7 @@ const SignIn = () => {
               style={styles.bottomButtonSignUp}
               onPress={() => router.push("/auth/signup")}
             >
-              <Text style={styles.bottomButtonTextSignUp}>Sign Up</Text>
+              <Text style={styles.bottomButtonTextSignUp}>{t("signup")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -150,7 +151,7 @@ const SignIn = () => {
               disabled={isLoading}
             >
               <Text style={styles.bottomButtonTextLogIn}>
-                {isLoading ? "Logging In..." : "Log In"}
+                {isLoading ? "Logging In..." : t("login")}
               </Text>
             </TouchableOpacity>
           </View>

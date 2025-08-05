@@ -1,6 +1,7 @@
 import { logout } from "@/features/auth/authSlice";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   Image,
@@ -71,6 +72,7 @@ const WelcomePage = () => {
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const userId = useSelector((state: RootState) => state.auth.userInfo?.id);
   const [updateUserInfo] = useUpdateUserLanguageMutation();
@@ -131,15 +133,12 @@ const WelcomePage = () => {
             style={styles.logoImage}
             resizeMode="contain"
           />
-          <Text style={styles.logoText}>PrefAI</Text>
+          <Text style={styles.logoText}>{t("prefai")}</Text>
         </View>
 
         <View style={styles.introTextContainer}>
-          <Text style={styles.welcomeTitle}>Bienvenue!</Text>
-          <Text style={styles.description}>
-            We&apos;re here to help you with forms, documents, and appointments.
-            Please choose your preferred language to get started:
-          </Text>
+          <Text style={styles.welcomeTitle}>{t("welcome")}</Text>
+          <Text style={styles.description}>{t("welcomeDescription")}</Text>
         </View>
       </View>
 
@@ -170,7 +169,7 @@ const WelcomePage = () => {
               !selectedLang && styles.continueButtonTextDisabled,
             ]}
           >
-            Continue
+            {t("continue")}
           </Text>
         </TouchableOpacity>
       </View>

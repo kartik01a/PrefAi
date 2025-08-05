@@ -3,6 +3,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ProjectCategories } from "../formData";
 import { styles } from "./stepStyles";
+import { useTranslation } from "react-i18next";
 
 interface Step3Props {
   projectCategories: ProjectCategories;
@@ -10,6 +11,7 @@ interface Step3Props {
 }
 
 export const Step3 = ({ projectCategories, setProjectCategories }: Step3Props) => {
+  const { t } = useTranslation()
   const toggleCheckbox = (field: keyof ProjectCategories) => {
     setProjectCategories({
       [field]: projectCategories[field] ? "" : "yes",
@@ -17,17 +19,17 @@ export const Step3 = ({ projectCategories, setProjectCategories }: Step3Props) =
   };
 
   const categoryItems = [
-    { key: "soloExhibit", label: "Solo Exhibit" },
-    { key: "painting", label: "Painting" },
-    { key: "photography", label: "Photography" },
-    { key: "groupExhibit", label: "Group Exhibit" },
-    { key: "artPublication", label: "Art Publication" },
-    { key: "vidoNewMdia", label: "Video / New Media" },
-    { key: "Residency", label: "Residency" },
-    { key: "TravelingExhibit", label: "Traveling Exhibit" },
-    { key: "installation", label: "Installation" },
-    { key: "performance", label: "Performance" },
-    { key: "other", label: "Other" },
+    { key: "soloExhibit", label: t('soloExhibit') },
+    { key: "painting", label: t('painting') },
+    { key: "photography", label: t('groupExhibit') },
+    { key: "groupExhibit", label: t('soloExhibit') },
+    { key: "artPublication", label: t('artPublication') },
+    { key: "vidoNewMdia", label: t('videoNewMedia') },
+    { key: "Residency", label: t('residency') },
+    { key: "TravelingExhibit", label: t('travelingExhibit') },
+    { key: "installation", label: t('installation') },
+    { key: "performance", label: t('performance') },
+    { key: "other", label: t('other') },
   ] as const;
 
   return (

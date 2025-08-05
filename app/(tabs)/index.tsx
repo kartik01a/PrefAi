@@ -1,5 +1,6 @@
 import { router } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   StyleSheet,
   Text,
@@ -22,35 +23,25 @@ const HomeTab: React.FC = () => {
   const colorScheme = useColorScheme();
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
 
-  useEffect(() => {
-    if (!userInfo) {
-      router.replace("/auth/signin");
-    }
-  }, [userInfo]);
-
-  if (!userInfo) return null;
+  const { t } = useTranslation();
+  const [activities, setActivities] = useState([]);
   const services = [
     {
       icon: "home-mic",
-      title: "Chat assistant translations support",
+      title: t("chatAssistantTranslationSupport"),
     },
     {
       icon: "home-document",
-      title: "Form checking assistant for CAF / Social Sercuirty",
+      title: t("formCheckingAssistantForCAFSocialSecurity"),
     },
     {
       icon: "home-person",
-      title: "Appointments Guide",
+      title: t("appointmentsGuide"),
     },
     {
       icon: "home-vault",
-      title: "Document Vault",
+      title: t("documentVault"),
     },
-  ];
-
-  const activities = [
-    "Completed CAF Housing Aid Form",
-    "Appointment Guide - Préfecture (Paris 13)",
   ];
 
   const routes = {
@@ -68,15 +59,20 @@ const HomeTab: React.FC = () => {
       router.push("/");
     }
   }
+  useEffect(() => {
+    if (!userInfo) {
+      router.replace("/auth/signin");
+    }
+  }, [userInfo]);
+
+  if (!userInfo) return null;
 
   return (
     <BaseLayout>
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={[styles.greeting]}>Hi, John</Text>
-          <Text style={[styles.subtitle]}>
-            What can I do to help you today?
-          </Text>
+          <Text style={[styles.subtitle]}>{t("whatCanIDoToHelpYouToday")}</Text>
         </View>
         <TouchableOpacity style={styles.notificationButton}>
           <HomeBell />
@@ -102,17 +98,17 @@ const HomeTab: React.FC = () => {
           activeOpacity={0.7}
         >
           <View style={styles.premiumHeader}>
-            <Text style={styles.premiumTitle}>Premium Plan</Text>
+            <Text style={styles.premiumTitle}>{t("premiumPlan")}</Text>
           </View>
           <Text style={styles.premiumDescription}>
-            Unlock all the features & get all premium access on the platform
+            {t("premiumPlanDescription")}
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: "#FFFFFF" }]}>
-          Our Services
+          {t("ourServices")}
         </Text>
         <View style={styles.servicesGrid}>
           {services.map((service, index) => (
@@ -133,7 +129,7 @@ const HomeTab: React.FC = () => {
             { color: colorScheme === "dark" ? "#FFFFFF" : "#FFFFFF" },
           ]}
         >
-          Recent Activity
+          {t("recentActivity")}
         </Text>
         <View style={styles.activityList}>
           {activities.map((activity, index) => (

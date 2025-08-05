@@ -41,7 +41,8 @@
           "photosPermission": "Allow access to save PDFs to your device",
           "savePhotosPermission": "Allow access to save PDFs to your device"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

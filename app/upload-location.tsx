@@ -1,12 +1,19 @@
+import CustomModal from "@/components/CustomModal";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import DocumentAddFolder from "../assets/images/document-add-folder.svg";
 import DocumentFolder from "../assets/images/document-folder.svg";
 import BaseLayout from "../components/BaseLayout";
 import useFileStore, { StoredFolder } from "./hooks/useDocumentStore";
-import CustomModal from "@/components/CustomModal";
+import { useTranslation } from "react-i18next";
 
 const SelectLocationScreen = () => {
   const {
@@ -17,15 +24,16 @@ const SelectLocationScreen = () => {
     files,
   } = useFileStore();
   const [isAddFolder, setIsAddFolder] = useState(false);
-    const [folderName, setFolderName] = useState("");
-  
-    const handleAddFolder = () => {
-      if (folderName) {
-        addFolder({ name: folderName });
-        setIsAddFolder(false)
-        setCurrentFolder("")
-      }
-    };
+  const [folderName, setFolderName] = useState("");
+  const { t } = useTranslation();
+
+  const handleAddFolder = () => {
+    if (folderName) {
+      addFolder({ name: folderName });
+      setIsAddFolder(false);
+      setCurrentFolder("");
+    }
+  };
 
   const handleFolderSelect = (folder: StoredFolder) => {
     setCurrentFolder(folder.name);
@@ -87,12 +95,12 @@ const SelectLocationScreen = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Document Management</Text>
+          <Text style={styles.headerTitle}>{t('documentManagement')}</Text>
         </View>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Select Destinantion</Text>
-            <TouchableOpacity onPress={()=>setIsAddFolder(true)}>
+            <Text style={styles.sectionTitle}>{t('selectDestination')}</Text>
+            <TouchableOpacity onPress={() => setIsAddFolder(true)}>
               <DocumentAddFolder />
             </TouchableOpacity>
           </View>
@@ -104,7 +112,7 @@ const SelectLocationScreen = () => {
       </View>
       <CustomModal visible={isAddFolder} onClose={() => setIsAddFolder(false)}>
         <View>
-          <Text style={{ color: "#2479CF" }}>Enter folder name</Text>
+          <Text style={{ color: "#2479CF" }}>{t('enterFolderName')}</Text>
           <TextInput
             style={styles.textInput}
             value={folderName}
@@ -113,7 +121,7 @@ const SelectLocationScreen = () => {
             placeholderTextColor="#999"
           />
           <TouchableOpacity style={styles.button} onPress={handleAddFolder}>
-            <Text style={{ color: "white" }}>Add Folder</Text>
+            <Text style={{ color: "white" }}>{t('addFolder')}</Text>
           </TouchableOpacity>
         </View>
       </CustomModal>
@@ -232,7 +240,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#2479CF",
     borderRadius: 12,
-    marginTop: 10
+    marginTop: 10,
   },
   button: {
     backgroundColor: "#2479CF",
@@ -240,7 +248,7 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-  }
+  },
 });
 
 export default SelectLocationScreen;

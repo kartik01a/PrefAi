@@ -1,10 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import {
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { useTranslation } from "react-i18next";
+import { Text, TextInput, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { ApplicantCandidate } from "../formData";
 import { styles } from "./stepStyles";
@@ -14,17 +11,21 @@ interface Step1Props {
   setApplicantCandidate: (data: Partial<ApplicantCandidate>) => void;
 }
 
-export const Step1 = ({ applicantCandidate, setApplicantCandidate }: Step1Props) => {
+export const Step1 = ({
+  applicantCandidate,
+  setApplicantCandidate,
+}: Step1Props) => {
+  const { t } = useTranslation();
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: 12 }}>
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Name of the Non-Profit Institution</Text>
+        <Text style={styles.label}>{t("nameOfNonProfitInstitution")}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setApplicantCandidate({ nameOfTheNonProfitInstitution: value })
           }
           value={applicantCandidate.nameOfTheNonProfitInstitution}
-          placeholder={{ label: "Select Institution", value: "" }}
+          placeholder={{ label: t('inputDetails'), value: "" }}
           items={[
             { label: "Institution A", value: "Institution A" },
             { label: "Institution B", value: "Institution B" },
@@ -47,10 +48,10 @@ export const Step1 = ({ applicantCandidate, setApplicantCandidate }: Step1Props)
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Name & Title of the Person in Charge</Text>
+        <Text style={styles.label}>{t('nameAndTtitleOfThePersonInCharge')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter name & title"
+          placeholder={t('inputDetails')}
           placeholderTextColor="#A0A0A0"
           value={applicantCandidate.nameAndTitleOfThePersonInChargeOfTheProject}
           onChangeText={(text) =>
@@ -62,76 +63,66 @@ export const Step1 = ({ applicantCandidate, setApplicantCandidate }: Step1Props)
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Full Address</Text>
+        <Text style={styles.label}>{t('fullAddress')}</Text>
         <TextInput
           style={[styles.input, { height: 100, textAlignVertical: "top" }]}
-          placeholder="Enter full address"
+          placeholder={t('inputDetails')}
           placeholderTextColor="#A0A0A0"
           multiline
           numberOfLines={4}
           value={applicantCandidate.fullAddress}
-          onChangeText={(text) =>
-            setApplicantCandidate({ fullAddress: text })
-          }
+          onChangeText={(text) => setApplicantCandidate({ fullAddress: text })}
         />
       </View>
 
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Telephone</Text>
+          <Text style={styles.label}>{t('telephone')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter telephone"
+            placeholder={t('inputDetails')}
             placeholderTextColor="#A0A0A0"
             keyboardType="phone-pad"
             value={applicantCandidate.telephone}
-            onChangeText={(text) =>
-              setApplicantCandidate({ telephone: text })
-            }
+            onChangeText={(text) => setApplicantCandidate({ telephone: text })}
           />
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Fax</Text>
+          <Text style={styles.label}>{t('fax')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter fax"
+            placeholder={t('inputDetails')}
             placeholderTextColor="#A0A0A0"
             value={applicantCandidate.fax}
-            onChangeText={(text) =>
-              setApplicantCandidate({ fax: text })
-            }
+            onChangeText={(text) => setApplicantCandidate({ fax: text })}
           />
         </View>
       </View>
 
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>{t('email')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter email"
+            placeholder={t('inputDetails')}
             placeholderTextColor="#A0A0A0"
             keyboardType="email-address"
             autoCapitalize="none"
             value={applicantCandidate.Email}
-            onChangeText={(text) =>
-              setApplicantCandidate({ Email: text })
-            }
+            onChangeText={(text) => setApplicantCandidate({ Email: text })}
           />
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Website</Text>
+          <Text style={styles.label}>{t('website')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter website"
+            placeholder={t('inputDetails')}
             placeholderTextColor="#A0A0A0"
             autoCapitalize="none"
             value={applicantCandidate.website}
-            onChangeText={(text) =>
-              setApplicantCandidate({ website: text })
-            }
+            onChangeText={(text) => setApplicantCandidate({ website: text })}
           />
         </View>
       </View>

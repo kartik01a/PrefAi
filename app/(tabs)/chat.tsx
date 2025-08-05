@@ -4,6 +4,7 @@ import ChatHeader from "@/components/Chat/ChatHeader";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   ScrollView,
@@ -22,6 +23,7 @@ export interface ChatType {
 
 const ChatTab = () => {
   const colorScheme = useColorScheme();
+  const { t } = useTranslation();
   const [chat, setChat] = useState<ChatType[]>([]);
 
   const addChat = (newChat: ChatType) => {
@@ -65,7 +67,7 @@ const ChatTab = () => {
                     <View style={styles.timeRow}>
                       <Text style={styles.timeText}>{item.time}</Text>
                       {item?.messageBy === 1 && (
-                        <Text style={styles.timeText}>You</Text>
+                        <Text style={styles.timeText}>{t('you')}</Text>
                       )}
                       <Image
                         source={{

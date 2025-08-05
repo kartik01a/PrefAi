@@ -5,6 +5,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Image,
@@ -19,15 +20,16 @@ import RNPickerSelect from "react-native-picker-select";
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
-  const [firstName, setFirstName] = useState("John");
-  const [lastName, setLastName] = useState("Doe");
-  const [userName, setUserName] = useState("Herigen");
-  const [securityNumber, setSecurityNumber] = useState("019239001229991");
+  const { t } = useTranslation();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [securityNumber, setSecurityNumber] = useState("");
 
-  const [title, setTitle] = useState("Mr");
-  const [country, setCountry] = useState("Spain");
-  const [email, setEmail] = useState("JohnDoe@gmail.com");
-  const [maritalStatus, setMaritalStatus] = useState("Married");
+  const [title, setTitle] = useState("");
+  const [country, setCountry] = useState("");
+  const [email, setEmail] = useState("");
+  const [maritalStatus, setMaritalStatus] = useState("");
   const [dob, setDob] = useState(new Date());
   const [arrivalDate, setArrivalDate] = useState(new Date());
   const [showDobPicker, setShowDobPicker] = useState(false);
@@ -54,8 +56,10 @@ const EditProfileScreen = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Account Management</Text>
-          <Text style={styles.headerSubtitle}>Account {">"} Edit Profile</Text>
+          <Text style={styles.headerTitle}>{t("accountManagement")}</Text>
+          <Text style={styles.headerSubtitle}>
+            {t("account")} {">"} Edit Profile
+          </Text>
           <View style={styles.profileRow}>
             <Image
               source={{
@@ -69,14 +73,14 @@ const EditProfileScreen = () => {
             </View>
           </View>
 
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Text style={styles.sectionTitle}>{t("personalInformation")}</Text>
         </View>
 
         {/* Content */}
         <View style={styles.content}>
           <View style={styles.row}>
             <View style={styles.inputHalf}>
-              <Text style={styles.label}>Title</Text>
+              <Text style={styles.label}>{t("title")}</Text>
               <RNPickerSelect
                 onValueChange={setTitle}
                 value={title}
@@ -98,12 +102,12 @@ const EditProfileScreen = () => {
             </View>
 
             <View style={styles.inputHalf}>
-              <Text style={styles.label}>First Name</Text>
+              <Text style={styles.label}>{t("firstName")}</Text>
               <TextInput
                 style={styles.input}
                 value={firstName}
                 onChangeText={setFirstName}
-                placeholder="Enter your first name"
+                placeholder={t("inputDetails")}
                 placeholderTextColor="#A0A0A0"
               />
             </View>
@@ -111,7 +115,7 @@ const EditProfileScreen = () => {
 
           <View style={styles.row}>
             <View style={styles.inputHalf}>
-              <Text style={styles.label}>Used Name (if applicable)</Text>
+              <Text style={styles.label}>{t("usedName")}(if applicable)</Text>
               <TextInput
                 style={styles.input}
                 value={userName}
@@ -122,7 +126,7 @@ const EditProfileScreen = () => {
               />
             </View>
             <View style={styles.inputHalf}>
-              <Text style={styles.label}>Last Name</Text>
+              <Text style={styles.label}>{t("lastName")}</Text>
               <TextInput
                 style={styles.input}
                 value={lastName}
@@ -135,11 +139,11 @@ const EditProfileScreen = () => {
 
           <View style={styles.row}>
             <View style={styles.inputHalf}>
-              <Text style={styles.label}>Date of Birth</Text>
+              <Text style={styles.label}>{t("dateOfBirth")}</Text>
               <TouchableOpacity onPress={() => setShowDobPicker(true)}>
                 <View style={styles.inputWithIcon}>
                   <TextInput
-                    style={[styles.input, { paddingRight: 35 }]} // paddingRight for icon
+                    style={[styles.input, { paddingRight: 35 }]}
                     editable={false}
                     value={dob.toLocaleDateString()}
                     placeholder="DD/MM/YYYY"
@@ -167,7 +171,7 @@ const EditProfileScreen = () => {
               )}
             </View>
             <View style={styles.inputHalf}>
-              <Text style={styles.label}>Country of Birth</Text>
+              <Text style={styles.label}>{t("countryOfBirth")}</Text>
               <RNPickerSelect
                 onValueChange={setCountry}
                 value={country}
@@ -194,7 +198,7 @@ const EditProfileScreen = () => {
 
           {/* Email Dropdown */}
 
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>{t("email")}</Text>
           <RNPickerSelect
             onValueChange={setEmail}
             value={email}
@@ -211,7 +215,7 @@ const EditProfileScreen = () => {
             )}
           />
 
-          <Text style={styles.label}>Marital Status</Text>
+          <Text style={styles.label}>{t("maritalStatus")}</Text>
           <RNPickerSelect
             onValueChange={setMaritalStatus}
             value={maritalStatus}
@@ -228,7 +232,7 @@ const EditProfileScreen = () => {
           />
 
           {/* Social Security Number */}
-          <Text style={styles.label}>Social Security Number</Text>
+          <Text style={styles.label}>{t("socialSecurityNumber")}</Text>
           <TextInput
             style={styles.input}
             value={securityNumber}
@@ -238,7 +242,7 @@ const EditProfileScreen = () => {
           />
 
           {/* Date of Arrival in France */}
-          <Text style={styles.label}>Date of Arrival in France</Text>
+          <Text style={styles.label}>{t("dateOfArrivalInFrance")}</Text>
           <TouchableOpacity onPress={() => setShowArrivalPicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -271,7 +275,7 @@ const EditProfileScreen = () => {
 
           <TouchableOpacity style={styles.autoFillButton}>
             <Text style={styles.autoFillText}>
-              Auto fill data from CAF Form
+              {t("autoFillDataFromCAFForm")}
             </Text>
           </TouchableOpacity>
         </View>

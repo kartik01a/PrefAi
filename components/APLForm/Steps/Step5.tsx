@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Text, TextInput, View } from "react-native";
 import { Budget } from "../formData";
 import { styles } from "./stepStyles";
@@ -9,27 +10,26 @@ interface Step5Props {
 }
 
 export const Step5 = ({ budget, setBudget }: Step5Props) => {
+  const { t } = useTranslation();
   return (
     <View style={{ gap: 16 }}>
-         <Text style={styles.heading}>Please attach a complete overall project budgetwith detailled expenses related to the presentation of the french artists.</Text>
-         <Text style={styles.subHeading}>Budget Details</Text>
+      <Text style={styles.heading}>{t("alpFormStep5Heading")}</Text>
+      <Text style={styles.subHeading}>{t("budgetDetails")}</Text>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Shipping of the Works</Text>
+          <Text style={styles.label}>{t("shippingOfTheWorks")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter shipping cost"
+            placeholder={t("inputDetails")}
             value={budget.shippingOfTheWorks}
-            onChangeText={(text) =>
-              setBudget({ shippingOfTheWorks: text })
-            }
+            onChangeText={(text) => setBudget({ shippingOfTheWorks: text })}
           />
         </View>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Insurance</Text>
+          <Text style={styles.label}>{t("insurance")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter insurance cost"
+            placeholder={t("inputDetails")}
             value={budget.insurance}
             onChangeText={(text) => setBudget({ insurance: text })}
           />
@@ -38,21 +38,19 @@ export const Step5 = ({ budget, setBudget }: Step5Props) => {
 
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Per Diem of the Artists</Text>
+          <Text style={styles.label}>{t("perDiemOdTheArtists")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter per diem"
+            placeholder={t("inputDetails")}
             value={budget.perDiemOfTheArtists}
-            onChangeText={(text) =>
-              setBudget({ perDiemOfTheArtists: text })
-            }
+            onChangeText={(text) => setBudget({ perDiemOfTheArtists: text })}
           />
         </View>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Travel</Text>
+          <Text style={styles.label}>{t("travel")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter travel cost"
+            placeholder={t("inputDetails")}
             value={budget.travel}
             onChangeText={(text) => setBudget({ travel: text })}
           />
@@ -60,10 +58,10 @@ export const Step5 = ({ budget, setBudget }: Step5Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Costs of Installing the Exhibition</Text>
+        <Text style={styles.label}>{t("costsOfInstallingTheExhibitions")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter installation cost"
+          placeholder={t("inputDetails")}
           value={budget.costsOfInstallingTheExchibition}
           onChangeText={(text) =>
             setBudget({ costsOfInstallingTheExchibition: text })
@@ -72,20 +70,20 @@ export const Step5 = ({ budget, setBudget }: Step5Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Other</Text>
+        <Text style={styles.label}>{t("other")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter other costs"
+          placeholder={t("inputDetails")}
           value={budget.other}
           onChangeText={(text) => setBudget({ other: text })}
         />
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Total</Text>
+        <Text style={styles.label}>{t("total")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter total amount"
+          placeholder={t("inputDetails")}
           keyboardType="number-pad"
           value={budget.total}
           onChangeText={(text) => setBudget({ total: text })}

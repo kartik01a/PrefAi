@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Platform,
   Text,
@@ -18,6 +19,7 @@ interface Step6Props {
 }
 
 export const Step6 = ({ employment, setEmployment }: Step6Props) => {
+  const { t } = useTranslation();
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
@@ -36,7 +38,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
     <View style={{ gap: 16 }}>
       {/* Current Status - single select */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Current Status</Text>
+        <Text style={styles.label}>{t("currentStatus")}</Text>
         <RNPickerSelect
           onValueChange={(value) => setEmployment({ currentStatus: value })}
           value={employment.currentStatus}
@@ -77,7 +79,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
 
       {/* Type of Contract */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Type of Contract</Text>
+        <Text style={styles.label}>{t("typeOfContract")}</Text>
         <RNPickerSelect
           onValueChange={(value) => setEmployment({ contractType: value })}
           value={employment.contractType}
@@ -170,7 +172,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
 
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Start Date</Text>
+          <Text style={styles.label}>{t("startDate")}</Text>
           <TouchableOpacity onPress={() => setShowStartPicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -211,7 +213,9 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
 
         {/* End Date */}
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>End Date (if fixed)</Text>
+          <Text style={styles.label}>
+            {t("endDate")} ({t("ifFixed")})
+          </Text>
           <TouchableOpacity onPress={() => setShowEndPicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -251,7 +255,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
 
       {/* Social Contribution */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Social Contribution</Text>
+        <Text style={styles.label}>{t('socialContribution')}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setEmployment({ socialContribution: value })
@@ -282,7 +286,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
 
       {/* Foreign Contribution Country */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Foreign Contributions? Country</Text>
+        <Text style={styles.label}>{t('foreignContributionCountry')}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setEmployment({ foreignContributionCountry: value })

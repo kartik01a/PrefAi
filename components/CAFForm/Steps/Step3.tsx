@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { MsaRegistration } from "../formData";
@@ -11,13 +12,11 @@ interface Step3Props {
 }
 
 export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
+  const { t } = useTranslation();
   return (
     <View style={{ gap: 16 }}>
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>
-          Have you or your spouse been previously registered in CAF/MSA in the
-          last 2 years?
-        </Text>
+        <Text style={styles.label}>{t("CAFFormStep3Title")}</Text>
 
         <View style={styles.row}>
           <TouchableOpacity
@@ -50,7 +49,7 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
                 fontWeight: "500",
               }}
             >
-              Yes
+              {t("yes")}
             </Text>
           </TouchableOpacity>
 
@@ -86,17 +85,17 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
                 fontWeight: "500",
               }}
             >
-              No
+              {t("no")}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Name of the organization</Text>
+        <Text style={styles.label}>{t("nameOfTheOrganization")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter organization name"
+          placeholder={t("inputDetails")}
           placeholderTextColor="#A0A0A0"
           value={msaRegistration.organizationName}
           onChangeText={(text) =>
@@ -105,13 +104,13 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
         />
       </View>
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Country</Text>
+        <Text style={styles.label}>{t("country")}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setMsaRegistration({ organizationCountry: value })
           }
           value={msaRegistration.organizationCountry}
-          placeholder={{ label: "Select Country", value: "" }}
+          placeholder={{ label: t("selectCountry"), value: "" }}
           items={[
             { label: "France", value: "France" },
             { label: "India", value: "India" },
@@ -134,10 +133,10 @@ export const Step3 = ({ msaRegistration, setMsaRegistration }: Step3Props) => {
         />
       </View>
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Beneficiary Number or Dossier Number</Text>
+        <Text style={styles.label}>{t("beneficiaryNumber")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter number"
+          placeholder={t("inputDetails")}
           placeholderTextColor="#A0A0A0"
           value={msaRegistration.beneficiaryNumber}
           onChangeText={(text) => {
