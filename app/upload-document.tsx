@@ -12,6 +12,7 @@ import {
 import DocumentPdf from "../assets/images/document-pdf.svg";
 import BaseLayout from "../components/BaseLayout";
 import useFileStore from "./hooks/useDocumentStore";
+import { useTranslation } from "react-i18next";
 
 // interface UploadDocumentScreenProps {
 //   route: {
@@ -34,6 +35,7 @@ const UploadDocumentScreen = () => {
     setCurrentFolder,
     addFile
   } = useFileStore();
+  const { t } = useTranslation()
   const [fileName, setFileName] = useState(
     selectedFile?.name.split(".")[0] || ""
   );
@@ -118,10 +120,10 @@ const UploadDocumentScreen = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Document Management</Text>
+          <Text style={styles.headerTitle}>{t('documentManagement')}</Text>
         </View>
 
-        <Text style={styles.subTitle}>Upload Document</Text>
+        <Text style={styles.subTitle}>{t('uploadDocument')}</Text>
 
         {/* Selected File Display */}
         <View style={styles.fileDisplay}>
@@ -138,13 +140,13 @@ const UploadDocumentScreen = () => {
 
         {/* File Name Input */}
         <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>File Name</Text>
+          <Text style={styles.inputLabel}>{t("fileName")}</Text>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.textInput}
               value={fileName}
               onChangeText={setFileName}
-              placeholder="Enter file name"
+              placeholder={t('enterFileName')}
               placeholderTextColor="#999"
             />
             <TouchableOpacity
@@ -158,7 +160,7 @@ const UploadDocumentScreen = () => {
 
         {/* Location Selection */}
         <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Location</Text>
+          <Text style={styles.inputLabel}>{t('location')}</Text>
           <TouchableOpacity
             style={styles.locationContainer}
             onPress={handleLocationPress}
@@ -169,7 +171,7 @@ const UploadDocumentScreen = () => {
                 !selectedFolder && styles.placeholderText,
               ]}
             >
-              {selectedFolder || "Select location"}
+              {selectedFolder || t('selectLocation')}
             </Text>
             {selectedFolder ? (
               <TouchableOpacity
@@ -184,7 +186,7 @@ const UploadDocumentScreen = () => {
 
         {/* Upload Button */}
         <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
-          <Text style={styles.uploadButtonText}>Upload</Text>
+          <Text style={styles.uploadButtonText}>{t('upload')}</Text>
         </TouchableOpacity>
       </View>
     </BaseLayout>

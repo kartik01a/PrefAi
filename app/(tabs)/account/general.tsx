@@ -1,9 +1,12 @@
 import BaseLayout from "@/components/BaseLayout";
+import { changeLanguageWithRestart, isRTLLanguage } from "@/i18n";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Alert,
+  I18nManager,
   Modal,
   StyleSheet,
   Switch,
@@ -12,6 +15,15 @@ import {
   View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
+
+const LANGUAGE_LABELS = {
+  en: "English",
+  zh: "Chinese",
+  ka: "Georgian",
+  ar: "Arabic",
+  ru: "Russian",
+  pt: "Portuguese",
+};
 
 type NotificationOption = "none" | "network" | "all";
 
@@ -63,11 +75,12 @@ const LabeledSwitch = ({
 
 const GeneralScreen = () => {
   const [language, setLanguage] = useState("en");
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
   const [profilePhotoVisibility, setProfilePhotoVisibility] =
     useState<NotificationOption>("network");
   const [notificationVisible, setNotificationVisible] = useState(false);
-
+  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState<
     Record<NotificationOption, boolean>
   >({
@@ -75,6 +88,78 @@ const GeneralScreen = () => {
     network: true,
     all: false,
   });
+
+  const handleLanguageSelect = async (languageCode: string) => {
+    if (isChangingLanguage || languageCode === language) return;
+
+    try {
+      setIsChangingLanguage(true);
+
+      const isRTL = isRTLLanguage(languageCode);
+      const currentRTL = I18nManager.isRTL;
+      const needsRestart = currentRTL !== isRTL;
+
+      if (needsRestart) {
+        Alert.alert(
+          t("languageChange") || "Language Change",
+          t("restartRequired") ||
+            "The app needs to restart to apply the layout changes for this language.",
+          [
+            {
+              text: t("cancel") || "Cancel",
+              style: "cancel",
+              onPress: () => {
+                setIsChangingLanguage(false);
+              },
+            },
+            {
+              text: t("changeAndRestart") || "Change & Restart",
+              onPress: async () => {
+                try {
+                  await changeLanguageWithRestart(languageCode, false);
+                } catch (error) {
+                  console.error("Error changing language:", error);
+                  Alert.alert(
+                    t("error") || "Error",
+                    t("languageChangeError") ||
+                      "Failed to change language. Please try again."
+                  );
+                  setIsChangingLanguage(false);
+                }
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      } else {
+        // No restart needed, just change language
+        await changeLanguageWithRestart(languageCode, false);
+        setLanguage(languageCode);
+        setIsChangingLanguage(false);
+
+        Alert.alert(
+          t("languageChanged") || "Language Changed",
+          t("languageChangedSuccess") ||
+            "Language has been changed successfully.",
+          [{ text: t("ok") || "OK" }]
+        );
+      }
+    } catch (error) {
+      console.error("Error in handleLanguageSelect:", error);
+      Alert.alert(
+        t("error") || "Error",
+        t("languageChangeError") ||
+          "Failed to change language. Please try again."
+      );
+      setIsChangingLanguage(false);
+    }
+  };
+
+  const getCurrentLanguageLabel = () => {
+    return (
+      LANGUAGE_LABELS[language as keyof typeof LANGUAGE_LABELS] || language
+    );
+  };
 
   return (
     <BaseLayout>
@@ -92,8 +177,10 @@ const GeneralScreen = () => {
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t("accountManagement")}</Text>
-          <Text style={styles.headerSubtitle}>{t("account")} {">"} {t('general')}</Text>
-          <Text style={styles.sectionTitle}>{t('personalInformation')}</Text>
+          <Text style={styles.headerSubtitle}>
+            {t("account")} {">"} {t("general")}
+          </Text>
+          <Text style={styles.sectionTitle}>{t("personalInformation")}</Text>
         </View>
 
         {/* Content */}
@@ -101,7 +188,10 @@ const GeneralScreen = () => {
           {/* Language Selection */}
           <RNPickerSelect
             value={language}
-            onValueChange={setLanguage}
+            onValueChange={(value) => {
+              handleLanguageSelect(value);
+              setLanguage(value);
+            }}
             items={[
               { label: "English", value: "en" },
               { label: "Chinese ", value: "zh" },
@@ -118,16 +208,9 @@ const GeneralScreen = () => {
             useNativeAndroidPickerStyle={false}
           >
             <OptionCard
-              label={`Language Selection - ${
-                {
-                  en: "English",
-                  fr: "French",
-                  ka: "Georgian",
-                  ar: "Arabic",
-                  ru: "Russian",
-                  pt: "Portuguese",
-                }[language]
-              }`}
+              label={`${
+                t("language") || "Language"
+              }: ${getCurrentLanguageLabel()}`}
             />
           </RNPickerSelect>
 
@@ -146,12 +229,12 @@ const GeneralScreen = () => {
             }}
             useNativeAndroidPickerStyle={false}
           >
-            <OptionCard label="Showing profile photos" />
+            <OptionCard label={t("showingProfilePhotos")} />
           </RNPickerSelect>
 
           {/* Notification Settings */}
           <OptionCard
-            label="Notifications Management"
+            label={t("notificationsManagement")}
             onPress={() => setNotificationVisible(true)}
           />
 
@@ -184,7 +267,7 @@ const GeneralScreen = () => {
                   onPress={() => setNotificationVisible(false)}
                   style={styles.modalClose}
                 >
-                  <Text style={styles.modalCloseText}>{t('close')}</Text>
+                  <Text style={styles.modalCloseText}>{t("close")}</Text>
                 </TouchableOpacity>
               </View>
             </View>

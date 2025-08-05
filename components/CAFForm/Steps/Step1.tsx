@@ -11,6 +11,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { PersonalDetails } from "../formData";
 import { styles } from "./stepStyles";
+import { useTranslation } from "react-i18next";
 
 interface Step1Props {
   personalDetails: PersonalDetails;
@@ -18,6 +19,7 @@ interface Step1Props {
 }
 
 export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
+  const { t } = useTranslation()
   const [showDobPicker, setShowDobPicker] = useState(false);
   const [showArrivalPicker, setShowArrivalPicker] = useState(false);
 
@@ -25,11 +27,11 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
     <View style={{ gap: 16 }}>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Title</Text>
+          <Text style={styles.label}>{t("title")}</Text>
           <RNPickerSelect
             onValueChange={(value) => setPersonalDetails({ title: value })}
             value={personalDetails.title}
-            placeholder={{ label: "Select Title", value: "" }}
+            placeholder={{ label: t('selectTitle'), value: "" }}
             items={[
               { label: "Mr", value: "Mr" },
               { label: "Mrs", value: "Mrs" },
@@ -53,10 +55,10 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>First Name</Text>
+          <Text style={styles.label}>{t('firstName')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter first name"
+            placeholder={t('inputDetails')}
             placeholderTextColor="#A0A0A0"
             value={personalDetails.firstName}
             onChangeText={(text) =>
@@ -68,10 +70,10 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
 
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Username (optional)</Text>
+          <Text style={styles.label}>{t('username')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter username"
+            placeholder={t('inputDetails')}
             placeholderTextColor="#A0A0A0"
             value={personalDetails.userName}
             onChangeText={(text) =>
@@ -81,10 +83,10 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Last Name</Text>
+          <Text style={styles.label}>{t('lastName')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter last name"
+            placeholder={t('inputDetails')}
             placeholderTextColor="#A0A0A0"
             value={personalDetails.lastName}
             onChangeText={(text) =>
@@ -96,7 +98,7 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
 
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Date of Birth</Text>
+          <Text style={styles.label}>{t('dateOfBirth')}</Text>
           <TouchableOpacity onPress={() => setShowDobPicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -146,10 +148,10 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
               setPersonalDetails({ countryOfBirth: value })
             }
             value={personalDetails.countryOfBirth}
-            placeholder={{ label: "Select Country", value: "" }}
+            placeholder={{ label: t('selectCountry'), value: "" }}
             items={[
               { label: "France", value: "France" },
-              { label: "India", value: "India" },
+              { label: "Portugal", value: "Portugal" },
               { label: "USA", value: "USA" },
             ]}
             useNativeAndroidPickerStyle={false}
@@ -171,7 +173,7 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Marital Status</Text>
+        <Text style={styles.label}>{t('maritalStatus')}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setPersonalDetails({ maritalStatus: value })
@@ -202,10 +204,10 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Social Security Number</Text>
+        <Text style={styles.label}>{t('socialSecurityNumber')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter SSN"
+          placeholder={t('inputDetails')}
           placeholderTextColor="#A0A0A0"
           keyboardType="numeric"
           value={personalDetails.socialSecurityNumber}
@@ -216,7 +218,7 @@ export const Step1 = ({ personalDetails, setPersonalDetails }: Step1Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Date of Arrival in France</Text>
+        <Text style={styles.label}>{t('dateOfArrivalInFrance')}</Text>
         <TouchableOpacity onPress={() => setShowArrivalPicker(true)}>
           <View style={styles.inputWithIcon}>
             <TextInput

@@ -187,7 +187,7 @@ const SignUp = () => {
               disabled={isLoading}
             >
               <Text style={styles.bottomButtonTextSignUp}>
-                {isLoading ? "Signing Up..." : t("signup")}
+                {isLoading ? t("signingup") + "..." : t("signup")}
               </Text>
             </TouchableOpacity>
 

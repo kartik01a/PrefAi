@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { InstituteType } from "../formData";
 import { styles } from "./stepStyles";
+import { useTranslation } from "react-i18next";
 
 interface Step2Props {
   instituteType: InstituteType;
@@ -18,6 +19,7 @@ interface Step2Props {
 
 export const Step2 = ({ instituteType, setInstituteType }: Step2Props) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const { t } = useTranslation()
 
   const toggleCheckbox = (field: keyof InstituteType) => {
     setInstituteType({
@@ -62,10 +64,10 @@ export const Step2 = ({ instituteType, setInstituteType }: Step2Props) => {
       ))}
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Project Title</Text>
+        <Text style={styles.label}>{t('projectTitle')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter project title"
+          placeholder={t('inputDetails')}
           placeholderTextColor="#A0A0A0"
           value={instituteType.projectTitle}
           onChangeText={(text) => setInstituteType({ projectTitle: text })}
@@ -73,10 +75,10 @@ export const Step2 = ({ instituteType, setInstituteType }: Step2Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Name of the French Artist</Text>
+        <Text style={styles.label}>{t('nameOfTheFrenchArtist')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter artist name"
+          placeholder={t('inputDetails')}
           placeholderTextColor="#A0A0A0"
           value={instituteType.nameOfTheFrenchArtist}
           onChangeText={(text) =>
@@ -86,7 +88,7 @@ export const Step2 = ({ instituteType, setInstituteType }: Step2Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Exact Project Dates</Text>
+        <Text style={styles.label}>{t('exactProjectDates')}</Text>
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
           <View style={styles.inputWithIcon}>
             <TextInput

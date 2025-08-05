@@ -3,6 +3,7 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   ScrollView,
@@ -16,6 +17,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 const FreePlan = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [selectedPlan, setSelectedPlan] = useState(0);
 
   const getIncludedItems = () => {
@@ -128,9 +130,9 @@ const FreePlan = () => {
               style={styles.icon}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Pricing</Text>
+            <Text style={styles.title}>{t("pricing")}</Text>
             <Text style={styles.subtitle}>
-              Get unlimited access to all features
+              {t("getUnlimitedAccessToAllFeatures")}
             </Text>
 
             <View style={styles.planList}>
@@ -166,7 +168,9 @@ const FreePlan = () => {
 
                     {isYearly && selectedPlan === 2 && (
                       <View style={styles.bestValueWrapper}>
-                        <Text style={styles.bestValueText}>Best Value!</Text>
+                        <Text style={styles.bestValueText}>
+                          {t("bestValue")}!
+                        </Text>
                       </View>
                     )}
                   </TouchableOpacity>
@@ -174,7 +178,7 @@ const FreePlan = () => {
               })}
             </View>
 
-            <Text style={styles.includedTitle}>What&apos;s included</Text>
+            <Text style={styles.includedTitle}>{t("whatsIncluded")}</Text>
 
             {getIncludedItems().map((item, index) => (
               <View key={index} style={styles.includedItem}>
@@ -194,14 +198,15 @@ const FreePlan = () => {
             ))}
 
             <Text style={styles.footerText}>
-              • Terms of Use{"   "}• Privacy Policy
+              • {t("termsOfUse")}
+              {"   "}• {t("privacyPolicy")}
             </Text>
 
             <TouchableOpacity
               style={styles.selectButton}
               onPress={() => console.log("Plan Selected:", plans[selectedPlan])}
             >
-              <Text style={styles.selectButtonText}>Select Plan</Text>
+              <Text style={styles.selectButtonText}>{t("selectPlan")}</Text>
             </TouchableOpacity>
           </ScrollView>
         </SafeAreaView>
