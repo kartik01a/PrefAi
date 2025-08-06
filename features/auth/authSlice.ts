@@ -2,16 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserInfo {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   role: "USER" | "ADMIN";
-  passportNumber: string;
-  provider: "manual" | "facebook" | "google" | "linkedin" | "apple"; 
+  passportNumber?: string;
+  provider: "manual" | "facebook" | "google" | "linkedin" | "apple";
   token: string;
-
-  // Optional fields
-  name?: string;
   refreshToken?: string;
   active?: boolean;
   blocked?: boolean;
@@ -24,8 +21,24 @@ export interface UserInfo {
   title?: string;
   country?: string;
   maritalStatus?: string;
-  dob?: string; 
+  dob?: string;
   arrivalDate?: string;
+}
+
+interface AuthResponsePayload {
+  data: {
+    accessToken: string;
+    refreshToken: string;
+    userInfo: {
+      _id: string;
+      email: string;
+      role: "USER" | "ADMIN";
+      provider: string;
+      active?: boolean;
+      [key: string]: any;
+    };
+  };
+  success: boolean;
 }
 
 interface AuthState {
@@ -40,21 +53,44 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setCredentials: (state, action: PayloadAction<UserInfo>) => {
-      state.userInfo = action.payload;
+    setCredentials: (state, action: PayloadAction<AuthResponsePayload>) => {
+      const { accessToken, refreshToken, userInfo } = action.payload.data;
+
+      state.userInfo = {
+        id: userInfo._id,
+        email: userInfo.email,
+        role: userInfo.role,
+        provider: userInfo.provider as UserInfo["provider"],
+        token: accessToken,
+        refreshToken,
+        active: userInfo.active ?? true,
+        // Include other optional fields from userInfo
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
+        passportNumber: userInfo.passportNumber,
+        facebookId: userInfo.facebookId,
+        linkedinId: userInfo.linkedinId,
+        image: userInfo.image,
+        userName: userInfo.userName,
+        securityNumber: userInfo.securityNumber,
+        title: userInfo.title,
+        country: userInfo.country,
+        maritalStatus: userInfo.maritalStatus,
+        dob: userInfo.dob,
+        arrivalDate: userInfo.arrivalDate,
+      };
     },
+
     logout: (state) => {
       state.userInfo = null;
     },
-     setUserIdOnly: (state, action: PayloadAction<string>) => {
+
+    setUserIdOnly: (state, action: PayloadAction<string>) => {
       if (!state.userInfo) {
         state.userInfo = {
           id: action.payload,
-          firstName: "",
-          lastName: "",
           email: "",
           role: "USER",
-          passportNumber: "",
           provider: "manual",
           token: "",
         };
