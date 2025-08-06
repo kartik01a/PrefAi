@@ -4,9 +4,14 @@ import BaseLayout from "@/components/BaseLayout";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useNavigation } from "expo-router";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import {
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+} from "@/app/auth/usersApiSlice";
+import { RootState } from "@/app/store";
 import {
   Image,
   Platform,
@@ -17,15 +22,20 @@ import {
   View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
+import { useSelector } from "react-redux";
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
+  let userData = useSelector((state: RootState) => state.auth.userInfo);
   const { t } = useTranslation();
+
+  const { data: user, isLoading, refetch  } = useGetUserByIdQuery(userData?.id || "");
+  const [updateUser] = useUpdateUserMutation();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userName, setUserName] = useState("");
   const [securityNumber, setSecurityNumber] = useState("");
-
   const [title, setTitle] = useState("");
   const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
@@ -36,10 +46,50 @@ const EditProfileScreen = () => {
   const [showArrivalPicker, setShowArrivalPicker] = useState(false);
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, [navigation]);
+
+  useEffect(() => {
+    if (user?.data) {
+      const userInfo = user.data;
+      setFirstName(userInfo.firstName || "");
+      setLastName(userInfo.lastName || "");
+      setUserName(userInfo.userName || "");
+      setSecurityNumber(userInfo.passportNumber || "");
+      setTitle(userInfo.title || "");
+      setCountry(userInfo.country || "");
+      setEmail(userInfo.email || "");
+      setMaritalStatus(userInfo.maritalStatus || "");
+
+      if (userInfo.dob) setDob(new Date(userInfo.dob));
+      if (userInfo.arrivalDate) setArrivalDate(new Date(userInfo.arrivalDate));
+    }
+  }, [user]);
+
+  const handleUpdate = async () => {
+    try {
+      await updateUser({
+        id: userData?.id || "",
+        data: {
+          firstName,
+          lastName,
+          userName,
+          securityNumber,
+          title,
+          country,
+          email,
+          maritalStatus,
+          dob: dob.toISOString(),
+          arrivalDate: arrivalDate.toISOString(),
+        },
+      }).unwrap();
+      await refetch();
+      alert("Profile updated successfully");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile");
+    }
+  };
 
   return (
     <BaseLayout>
@@ -68,8 +118,8 @@ const EditProfileScreen = () => {
               style={styles.profileImage}
             />
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>John Doe</Text>
-              <Text style={styles.profileLocation}>Spain Citizen</Text>
+              <Text style={styles.profileName}></Text>
+              <Text style={styles.profileLocation}></Text>
             </View>
           </View>
 
@@ -78,6 +128,7 @@ const EditProfileScreen = () => {
 
         {/* Content */}
         <View style={styles.content}>
+          
           <View style={styles.row}>
             <View style={styles.inputHalf}>
               <Text style={styles.label}>{t("title")}</Text>
@@ -120,7 +171,6 @@ const EditProfileScreen = () => {
                 style={styles.input}
                 value={userName}
                 onChangeText={setUserName}
-                editable={false}
                 placeholder="Mr/Mrs"
                 placeholderTextColor="#A0A0A0"
               />
@@ -196,24 +246,39 @@ const EditProfileScreen = () => {
             </View>
           </View>
 
-          {/* Email Dropdown */}
-
           <Text style={styles.label}>{t("email")}</Text>
-          <RNPickerSelect
-            onValueChange={setEmail}
-            value={email}
-            items={[
+
+          {(() => {
+            const defaultEmailOptions = [
               { label: "JohnDoe@gmail.com", value: "JohnDoe@gmail.com" },
               { label: "JDoe@hotmail.com", value: "JDoe@hotmail.com" },
               { label: "john.d@example.com", value: "john.d@example.com" },
-            ]}
-            style={pickerSelectStyles}
-            useNativeAndroidPickerStyle={false}
-            placeholder={{ label: "Select your email", value: null }}
-            Icon={() => (
-              <Ionicons name="caret-down-outline" size={20} color="#A0A0A0" />
-            )}
-          />
+            ];
+
+            const emailOptions = email
+              ? defaultEmailOptions.some((item) => item.value === email)
+                ? defaultEmailOptions
+                : [{ label: email, value: email }, ...defaultEmailOptions]
+              : defaultEmailOptions;
+
+            return (
+              <RNPickerSelect
+                onValueChange={setEmail}
+                value={email}
+                items={emailOptions}
+                style={pickerSelectStyles}
+                useNativeAndroidPickerStyle={false}
+                placeholder={{ label: "Select your email", value: null }}
+                Icon={() => (
+                  <Ionicons
+                    name="caret-down-outline"
+                    size={20}
+                    color="#A0A0A0"
+                  />
+                )}
+              />
+            );
+          })()}
 
           <Text style={styles.label}>{t("maritalStatus")}</Text>
           <RNPickerSelect
@@ -273,7 +338,10 @@ const EditProfileScreen = () => {
             />
           )}
 
-          <TouchableOpacity style={styles.autoFillButton}>
+          <TouchableOpacity
+            style={styles.autoFillButton}
+            onPress={handleUpdate}
+          >
             <Text style={styles.autoFillText}>
               {t("autoFillDataFromCAFForm")}
             </Text>

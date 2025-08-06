@@ -47,7 +47,9 @@ export interface LoginRequest {
 }
 
 export interface updateRequest {
-  name?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
   refreshToken?: string;
   active?: boolean;
   blocked?: boolean;
@@ -63,6 +65,11 @@ export interface updateRequest {
   dob?: string;
   arrivalDate?: string;
   language?: string;
+}
+
+export interface ApiResponse<AuthResponse> {
+  success: boolean;
+  data: AuthResponse;
 }
 
 export const usersApiSlice = apiSlice.injectEndpoints({
@@ -94,6 +101,19 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: { language },
       }),
     }),
+    getUserById: builder.query<ApiResponse<AuthResponse>, string>({
+    query: (id) => ({
+        url: `${USERS_URL}/${id}`,
+        method: "GET",
+     }),
+    }),
+    updateUser: builder.mutation<void, { id: string; data: updateRequest }>({
+    query: ({ id, data }) => ({
+      method: "PUT",
+      url: `${USERS_URL}/${id}`,
+      body: data,
+    }),
+   }),
   }),
 });
 
@@ -102,4 +122,6 @@ export const {
   useLogoutMutation,
   useRegisterMutation,
   useUpdateUserLanguageMutation,
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
 } = usersApiSlice;
