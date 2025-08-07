@@ -1,3 +1,4 @@
+import Loading from "@/components/Loading";
 import NotFoundComp from "@/components/NotFoundComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -5,11 +6,12 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import DocumentPdf from "../assets/images/document-pdf.svg";
 import BaseLayout from "../components/BaseLayout";
-import useFileStore, { StoredFile } from "./hooks/useDocumentStore";
+import { IDocument, useGetDocumentsQuery } from "./auth/usersApiSlice";
+import useFileStore from "./hooks/useDocumentStore";
 
-const renderDocumentItem = (document: StoredFile) => (
+const renderDocumentItem = (document: IDocument) => (
   <TouchableOpacity
-    key={document.id}
+    key={document._id}
     style={styles.documentItem}
     // onPress={() => handleDocumentPress(document)}
   >
@@ -21,13 +23,12 @@ const renderDocumentItem = (document: StoredFile) => (
 );
 
 const DocumentFilesScreen = () => {
-  const { files, currentFolder, setCurrentFolder } = useFileStore();
-  const selectedFiles = files.filter(
-    (item) => item.folderName === currentFolder
-  );
+  const { currentFolder, setCurrentFolder } = useFileStore();
+  const { data: files, isLoading } = useGetDocumentsQuery(currentFolder || "");
 
   return (
     <BaseLayout>
+      <Loading visible={isLoading} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -52,14 +53,16 @@ const DocumentFilesScreen = () => {
               Document {"<"} {currentFolder}
             </Text>
             <Text style={styles.sectionBarItem}>
-              {selectedFiles.length} items
+              {files?.data?.length} items
             </Text>
           </View>
           <View style={styles.documentsContainer}>
-            {selectedFiles.length === 0 && (
+            {files?.data?.length === 0 && (
               <NotFoundComp text="No Files Found" />
             )}
-            {selectedFiles.map((document) => renderDocumentItem(document))}
+            {files?.data?.map((document: IDocument) =>
+              renderDocumentItem(document)
+            )}
           </View>
         </View>
       </View>

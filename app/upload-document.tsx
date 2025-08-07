@@ -1,6 +1,8 @@
+import Loading from "@/components/Loading";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   StyleSheet,
@@ -9,10 +11,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSelector } from "react-redux";
 import DocumentPdf from "../assets/images/document-pdf.svg";
 import BaseLayout from "../components/BaseLayout";
+import { useCreateDocumentMutation } from "./auth/usersApiSlice";
 import useFileStore from "./hooks/useDocumentStore";
-import { useTranslation } from "react-i18next";
+import { RootState } from "./store";
 
 // interface UploadDocumentScreenProps {
 //   route: {
@@ -29,16 +33,18 @@ import { useTranslation } from "react-i18next";
 // }
 
 const UploadDocumentScreen = () => {
+  let userData = useSelector((state: RootState) => state.auth.userInfo);
   const {
     selectedFile,
     currentFolder: selectedFolder,
     setCurrentFolder,
-    addFile
   } = useFileStore();
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const [fileName, setFileName] = useState(
     selectedFile?.name.split(".")[0] || ""
   );
+
+  const [addDocument, { isLoading }] = useCreateDocumentMutation();
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
@@ -67,7 +73,7 @@ const UploadDocumentScreen = () => {
     setCurrentFolder("");
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!fileName.trim()) {
       Alert.alert("Error", "Please enter a file name");
       return;
@@ -79,24 +85,15 @@ const UploadDocumentScreen = () => {
     }
 
     const uploadData = {
-      file: selectedFile,
-      fileName: fileName.trim(),
-      folder: selectedFolder,
-      originalName: selectedFile!.name,
-      size: selectedFile!.size,
-      type: selectedFile!.type,
+      userId: userData?.id || "",
+      uri: selectedFile?.uri || "",
+      name: fileName.trim() || selectedFile?.name || "",
+      size: selectedFile?.size || 0,
+      type: selectedFile?.type || "",
+      folderId: selectedFolder || "",
     };
-    addFile({
-      file: selectedFile,
-      uri: selectedFile!.uri,
-      name: fileName.trim(),
-      size: selectedFile!.size,
-      type: selectedFile!.type,
-    });
-
-    // TODO: Call your API here
-    console.log("Upload data:", uploadData);
-
+    console.log(uploadData, "uploadData");
+    await addDocument(uploadData);
     Alert.alert("Success", "Document uploaded successfully!", [
       {
         text: "OK",
@@ -107,6 +104,7 @@ const UploadDocumentScreen = () => {
 
   return (
     <BaseLayout>
+      <Loading visible={isLoading} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -120,10 +118,10 @@ const UploadDocumentScreen = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('documentManagement')}</Text>
+          <Text style={styles.headerTitle}>{t("documentManagement")}</Text>
         </View>
 
-        <Text style={styles.subTitle}>{t('uploadDocument')}</Text>
+        <Text style={styles.subTitle}>{t("uploadDocument")}</Text>
 
         {/* Selected File Display */}
         <View style={styles.fileDisplay}>
@@ -146,7 +144,7 @@ const UploadDocumentScreen = () => {
               style={styles.textInput}
               value={fileName}
               onChangeText={setFileName}
-              placeholder={t('enterFileName')}
+              placeholder={t("enterFileName")}
               placeholderTextColor="#999"
             />
             <TouchableOpacity
@@ -160,7 +158,7 @@ const UploadDocumentScreen = () => {
 
         {/* Location Selection */}
         <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>{t('location')}</Text>
+          <Text style={styles.inputLabel}>{t("location")}</Text>
           <TouchableOpacity
             style={styles.locationContainer}
             onPress={handleLocationPress}
@@ -171,7 +169,7 @@ const UploadDocumentScreen = () => {
                 !selectedFolder && styles.placeholderText,
               ]}
             >
-              {selectedFolder || t('selectLocation')}
+              {selectedFolder || t("selectLocation")}
             </Text>
             {selectedFolder ? (
               <TouchableOpacity
@@ -186,7 +184,7 @@ const UploadDocumentScreen = () => {
 
         {/* Upload Button */}
         <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
-          <Text style={styles.uploadButtonText}>{t('upload')}</Text>
+          <Text style={styles.uploadButtonText}>{t("upload")}</Text>
         </TouchableOpacity>
       </View>
     </BaseLayout>

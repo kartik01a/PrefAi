@@ -1,7 +1,9 @@
 import CustomModal from "@/components/CustomModal";
+import Loading from "@/components/Loading";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   StyleSheet,
   Text,
@@ -9,72 +11,81 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSelector } from "react-redux";
 import DocumentAddFolder from "../assets/images/document-add-folder.svg";
 import DocumentFolder from "../assets/images/document-folder.svg";
 import BaseLayout from "../components/BaseLayout";
-import useFileStore, { StoredFolder } from "./hooks/useDocumentStore";
-import { useTranslation } from "react-i18next";
+import {
+  IFolder,
+  useCreateFolderMutation,
+  useGetFoldersQuery,
+} from "./auth/usersApiSlice";
+import useFileStore from "./hooks/useDocumentStore";
+import { RootState } from "./store";
 
 const SelectLocationScreen = () => {
+  let userData = useSelector((state: RootState) => state.auth.userInfo);
   const {
     setCurrentFolder,
-    addFolder,
     currentFolder: selectedFolder,
-    folders,
     files,
   } = useFileStore();
+  const [addFolder, { isLoading: createFolderLoading }] =
+    useCreateFolderMutation();
+  const { data: folders, isLoading: getFolderLoading } = useGetFoldersQuery(
+    userData?.id || ""
+  );
   const [isAddFolder, setIsAddFolder] = useState(false);
   const [folderName, setFolderName] = useState("");
   const { t } = useTranslation();
 
   const handleAddFolder = () => {
     if (folderName) {
-      addFolder({ name: folderName });
+      addFolder({ folderName, userId: userData?.id || "" });
       setIsAddFolder(false);
       setCurrentFolder("");
     }
   };
 
-  const handleFolderSelect = (folder: StoredFolder) => {
-    setCurrentFolder(folder.name);
+  const handleFolderSelect = (folder: string) => {
+    setCurrentFolder(folder);
     router.back();
   };
 
-  const renderFolderItem = (item: StoredFolder) => {
-    const count = files.filter((item) => item.folderName === item.name).length;
+  const renderFolderItem = (item: IFolder) => {
     return (
       <TouchableOpacity
-        key={item.id}
+        key={item._id}
         style={
-          selectedFolder === item.name
+          selectedFolder === item._id
             ? styles.selectedFolderItem
             : styles.folderItem
         }
-        onPress={() => handleFolderSelect(item)}
+        onPress={() => handleFolderSelect(item._id)}
       >
         <View style={styles.folderIcon}>
           <DocumentFolder
-            color={selectedFolder === item.name ? "white" : "#2479CF"}
+            color={selectedFolder === item._id ? "white" : "#2479CF"}
           />
         </View>
         <Text
           style={
-            selectedFolder === item.name
+            selectedFolder === item._id
               ? styles.selectFolderName
               : styles.folderName
           }
         >
-          {item.name}
+          {item.folderName}
         </Text>
         <Text
           style={[
             styles.folderCount,
-            selectedFolder === item.name
+            selectedFolder === item._id
               ? { color: "white" }
               : { color: "#2479CF" },
           ]}
         >
-          {count} items
+          {item.fileCount} items
         </Text>
       </TouchableOpacity>
     );
@@ -82,6 +93,7 @@ const SelectLocationScreen = () => {
 
   return (
     <BaseLayout>
+      <Loading visible={createFolderLoading || getFolderLoading} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -95,24 +107,24 @@ const SelectLocationScreen = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('documentManagement')}</Text>
+          <Text style={styles.headerTitle}>{t("documentManagement")}</Text>
         </View>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{t('selectDestination')}</Text>
+            <Text style={styles.sectionTitle}>{t("selectDestination")}</Text>
             <TouchableOpacity onPress={() => setIsAddFolder(true)}>
               <DocumentAddFolder />
             </TouchableOpacity>
           </View>
 
           <View style={styles.folderGrid}>
-            {folders.map((folder) => renderFolderItem(folder))}
+            {folders?.data?.map((folder) => renderFolderItem(folder))}
           </View>
         </View>
       </View>
       <CustomModal visible={isAddFolder} onClose={() => setIsAddFolder(false)}>
         <View>
-          <Text style={{ color: "#2479CF" }}>{t('enterFolderName')}</Text>
+          <Text style={{ color: "#2479CF" }}>{t("enterFolderName")}</Text>
           <TextInput
             style={styles.textInput}
             value={folderName}
@@ -121,7 +133,7 @@ const SelectLocationScreen = () => {
             placeholderTextColor="#999"
           />
           <TouchableOpacity style={styles.button} onPress={handleAddFolder}>
-            <Text style={{ color: "white" }}>{t('addFolder')}</Text>
+            <Text style={{ color: "white" }}>{t("addFolder")}</Text>
           </TouchableOpacity>
         </View>
       </CustomModal>

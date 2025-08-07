@@ -1,7 +1,8 @@
 import { create } from "zustand";
 
 interface FileData {
-  file: any;
+  // file: any;
+  resource_type: string;
   uri: string;
   name: string;
   type: string;
@@ -65,20 +66,20 @@ interface FileActions {
 type FileStore = FileState & FileActions;
 
 const createFile = (
-  file: File,
   uri: string,
   name: string,
   type: string,
   size: number,
+  resource_type: string,
   folderName = ""
 ) => ({
   id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-  file,
   uri,
   name,
   type,
   size,
   folderName,
+  resource_type,
   uploadedAt: new Date().toISOString(),
 });
 const createFolder = (name: string) => ({
@@ -96,13 +97,13 @@ const useFileStore = create<FileStore>()((set, get) => ({
 
   // Actions for selected file
   setSelectedFile: (fileData) => {
-    const { file, uri, name, type, size } = fileData;
+    const { uri, name, type, size, resource_type } = fileData;
     const selectedFile = createFile(
-      file,
       uri,
       name,
       type,
       size,
+      resource_type,
       get().currentFolder
     );
     set({ selectedFile: selectedFile });
@@ -120,9 +121,9 @@ const useFileStore = create<FileStore>()((set, get) => ({
   },
 
   addFile: (fileData) => {
-    const { file, uri, name, type, size } = fileData;
+    const { uri, name, type, size } = fileData;
     const newFile = createFile(
-      file,
+      // file,
       uri,
       name,
       type,
@@ -146,8 +147,8 @@ const useFileStore = create<FileStore>()((set, get) => ({
 
   addMultipleFiles: (filesData) => {
     const newFiles = filesData.map((fileData) => {
-      const { file, uri, name, type, size } = fileData;
-      return createFile(file, uri, name, type, size, get().currentFolder);
+      const { uri, name, type, size } = fileData;
+      return createFile(uri, name, type, size, get().currentFolder);
     });
 
     set((state) => ({

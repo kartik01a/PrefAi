@@ -1,5 +1,7 @@
 import CustomModal from "@/components/CustomModal";
+import Loading from "@/components/Loading";
 import NotFoundComp from "@/components/NotFoundComp";
+import cloudinaryService from "@/services/cloudinaryService";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
@@ -15,37 +17,46 @@ import {
   View,
 } from "react-native";
 import { Menu } from "react-native-paper";
+import { useSelector } from "react-redux";
 import DocumentFolder from "../../assets/images/document-folder.svg";
 import DocumentPdf from "../../assets/images/document-pdf.svg";
 import UploadAdd from "../../assets/images/upload-add.svg";
 import BaseLayout from "../../components/BaseLayout";
-import useFileStore, {
-  StoredFile,
-  StoredFolder,
-} from "../hooks/useDocumentStore";
+import {
+  IFolder,
+  useCreateFolderMutation,
+  useGetFoldersQuery,
+} from "../auth/usersApiSlice";
+import useFileStore, { StoredFile } from "../hooks/useDocumentStore";
+import { RootState } from "../store";
 
 const DocumentTab = () => {
-  const { setSelectedFile, setCurrentFolder, files, folders, addFolder } =
-    useFileStore();
+  const { setSelectedFile, setCurrentFolder, files } = useFileStore();
+  let userData = useSelector((state: RootState) => state.auth.userInfo);
+  const [addFolder, { isLoading: createFolderLoading }] =
+    useCreateFolderMutation();
+  const { data: folders, isLoading: getFolderLoading } = useGetFoldersQuery(
+    userData?.id || ""
+  );
   const { t } = useTranslation();
   const [isAddFolder, setIsAddFolder] = useState(false);
   const [visible, setVisible] = useState(false);
   const [folderName, setFolderName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
   const handleAddFolder = () => {
     if (folderName) {
-      addFolder({ name: folderName });
+      addFolder({ folderName, userId: userData?.id || "" });
       setIsAddFolder(false);
       setCurrentFolder("");
     }
   };
 
-  const handleFolderPress = (folder: StoredFolder) => {
-    console.log("Folder pressed:", folder.name);
-    setCurrentFolder(folder.name);
+  const handleFolderPress = (folder: string) => {
+    setCurrentFolder(folder);
     router.push("/document-files");
   };
 
@@ -55,12 +66,23 @@ const DocumentTab = () => {
   };
 
   const validateFileSize = (file: any) => {
-    const maxSizeImage = 1 * 1024 * 1024; // 1MB for images
+    const maxSizeImage = 25 * 1024 * 1024; // 25MB for images
     const maxSizePdf = 10 * 1024 * 1024; // 10MB for PDFs
 
     if (file.type && file.type.includes("image")) {
-      return file.size <= maxSizeImage;
+      return file.fileSize <= maxSizeImage;
     } else if (file.type && file.type.includes("pdf")) {
+      return file.size <= maxSizePdf;
+    }
+    return false;
+  };
+  const validateDocumentSize = (file: any) => {
+    const maxSizeImage = 25 * 1024 * 1024; // 25MB for images
+    const maxSizePdf = 10 * 1024 * 1024; // 10MB for PDFs
+
+    if (file.mimeType && file.mimeType.includes("image")) {
+      return file.size <= maxSizeImage;
+    } else if (file.mimeType && file.mimeType.includes("pdf")) {
       return file.size <= maxSizePdf;
     }
     return false;
@@ -109,17 +131,25 @@ const DocumentTab = () => {
 
       if (!result.canceled && result.assets[0]) {
         const file = result.assets[0];
+        setIsLoading(true);
+        if (!validateFileSize(file)) {
+          Alert.alert("File Too Large", "Images must be less than 25MB");
+          return;
+        }
 
-        // Validate file size
-        // if (!validateFileSize(file)) {
-        //   Alert.alert("File Too Large", "Images must be less than 1MB");
-        //   return;
-        // }
+        const uploadResult = await cloudinaryService.uploadFile(
+          result.assets[0].uri,
+          {
+            folder: "app-uploads/images",
+            resourceType: "image",
+          }
+        );
+        setIsLoading(false);
 
         // Navigate to upload screen
         setSelectedFile({
-          file: file,
-          uri: file.uri,
+          resource_type: uploadResult.resource_type,
+          uri: uploadResult.secure_url,
           name: file.fileName || `image_${Date.now()}.jpg`,
           type: file.type || "image/jpeg",
           size: file.fileSize || 0,
@@ -143,19 +173,22 @@ const DocumentTab = () => {
 
       if (!result.canceled && result.assets[0]) {
         const file = result.assets[0];
+        setIsLoading(true);
 
-        // Validate file size
-        // if (!validateFileSize(file)) {
-        //   const maxSize = file.mimeType?.includes("image") ? "1MB" : "10MB";
-        //   Alert.alert("File Too Large", `File must be less than ${maxSize}`);
-        //   return;
-        // }
-
-        // Navigate to upload screen
+        if (!validateDocumentSize(file)) {
+          const maxSize = file.mimeType?.includes("image") ? "25MB" : "10MB";
+          Alert.alert("File Too Large", `File must be less than ${maxSize}`);
+          return;
+        }
+        const uploadResult = await cloudinaryService.uploadFile(file.uri, {
+          folder: "app-uploads/documents",
+          resourceType: file.mimeType?.startsWith("image/") ? "image" : "raw",
+        });
+        setIsLoading(false);
 
         setSelectedFile({
-          file: file,
-          uri: file.uri,
+          resource_type: uploadResult.resource_type,
+          uri: uploadResult.secure_url,
           name: file.name || `image_${Date.now()}.jpg`,
           type: file.mimeType || "image/jpeg",
           size: file.size || 0,
@@ -171,23 +204,19 @@ const DocumentTab = () => {
     }
   };
 
-  const renderFolderItem = (folder: StoredFolder, files: StoredFile[]) => {
-    const count = files.filter(
-      (item) => item.folderName === folder.name
-    ).length;
-    console.log(count, "count");
+  const renderFolderItem = (folder: IFolder, files: StoredFile[]) => {
     return (
       <TouchableOpacity
-        key={folder.id}
+        key={folder._id}
         style={styles.folderItem}
-        onPress={() => handleFolderPress(folder)}
+        onPress={() => handleFolderPress(folder._id)}
       >
         <View style={styles.folderIcon}>
           <DocumentFolder color="#2479CF" />
         </View>
-        <Text style={styles.folderName}>{folder.name}</Text>
+        <Text style={styles.folderName}>{folder.folderName}</Text>
         <Text style={styles.folderCount}>
-          {count || 0} {t("items")}
+          {folder.fileCount || 0} {t("items")}
         </Text>
       </TouchableOpacity>
     );
@@ -208,6 +237,7 @@ const DocumentTab = () => {
 
   return (
     <BaseLayout>
+      <Loading visible={createFolderLoading || isLoading} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -262,20 +292,22 @@ const DocumentTab = () => {
             </TouchableOpacity>
           </View>
 
-          {folders.length === 0 && <NotFoundComp text={t("noFolderFound")} />}
-          {folders.length !== 0 && (
+          {folders?.data?.length === 0 && (
+            <NotFoundComp text={t("noFolderFound")} />
+          )}
+          {folders?.data?.length !== 0 && (
             <View style={styles.folderGrid}>
-              {folders.map((folder) => renderFolderItem(folder, files))}
+              {folders?.data?.map((folder) => renderFolderItem(folder, files))}
             </View>
           )}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recent Document</Text>
-          <View style={styles.documentsContainer}>
+          {/* <View style={styles.documentsContainer}>
             {files.length === 0 && <NotFoundComp text={t("noFilesFound")} />}
             {files.map((document) => renderDocumentItem(document))}
-          </View>
+          </View> */}
         </View>
       </View>
       <CustomModal visible={isAddFolder} onClose={() => setIsAddFolder(false)}>

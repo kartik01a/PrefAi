@@ -1,4 +1,4 @@
-import { USERS_URL } from "../../constants/constants";
+import { DOCUMENTS_URL, USERS_URL } from "../../constants/constants";
 import { apiSlice } from "../../services/apiSlice";
 
 export interface RegisterRequest {
@@ -67,9 +67,24 @@ export interface updateRequest {
   language?: string;
 }
 
-export interface ApiResponse<AuthResponse> {
+export interface IDocument {
+  _id?: string;
+  userId: string;
+  uri: string;
+  name: string;
+  size: number;
+  type: string;
+  folderId: string;
+}
+export interface IFolder {
+  folderName: string;
+  fileCount: string;
+  _id: string;
+}
+
+export interface ApiResponse<T> {
   success: boolean;
-  data: AuthResponse;
+  data: T;
 }
 
 export const usersApiSlice = apiSlice.injectEndpoints({
@@ -94,7 +109,10 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    updateUserLanguage: builder.mutation<void,{ id: string; language: string }>({
+    updateUserLanguage: builder.mutation<
+      void,
+      { id: string; language: string }
+    >({
       query: ({ id, language }) => ({
         url: `${USERS_URL}/language/${id}`,
         method: "PATCH",
@@ -102,18 +120,51 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     getUserById: builder.query<ApiResponse<AuthResponse>, string>({
-    query: (id) => ({
+      query: (id) => ({
         url: `${USERS_URL}/${id}`,
         method: "GET",
-     }),
+      }),
     }),
     updateUser: builder.mutation<void, { id: string; data: updateRequest }>({
-    query: ({ id, data }) => ({
-      method: "PUT",
-      url: `${USERS_URL}/${id}`,
-      body: data,
+      query: ({ id, data }) => ({
+        method: "PUT",
+        url: `${USERS_URL}/${id}`,
+        body: data,
+      }),
     }),
-   }),
+    getDocuments: builder.query<ApiResponse<IDocument[]>, string>({
+      query: (id) => ({
+        url: `${DOCUMENTS_URL}/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Document"],
+    }),
+    createDocument: builder.mutation<void, IDocument>({
+      query: (data) => ({
+        method: "POST",
+        url: `${DOCUMENTS_URL}`,
+        body: data,
+      }),
+      invalidatesTags: ["Document", "Folder"],
+    }),
+    getFolders: builder.query<ApiResponse<IFolder[]>, string>({
+      query: (id) => ({
+        url: `${DOCUMENTS_URL}/folder/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Folder"],
+    }),
+    createFolder: builder.mutation<
+      void,
+      { folderName: string; userId: string }
+    >({
+      query: (data) => ({
+        method: "POST",
+        url: `${DOCUMENTS_URL}/folder`,
+        body: data,
+      }),
+      invalidatesTags: ["Folder"],
+    }),
   }),
 });
 
@@ -124,4 +175,8 @@ export const {
   useUpdateUserLanguageMutation,
   useGetUserByIdQuery,
   useUpdateUserMutation,
+  useGetDocumentsQuery,
+  useGetFoldersQuery,
+  useCreateDocumentMutation,
+  useCreateFolderMutation,
 } = usersApiSlice;
