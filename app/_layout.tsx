@@ -1,6 +1,7 @@
 import { store } from "@/app/store";
 import { initI18n, initializeRTL, isRTLLanguage, loadSavedLanguage } from "@/i18n";
 import { loadUserFromStorage } from "@/utils/authLoader";
+import { StripeProvider } from '@stripe/stripe-react-native';
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import { I18nManager, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from 'react-native-toast-message';
 import { Provider as ReduxProvider } from "react-redux";
 
 SplashScreen.preventAutoHideAsync();
@@ -78,6 +80,7 @@ export default function RootLayout() {
 
   return (
     <ReduxProvider store={store}>
+       <StripeProvider publishableKey={process.env.PUBLISHABLE_KEY}>
       <SafeAreaProvider>
         <PaperProvider>
           <View key={appKey} style={{ flex: 1 }}>
@@ -115,9 +118,11 @@ export default function RootLayout() {
                 }} 
               />
             </Stack>
+             <Toast />
           </View>
         </PaperProvider>
       </SafeAreaProvider>
+      </StripeProvider>
     </ReduxProvider>
   );
 }

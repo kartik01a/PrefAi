@@ -2,6 +2,7 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import React, { useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,10 +11,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
+import { useCreateSubscriptionMutation } from "./subscriptionApiSlice";
 
 const FreePlan = () => {
   const navigation = useNavigation();
@@ -107,14 +110,52 @@ const FreePlan = () => {
   };
 
   const plans = [
-    { title: "Free Plan - 3 days", price: "€0.00 / month" },
-    { title: "Monthly Plan - Full Access", price: "€4.99 / month" },
-    { title: "Yearly Plan - Best Value", price: "€59.99 / year" },
+    { title: "Free Plan - 3 days", price: "€0.00 / month", id: null },
+    {
+      title: "Monthly Plan - Full Access",
+      price: "€4.99 / month",
+      id: "price_1RtaE42SNvhd3XUdMxiwpVrc",
+    },
+    {
+      title: "Yearly Plan - Best Value",
+      price: "€59.99 / year",
+      id: "price_456_Yearly",
+    },
   ];
 
+  const [createSubscription, { isLoading }] = useCreateSubscriptionMutation();
+
+  const handleSelectPlan = async () => {
+    const selectedPlanId = plans[selectedPlan].id;
+    if (!selectedPlanId) {
+      Toast.show({
+        type: "info",
+        text1: "Free plan selected",
+        text2: "You're already on a free plan.",
+      });
+      return;
+    }
+    try {
+      const response = await createSubscription({
+        planId: selectedPlanId,
+      }).unwrap();
+      console.log("response", response)
+      const url = response?.data?.url;
+      console.log("url", url);
+      if (url) {
+        await WebBrowser.openBrowserAsync(url);
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to start subscription",
+      });
+    }
+  };
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
-  }, []);
+  }, [navigation]);
 
   return (
     <SafeAreaProvider>
@@ -204,9 +245,12 @@ const FreePlan = () => {
 
             <TouchableOpacity
               style={styles.selectButton}
-              onPress={() => console.log("Plan Selected:", plans[selectedPlan])}
+              onPress={handleSelectPlan}
+              disabled={isLoading}
             >
-              <Text style={styles.selectButtonText}>{t("selectPlan")}</Text>
+              <Text style={styles.selectButtonText}>
+                {isLoading ? "Processing..." : t("selectPlan")}
+              </Text>
             </TouchableOpacity>
           </ScrollView>
         </SafeAreaView>
