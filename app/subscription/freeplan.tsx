@@ -119,7 +119,7 @@ const FreePlan = () => {
     {
       title: "Yearly Plan - Best Value",
       price: "€59.99 / year",
-      id: "price_456_Yearly",
+      id: "price_1RuFHLCe7yxtOx2Nu1ieMoba",
     },
   ];
 
