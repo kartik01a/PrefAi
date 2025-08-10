@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import CustomModal from "@/components/CustomModal";
 import Loading from "@/components/Loading";
 import NotFoundComp from "@/components/NotFoundComp";
@@ -6,7 +7,6 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -33,10 +33,11 @@ import { RootState } from "../store";
 const DocumentTab = () => {
   const { setSelectedFile, setCurrentFolder, files } = useFileStore();
   let userData = useSelector((state: RootState) => state.auth.userInfo);
+  console.log(userData)
   const [addFolder, { isLoading: createFolderLoading }] =
     useCreateFolderMutation();
   const { data: folders, isLoading: getFolderLoading } = useGetFoldersQuery(
-    userData?.id || ""
+    userData?._id || ""
   );
   const { t } = useTranslation();
   const [isAddFolder, setIsAddFolder] = useState(false);
@@ -49,14 +50,14 @@ const DocumentTab = () => {
 
   const handleAddFolder = () => {
     if (folderName) {
-      addFolder({ folderName, userId: userData?.id || "" });
+      addFolder({ folderName, userId: userData?._id || "" });
       setIsAddFolder(false);
-      setCurrentFolder("");
+      setCurrentFolder({name: "", id: ""});
     }
   };
 
-  const handleFolderPress = (folder: string) => {
-    setCurrentFolder(folder);
+  const handleFolderPress = ({ name, id }: { name: string; id: string }) => {
+    setCurrentFolder({ name, id });
     router.push("/document-files");
   };
 
@@ -209,7 +210,7 @@ const DocumentTab = () => {
       <TouchableOpacity
         key={folder._id}
         style={styles.folderItem}
-        onPress={() => handleFolderPress(folder._id)}
+        onPress={() => handleFolderPress({ name: folder.folderName, id: folder._id })}
       >
         <View style={styles.folderIcon}>
           <DocumentFolder color="#2479CF" />

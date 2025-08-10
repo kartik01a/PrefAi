@@ -1,5 +1,10 @@
 import { store } from "@/app/store";
-import { initI18n, initializeRTL, isRTLLanguage, loadSavedLanguage } from "@/i18n";
+import {
+  initI18n,
+  initializeRTL,
+  isRTLLanguage,
+  loadSavedLanguage,
+} from "@/i18n";
 import { loadUserFromStorage } from "@/utils/authLoader";
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { useFonts } from "expo-font";
@@ -19,7 +24,7 @@ export default function RootLayout() {
   const [isI18nReady, setIsI18nReady] = useState(false);
   const [isRTLReady, setIsRTLReady] = useState(false);
   const [appKey, setAppKey] = useState(0); // For forcing re-render
-  
+
   const [fontsLoaded] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
@@ -31,22 +36,21 @@ export default function RootLayout() {
       try {
         await initializeRTL();
         setIsRTLReady(true);
-        
+
         await initI18n();
         console.log("✅ i18n initialized");
-        
+
         const savedLanguage = await loadSavedLanguage();
         if (savedLanguage) {
           const shouldBeRTL = isRTLLanguage(savedLanguage);
           const currentRTL = I18nManager.isRTL;
-          
+
           if (shouldBeRTL !== currentRTL) {
-            console.log('RTL mismatch detected, will need app restart');
+            console.log("RTL mismatch detected, will need app restart");
             I18nManager.allowRTL(shouldBeRTL);
             I18nManager.forceRTL(shouldBeRTL);
           }
         }
-        
       } catch (error) {
         console.error("❌ Failed to initialize app:", error);
       } finally {
@@ -85,37 +89,47 @@ export default function RootLayout() {
         <PaperProvider>
           <View key={appKey} style={{ flex: 1 }}>
             <StatusBar />
-            <Stack screenOptions={{
-              headerShown: false,
-              // Apply RTL-aware animations
-              animationTypeForReplace: 'push',
-              animation: I18nManager.isRTL ? 'slide_from_left' : 'slide_from_right',
-            }}>
-              <Stack.Screen 
-                name="(tabs)" 
-                options={{ 
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                // Apply RTL-aware animations
+                animationTypeForReplace: "push",
+                animation: I18nManager.isRTL
+                  ? "slide_from_left"
+                  : "slide_from_right",
+              }}
+            >
+              <Stack.Screen
+                name="(tabs)"
+                options={{
                   headerShown: false,
-                }} 
+                }}
               />
-              <Stack.Screen 
-                name="upload-document" 
-                options={{ 
+              <Stack.Screen
+                name="upload-document"
+                options={{
                   headerShown: false,
-                  presentation: 'modal',
-                }} 
+                  presentation: "modal",
+                }}
               />
-              <Stack.Screen 
-                name="upload-location" 
-                options={{ 
+              <Stack.Screen
+                name="upload-location"
+                options={{
                   headerShown: false,
-                  presentation: 'modal',
-                }} 
+                  presentation: "modal",
+                }}
               />
-              <Stack.Screen 
-                name="document-files" 
-                options={{ 
+              <Stack.Screen
+                name="document-files"
+                options={{
                   headerShown: false,
-                }} 
+                }}
+              />
+              <Stack.Screen
+                name="file-viewer"
+                options={{
+                  headerShown: false,
+                }}
               />
             </Stack>
              <Toast />

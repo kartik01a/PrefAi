@@ -79,13 +79,17 @@ const AccountTab: React.FC = () => {
           <View style={styles.profileCard}>
             <Image
               source={{
-                uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+                uri: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
               }}
               style={styles.profileImage}
             />
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{userInfo?.firstName ?? "" + userInfo?.lastName ?? ""}</Text>
-              <Text style={styles.profileLocation}>{userInfo?.country} Citizen</Text>
+              <Text style={styles.profileName}>
+                {userInfo?.firstName ? userInfo?.firstName : "" + userInfo?.lastName ? userInfo?.lastName : ""}
+              </Text>
+              <Text style={styles.profileLocation}>
+                {userInfo?.country} Citizen
+              </Text>
             </View>
             <TouchableOpacity onPress={openMenu}>
               <Menu

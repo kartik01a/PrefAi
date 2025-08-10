@@ -9,22 +9,27 @@ import BaseLayout from "../components/BaseLayout";
 import { IDocument, useGetDocumentsQuery } from "./auth/usersApiSlice";
 import useFileStore from "./hooks/useDocumentStore";
 
-const renderDocumentItem = (document: IDocument) => (
-  <TouchableOpacity
-    key={document._id}
-    style={styles.documentItem}
-    // onPress={() => handleDocumentPress(document)}
-  >
-    <View style={styles.documentIcon}>
-      <DocumentPdf />
-    </View>
-    <Text style={styles.documentName}>{document.name}</Text>
-  </TouchableOpacity>
-);
-
 const DocumentFilesScreen = () => {
-  const { currentFolder, setCurrentFolder } = useFileStore();
-  const { data: files, isLoading } = useGetDocumentsQuery(currentFolder || "");
+  const { currentFolder, setCurrentFolder, setViewUrl } = useFileStore();
+  const { data: files, isLoading } = useGetDocumentsQuery(
+    currentFolder.id || ""
+  );
+
+  const renderDocumentItem = (document: IDocument) => (
+    <TouchableOpacity
+      key={document._id}
+      style={styles.documentItem}
+      onPress={() => {
+        setViewUrl(document.uri);
+        router.push("/file-viewer");
+      }}
+    >
+      <View style={styles.documentIcon}>
+        <DocumentPdf />
+      </View>
+      <Text style={styles.documentName}>{document.name}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <BaseLayout>
@@ -34,7 +39,7 @@ const DocumentFilesScreen = () => {
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => {
-              setCurrentFolder("");
+              setCurrentFolder({ name: "", id: "" });
               router.back();
             }}
             style={styles.backButton}
@@ -50,7 +55,7 @@ const DocumentFilesScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionBar}>
             <Text style={styles.sectionBarItem}>
-              Document {"<"} {currentFolder}
+              Document {"<"} {currentFolder.name}
             </Text>
             <Text style={styles.sectionBarItem}>
               {files?.data?.length} items

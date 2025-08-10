@@ -1,8 +1,8 @@
+import React, { useState } from "react";
 import CustomModal from "@/components/CustomModal";
 import Loading from "@/components/Loading";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   StyleSheet,
@@ -25,15 +25,11 @@ import { RootState } from "./store";
 
 const SelectLocationScreen = () => {
   let userData = useSelector((state: RootState) => state.auth.userInfo);
-  const {
-    setCurrentFolder,
-    currentFolder: selectedFolder,
-    files,
-  } = useFileStore();
+  const { setCurrentFolder, currentFolder: selectedFolder } = useFileStore();
   const [addFolder, { isLoading: createFolderLoading }] =
     useCreateFolderMutation();
   const { data: folders, isLoading: getFolderLoading } = useGetFoldersQuery(
-    userData?.id || ""
+    userData?._id || ""
   );
   const [isAddFolder, setIsAddFolder] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -41,14 +37,14 @@ const SelectLocationScreen = () => {
 
   const handleAddFolder = () => {
     if (folderName) {
-      addFolder({ folderName, userId: userData?.id || "" });
+      addFolder({ folderName, userId: userData?._id || "" });
       setIsAddFolder(false);
-      setCurrentFolder("");
+      setCurrentFolder({ name: "", id: "" });
     }
   };
 
-  const handleFolderSelect = (folder: string) => {
-    setCurrentFolder(folder);
+  const handleFolderSelect = ({ name, id }: { name: string; id: string }) => {
+    setCurrentFolder({ name, id });
     router.back();
   };
 
@@ -57,20 +53,22 @@ const SelectLocationScreen = () => {
       <TouchableOpacity
         key={item._id}
         style={
-          selectedFolder === item._id
+          selectedFolder.id === item._id
             ? styles.selectedFolderItem
             : styles.folderItem
         }
-        onPress={() => handleFolderSelect(item._id)}
+        onPress={() =>
+          handleFolderSelect({ name: item.folderName, id: item._id })
+        }
       >
         <View style={styles.folderIcon}>
           <DocumentFolder
-            color={selectedFolder === item._id ? "white" : "#2479CF"}
+            color={selectedFolder.id === item._id ? "white" : "#2479CF"}
           />
         </View>
         <Text
           style={
-            selectedFolder === item._id
+            selectedFolder.id === item._id
               ? styles.selectFolderName
               : styles.folderName
           }
@@ -80,7 +78,7 @@ const SelectLocationScreen = () => {
         <Text
           style={[
             styles.folderCount,
-            selectedFolder === item._id
+            selectedFolder.id === item._id
               ? { color: "white" }
               : { color: "#2479CF" },
           ]}

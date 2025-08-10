@@ -70,7 +70,7 @@ const UploadDocumentScreen = () => {
   };
 
   const handleRemoveFolder = () => {
-    setCurrentFolder("");
+    setCurrentFolder({name: "", id: ""});
   };
 
   const handleUpload = async () => {
@@ -85,12 +85,12 @@ const UploadDocumentScreen = () => {
     }
 
     const uploadData = {
-      userId: userData?.id || "",
+      userId: userData?._id || "",
       uri: selectedFile?.uri || "",
       name: fileName.trim() || selectedFile?.name || "",
       size: selectedFile?.size || 0,
       type: selectedFile?.type || "",
-      folderId: selectedFolder || "",
+      folderId: selectedFolder.id || "",
     };
     console.log(uploadData, "uploadData");
     await addDocument(uploadData);
@@ -169,7 +169,7 @@ const UploadDocumentScreen = () => {
                 !selectedFolder && styles.placeholderText,
               ]}
             >
-              {selectedFolder || t("selectLocation")}
+              {selectedFolder.name || t("selectLocation")}
             </Text>
             {selectedFolder ? (
               <TouchableOpacity

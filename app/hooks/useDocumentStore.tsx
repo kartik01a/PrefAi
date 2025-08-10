@@ -25,9 +25,10 @@ interface FileState {
   selectedFile: StoredFile | null;
   files: StoredFile[];
   folders: StoredFolder[];
-  currentFolder: string;
+  currentFolder: { name: string; id: string };
   uploadProgress: Record<string, number>;
   isUploading: boolean;
+  viewUrl: string;
 }
 
 interface FileActions {
@@ -41,26 +42,8 @@ interface FileActions {
   removeFileByUri: (uri: string) => void;
   updateFile: (fileId: string, updates: Partial<StoredFile>) => void;
   clearAllFiles: () => void;
-  setCurrentFolder: (folderName: string) => void;
-  moveFileToFolder: (fileId: string, folderName: string) => void;
-  moveSelectedFileToFolder: (folderName: string) => void;
-  setUploadProgress: (fileId: string, progress: number) => void;
-  setIsUploading: (isUploading: boolean) => void;
-  clearUploadProgress: (fileId: string) => void;
-  getFilesByFolder: (folderName?: string) => StoredFile[];
-  getFileById: (fileId: string) => StoredFile | undefined;
-  getFileByUri: (uri: string) => StoredFile | undefined;
-  getTotalFiles: () => number;
-  getTotalSize: () => number;
-  getFilesByType: (type: string) => StoredFile[];
-  getFolders: () => string[];
-  getImages: () => StoredFile[];
-  getVideos: () => StoredFile[];
-  getDocuments: () => StoredFile[];
-  searchFiles: (query: string) => StoredFile[];
-  isValidFile: (fileData: any) => boolean;
-  exportFiles: () => { files: StoredFile[]; exportedAt: string };
-  importFiles: (importData: any) => boolean;
+  setCurrentFolder: ({ name, id }: { name: string; id: string }) => void;
+  setViewUrl: (url: string) => void;
 }
 
 type FileStore = FileState & FileActions;
@@ -91,9 +74,10 @@ const useFileStore = create<FileStore>()((set, get) => ({
   selectedFile: null,
   files: [],
   folders: [],
-  currentFolder: "",
+  currentFolder: { name: "", id: "" },
   uploadProgress: {},
   isUploading: false,
+  viewUrl: "",
 
   // Actions for selected file
   setSelectedFile: (fileData) => {
@@ -104,7 +88,7 @@ const useFileStore = create<FileStore>()((set, get) => ({
       type,
       size,
       resource_type,
-      get().currentFolder
+      get().currentFolder.name
     );
     set({ selectedFile: selectedFile });
   },
@@ -128,7 +112,7 @@ const useFileStore = create<FileStore>()((set, get) => ({
       name,
       type,
       size,
-      get().currentFolder
+      get().currentFolder.name
     );
     set((state) => ({
       files: [...state.files, newFile],
@@ -148,7 +132,7 @@ const useFileStore = create<FileStore>()((set, get) => ({
   addMultipleFiles: (filesData) => {
     const newFiles = filesData.map((fileData) => {
       const { uri, name, type, size } = fileData;
-      return createFile(uri, name, type, size, get().currentFolder);
+      return createFile(uri, name, type, size, get().currentFolder.name);
     });
 
     set((state) => ({
@@ -193,117 +177,8 @@ const useFileStore = create<FileStore>()((set, get) => ({
     }),
 
   // Folder management
-  setCurrentFolder: (folderName) => set({ currentFolder: folderName }),
-
-  moveFileToFolder: (fileId, folderName) => {
-    const updates = { folderName };
-    get().updateFile(fileId, updates);
-  },
-
-  moveSelectedFileToFolder: (folderName) => {
-    get().updateSelectedFile({ folderName });
-    get().setCurrentFolder(folderName);
-  },
-
-  // Upload progress tracking
-  setUploadProgress: (fileId, progress) => {
-    set((state) => ({
-      uploadProgress: {
-        ...state.uploadProgress,
-        [fileId]: progress,
-      },
-    }));
-  },
-
-  setIsUploading: (isUploading) => set({ isUploading }),
-
-  clearUploadProgress: (fileId) => {
-    set((state) => {
-      const newProgress = { ...state.uploadProgress };
-      delete newProgress[fileId];
-      return { uploadProgress: newProgress };
-    });
-  },
-
-  // Computed values / getters
-  getFilesByFolder: (folderName = "") => {
-    return get().files.filter((file) => file.folderName === folderName);
-  },
-
-  getFileById: (fileId) => {
-    return get().files.find((file) => file.id === fileId);
-  },
-
-  getFileByUri: (uri) => {
-    return get().files.find((file) => file.uri === uri);
-  },
-
-  getTotalFiles: () => get().files.length,
-
-  getTotalSize: () => {
-    return get().files.reduce((total, file) => total + (file.size || 0), 0);
-  },
-
-  getFilesByType: (type) => {
-    return get().files.filter((file) => file.type.includes(type));
-  },
-
-  getFolders: () => {
-    const folders = new Set(
-      get()
-        .files.map((file) => file.folderName)
-        .filter(Boolean)
-    );
-    return Array.from(folders);
-  },
-
-  // File type helpers
-  getImages: () => get().getFilesByType("image"),
-  getVideos: () => get().getFilesByType("video"),
-  getDocuments: () =>
-    get().files.filter(
-      (file) =>
-        file.type.includes("pdf") ||
-        file.type.includes("doc") ||
-        file.type.includes("txt")
-    ),
-
-  // Search functionality
-  searchFiles: (query) => {
-    const lowerQuery = query.toLowerCase();
-    return get().files.filter(
-      (file) =>
-        file.name.toLowerCase().includes(lowerQuery) ||
-        file.folderName.toLowerCase().includes(lowerQuery)
-    );
-  },
-
-  // Validation
-  isValidFile: (fileData) => {
-    return (
-      fileData &&
-      typeof fileData.uri === "string" &&
-      typeof fileData.name === "string" &&
-      typeof fileData.type === "string" &&
-      typeof fileData.size === "number"
-    );
-  },
-
-  // Export/Import functionality
-  exportFiles: () => {
-    return {
-      files: get().files,
-      exportedAt: new Date().toISOString(),
-    };
-  },
-
-  importFiles: (importData) => {
-    if (importData && Array.isArray(importData.files)) {
-      set({ files: importData.files });
-      return true;
-    }
-    return false;
-  },
+  setCurrentFolder: ({ name, id }) => set({ currentFolder: { name, id } }),
+  setViewUrl: (url) => set({ viewUrl: url }),
 }));
 
 export default useFileStore;

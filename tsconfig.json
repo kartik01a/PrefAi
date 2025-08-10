@@ -3,9 +3,9 @@
   "compilerOptions": {
     "jsx": "react",
     "strict": true,
-    "baseUrl": ".",          // change from "src"
+    "baseUrl": ".", // change from "src"
     "paths": {
-      "@/*": ["./*"]         // adjust path
+      "@/*": ["./*"] // adjust path
     }
   },
   "include": [
