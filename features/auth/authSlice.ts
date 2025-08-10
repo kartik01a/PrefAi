@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserInfo {
-  id: string;
+  _id: string;
   firstName?: string;
   lastName?: string;
   email: string;
   role: "USER" | "ADMIN";
   passportNumber?: string;
   provider: "manual" | "facebook" | "google" | "linkedin" | "apple";
-  token: string;
+  token?: string;
   refreshToken?: string;
   active?: boolean;
   blocked?: boolean;
@@ -25,18 +25,11 @@ export interface UserInfo {
   arrivalDate?: string;
 }
 
-interface AuthResponsePayload {
+export interface AuthResponsePayload {
   data: {
     accessToken: string;
     refreshToken: string;
-    userInfo: {
-      _id: string;
-      email: string;
-      role: "USER" | "ADMIN";
-      provider: string;
-      active?: boolean;
-      [key: string]: any;
-    };
+    userInfo: UserInfo;
   };
   success: boolean;
 }
@@ -55,29 +48,10 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (state, action: PayloadAction<AuthResponsePayload>) => {
       const { accessToken, refreshToken, userInfo } = action.payload.data;
-
       state.userInfo = {
-        id: userInfo._id,
-        email: userInfo.email,
-        role: userInfo.role,
-        provider: userInfo.provider as UserInfo["provider"],
+        ...userInfo,
         token: accessToken,
         refreshToken,
-        active: userInfo.active ?? true,
-        // Include other optional fields from userInfo
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        passportNumber: userInfo.passportNumber,
-        facebookId: userInfo.facebookId,
-        linkedinId: userInfo.linkedinId,
-        image: userInfo.image,
-        userName: userInfo.userName,
-        securityNumber: userInfo.securityNumber,
-        title: userInfo.title,
-        country: userInfo.country,
-        maritalStatus: userInfo.maritalStatus,
-        dob: userInfo.dob,
-        arrivalDate: userInfo.arrivalDate,
       };
     },
 
@@ -88,14 +62,13 @@ const authSlice = createSlice({
     setUserIdOnly: (state, action: PayloadAction<string>) => {
       if (!state.userInfo) {
         state.userInfo = {
-          id: action.payload,
+          _id: action.payload,
           email: "",
           role: "USER",
           provider: "manual",
-          token: "",
         };
       } else {
-        state.userInfo.id = action.payload;
+        state.userInfo._id = action.payload;
       }
     },
   },

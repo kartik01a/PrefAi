@@ -1,3 +1,4 @@
+import { UserInfo } from "@/features/auth/authSlice";
 import { DOCUMENTS_URL, USERS_URL } from "../../constants/constants";
 import { apiSlice } from "../../services/apiSlice";
 
@@ -39,6 +40,35 @@ export interface AuthResponse {
   dob?: string;
   arrivalDate?: string;
   language?: string;
+}
+
+export interface AuthResponsePayload {
+  token: string;
+  refreshToken: string;
+  _id: string;
+  email: string;
+  role: "USER" | "ADMIN";
+  provider: "manual" | "facebook" | "google" | "linkedin" | "apple";
+  active: boolean;
+  firstName: string | undefined;
+  lastName: string | undefined;
+  passportNumber: string | undefined;
+  facebookId: string | undefined;
+  linkedinId: string | undefined;
+  image: string | undefined;
+  userName: string | undefined;
+  securityNumber: string | undefined;
+  title: string | undefined;
+  country: string | undefined;
+  maritalStatus: string | undefined;
+  dob: string | undefined;
+  arrivalDate: string | undefined;
+  data: {
+    accessToken: string;
+    refreshToken: string;
+    userInfo: UserInfo;
+  };
+  success: boolean;
 }
 
 export interface LoginRequest {
@@ -89,7 +119,7 @@ export interface ApiResponse<T> {
 
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<AuthResponse, LoginRequest>({
+    login: builder.mutation<AuthResponsePayload, LoginRequest>({
       query: (data) => ({
         url: `${USERS_URL}/login`,
         method: "POST",
@@ -109,10 +139,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    updateUserLanguage: builder.mutation<
-      void,
-      { id: string; language: string }
-    >({
+    updateUserLanguage: builder.mutation<void,{ id: string; language: string }>({
       query: ({ id, language }) => ({
         url: `${USERS_URL}/language/${id}`,
         method: "PATCH",
@@ -125,7 +152,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-    updateUser: builder.mutation<void, { id: string; data: updateRequest }>({
+    updateUser: builder.mutation<UserInfo, { id: string; data: updateRequest }>({
       query: ({ id, data }) => ({
         method: "PUT",
         url: `${USERS_URL}/${id}`,

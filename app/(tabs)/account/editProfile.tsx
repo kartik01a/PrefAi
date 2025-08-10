@@ -7,11 +7,10 @@ import { router, useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  useGetUserByIdQuery,
-  useUpdateUserMutation,
-} from "@/app/auth/usersApiSlice";
-import { RootState } from "@/app/store";
+import { useUpdateUserMutation } from "@/app/auth/usersApiSlice";
+import { AppDispatch, RootState } from "@/app/store";
+import { UserInfo } from "@/features/auth/authSlice";
+import { persistUser } from "@/utils/authLoader";
 import {
   Image,
   Platform,
@@ -22,15 +21,15 @@ import {
   View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
+import { useDispatch, useSelector } from "react-redux";
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
-  let userData = useSelector((state: RootState) => state.auth.userInfo);
+  const user = useSelector((state: RootState) => state.auth.userInfo);
   const { t } = useTranslation();
-
-  const { data: user, isLoading, refetch  } = useGetUserByIdQuery(userData?.id || "");
   const [updateUser] = useUpdateUserMutation();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -50,26 +49,24 @@ const EditProfileScreen = () => {
   }, [navigation]);
 
   useEffect(() => {
-    if (user?.data) {
-      const userInfo = user.data;
-      setFirstName(userInfo.firstName || "");
-      setLastName(userInfo.lastName || "");
-      setUserName(userInfo.userName || "");
-      setSecurityNumber(userInfo.passportNumber || "");
-      setTitle(userInfo.title || "");
-      setCountry(userInfo.country || "");
-      setEmail(userInfo.email || "");
-      setMaritalStatus(userInfo.maritalStatus || "");
-
-      if (userInfo.dob) setDob(new Date(userInfo.dob));
-      if (userInfo.arrivalDate) setArrivalDate(new Date(userInfo.arrivalDate));
+    if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setUserName(user.userName || "");
+      setSecurityNumber(user.passportNumber || "");
+      setTitle(user.title || "");
+      setCountry(user.country || "");
+      setEmail(user.email || "");
+      setMaritalStatus(user.maritalStatus || "");
+      if (user.dob) setDob(new Date(user.dob));
+      if (user.arrivalDate) setArrivalDate(new Date(user.arrivalDate));
     }
   }, [user]);
 
   const handleUpdate = async () => {
     try {
       await updateUser({
-        id: userData?.id || "",
+        id: user?._id || "",
         data: {
           firstName,
           lastName,
@@ -79,15 +76,55 @@ const EditProfileScreen = () => {
           country,
           email,
           maritalStatus,
-          dob: dob.toISOString(),
-          arrivalDate: arrivalDate.toISOString(),
+          dob: dob ? dob.toISOString() : "",
+          arrivalDate: arrivalDate ? arrivalDate.toISOString() : "",
         },
       }).unwrap();
-      await refetch();
-      alert("Profile updated successfully");
+      const newUserInfo: UserInfo = {
+        _id: user?._id ?? "", 
+        role: user?.role ?? "USER",
+        provider: user?.provider ?? "manual",
+        email, 
+        token: user?.token,
+        refreshToken: user?.refreshToken,
+        active: user?.active,
+        blocked: user?.blocked,
+        blockReason: user?.blockReason,
+        facebookId: user?.facebookId,
+        linkedinId: user?.linkedinId,
+        image: user?.image,
+        ...user,
+        firstName,
+        lastName,
+        userName,
+        securityNumber,
+        title,
+        country,
+        maritalStatus,
+        dob: dob ? dob.toISOString() : "",
+        arrivalDate: arrivalDate ? arrivalDate.toISOString() : "",
+      };
+
+      await dispatch(
+        persistUser({
+          data: {
+            accessToken: user?.token || "",
+            refreshToken: user?.refreshToken || "",
+            userInfo: newUserInfo,
+          },
+          success: true,
+        })
+      );
+      Toast.show({
+        type: "success",
+        text1: "Profile updated successfully",
+      });
     } catch (error) {
       console.error("Failed to update profile:", error);
-      alert("Failed to update profile");
+      Toast.show({
+        type: "error",
+        text1: "Failed to update profile",
+      });
     }
   };
 
@@ -128,7 +165,6 @@ const EditProfileScreen = () => {
 
         {/* Content */}
         <View style={styles.content}>
-          
           <View style={styles.row}>
             <View style={styles.inputHalf}>
               <Text style={styles.label}>{t("title")}</Text>

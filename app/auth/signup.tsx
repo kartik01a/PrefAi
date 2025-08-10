@@ -4,7 +4,6 @@ import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -16,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
 import { useRegisterMutation } from "./usersApiSlice";
@@ -50,16 +50,18 @@ const SignUp = () => {
         role: "USER",
         provider: "manual",
       }).unwrap();
-      console.log("register", response);
       const userId = response?.data?._id;
       await dispatch(setUserIdOnly(userId));
+      Toast.show({
+        type: "success",
+        text1: "Registration Successful",
+      });
       router.push("/auth/welcomepage");
     } catch (error: any) {
-      console.error("❌ Register failed:", JSON.stringify(error, null, 2));
-      Alert.alert(
-        "Registration Error",
-        error?.data?.message || "Something went wrong."
-      );
+      Toast.show({
+        type: "error",
+        text1: "Registration failed",
+      });
     }
   };
 

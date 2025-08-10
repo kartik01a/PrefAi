@@ -3,7 +3,6 @@ import { router, useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -12,9 +11,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import { persistUser } from "../../utils/authLoader";
 import { AppDispatch, RootState } from "../store";
@@ -43,19 +43,25 @@ const SignIn = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please enter email and password.");
+      Toast.show({
+        type: "error",
+        text1: "Please enter email and password.",
+      });
       return;
     }
     try {
       const user = await login({ email, password }).unwrap();
       await dispatch(persistUser(user));
+      Toast.show({
+        type: "success",
+        text1: "Logged In Successful",
+      });
       router.replace("/");
     } catch (error: any) {
-      console.error("Login error:", error);
-      Alert.alert(
-        "Login Failed",
-        error?.data?.message || "Invalid credentials. Please try again."
-      );
+      Toast.show({
+        type: "error",
+        text1: "Logged In Failed",
+      });
     }
   };
 

@@ -1,5 +1,5 @@
 import { useLogoutMutation } from "@/app/auth/usersApiSlice";
-import { AppDispatch } from "@/app/store";
+import { AppDispatch, RootState } from "@/app/store";
 import BaseLayout from "@/components/BaseLayout";
 import { clearUser } from "@/utils/authLoader";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Menu } from "react-native-paper";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AccountDisplay from "../../../assets/images/account-display.svg";
 import AccountInfo from "../../../assets/images/account-info.svg";
 import AccountManage from "../../../assets/images/account-manage.svg";
@@ -49,6 +49,8 @@ const AccountTab: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [triggerLogout] = useLogoutMutation();
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+  // const {name, country} = userInfo?.firstName + userInfo?.lastName;
 
   const handleLogout = async () => {
     try {
@@ -82,8 +84,8 @@ const AccountTab: React.FC = () => {
               style={styles.profileImage}
             />
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>John Doe</Text>
-              <Text style={styles.profileLocation}>Spain Citizen</Text>
+              <Text style={styles.profileName}>{userInfo?.firstName ?? "" + userInfo?.lastName ?? ""}</Text>
+              <Text style={styles.profileLocation}>{userInfo?.country} Citizen</Text>
             </View>
             <TouchableOpacity onPress={openMenu}>
               <Menu

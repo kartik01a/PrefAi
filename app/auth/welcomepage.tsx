@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { useUpdateUserLanguageMutation } from "./usersApiSlice";
@@ -85,8 +86,16 @@ const WelcomePage = () => {
     try {
       await updateUserInfo({ language: selectedLang, id: userId }).unwrap();
       dispatch(logout());
+      Toast.show({
+        type: "success",
+        text1: "Success",
+      });
       router.replace("/auth/signin");
     } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Failed to update language",
+      });
       console.error("Failed to update language:", error);
     }
   };

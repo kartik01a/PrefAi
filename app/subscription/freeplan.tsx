@@ -139,7 +139,6 @@ const FreePlan = () => {
       const response = await createSubscription({
         planId: selectedPlanId,
       }).unwrap();
-      console.log("response", response)
       const url = response?.data?.url;
       console.log("url", url);
       if (url) {
