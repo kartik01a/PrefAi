@@ -13,6 +13,7 @@ import { handleFormToPDF } from "@/components/PDF/ExportPdf";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -26,6 +27,7 @@ import {
 
 const CEFDeclarationForm = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(1);
   const steps = Array.from({ length: 8 }, (_, i) => i + 1);
 
@@ -36,23 +38,23 @@ const CEFDeclarationForm = () => {
     navigation.setOptions({ headerShown: false });
   }, []);
 
-    const exportToPDF = async () => {
-      try {
-        await handleFormToPDF(formData);
-        Alert.alert("Success", "PDF generated successfully!");
-      } catch (error) {
-        Alert.alert("Error", "Failed to generate PDF. Please try again.");
-      }
-    };
-    const downloadPDF = async () => {
-      console.log(formData, "formData");
-      try {
-        await saveToDownloads(formData);
-        Alert.alert("Success", "PDF downloaded successfully!");
-      } catch (error) {
-        Alert.alert("Error", "Failed to download PDF. Please try again.");
-      }
-    };
+  const exportToPDF = async () => {
+    try {
+      await handleFormToPDF(formData);
+      Alert.alert("Success", "PDF generated successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to generate PDF. Please try again.");
+    }
+  };
+  const downloadPDF = async () => {
+    console.log(formData, "formData");
+    try {
+      await saveToDownloads(formData);
+      Alert.alert("Success", "PDF downloaded successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to download PDF. Please try again.");
+    }
+  };
 
   const handleContinue = () => {
     if (activeStep < steps.length) {
@@ -189,21 +191,21 @@ const CEFDeclarationForm = () => {
   const getStepSubtitle = (step: number): string => {
     switch (step) {
       case 1:
-        return "Personal Information – Applicant";
+        return t("housingForm1");
       case 2:
-        return "Personal Information – Partner / Spouse";
+        return t("housingForm2");
       case 3:
-        return "Previous CAF / MSA Registration";
+        return t("housingForm3");
       case 4:
-        return "Contact Information & Family Status";
+        return t("housingForm4");
       case 5:
-        return "Parents’ Information (if applicant <25 years old)";
+        return t("housingForm5");
       case 6:
-        return "Employment Situation";
+        return t("housingForm6");
       case 7:
-        return "Review and Signature";
+        return t("housingForm7");
       case 8:
-        return "Generate PDF and Download/Send";
+        return t("housingForm8");
       default:
         return "Generate PDF and Download/Send";
     }
@@ -240,15 +242,13 @@ const CEFDeclarationForm = () => {
                     color="white"
                   />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>
-                  CAF Declaration of Situation – Housing & Family Benefits
-                </Text>
+                <Text style={styles.headerTitle}>{t("formName1")}</Text>
               </View>
 
               <View style={styles.stepperContainer}>
                 <View style={styles.stepsRow}>
                   {steps.map((number, index) => (
-                    <React.Fragment key={`step-${number}`}>
+                    <React.Fragment key={`${t('step')}-${number}`}>
                       <View
                         style={[
                           styles.stepCircle,
@@ -305,7 +305,7 @@ const CEFDeclarationForm = () => {
                             styles.continueButtonTextDisabled,
                         ]}
                       >
-                        Continue
+                       { t('continue')}
                       </Text>
                     </TouchableOpacity>
                   )}

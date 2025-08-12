@@ -4,6 +4,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { RentalContext } from "../formData";
 import { styles } from "./stepStyles";
+import { useTranslation } from "react-i18next";
 
 interface Step4Props {
   rentalContext: RentalContext;
@@ -11,6 +12,7 @@ interface Step4Props {
 }
 
 export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
+  const { t } = useTranslation()
   const handleRentPaidToggle = (value: string) => {
     setRentalContext({
       isRentPaidDirectly: rentalContext.isRentPaidDirectly === value ? "" : value,
@@ -21,7 +23,7 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
     <View style={{ gap: 16 }}>
       {/* Main Source of Funding */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Main Source of Funding</Text>
+        <Text style={styles.label}>{t('mainSourceOfFunding')}</Text>
         <RNPickerSelect
           onValueChange={(value) => setRentalContext({ mainSourceOfFunding: value })}
           value={rentalContext.mainSourceOfFunding}
@@ -50,7 +52,7 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
       </View>
 
       {/* Is Rent Paid Directly (Yes/No) */}
-      <Text style={styles.label}>Is Rent Paid Directly?</Text>
+      <Text style={styles.label}>{t('isRentPaidDirectly')}</Text>
       <View style={styles.row}>
         <TouchableOpacity
           style={[
@@ -73,7 +75,7 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
               fontWeight: "500",
             }}
           >
-            Yes
+            {t('yes')}
           </Text>
         </TouchableOpacity>
 
@@ -98,41 +100,9 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
               fontWeight: "500",
             }}
           >
-            No
+            {t('no')}
           </Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Co-Lessee Details Dropdown */}
-      <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Co-lessee Details (if Co-located)</Text>
-        <RNPickerSelect
-          onValueChange={(value) =>
-            setRentalContext({ coLesseDetailsIfColocated: value })
-          }
-          value={rentalContext.coLesseDetailsIfColocated}
-          placeholder={{ label: "Select details", value: "" }}
-          items={[
-            { label: "Spouse", value: "Spouse" },
-            { label: "Friend", value: "Friend" },
-            { label: "Relative", value: "Relative" },
-            { label: "Other", value: "Other" },
-          ]}
-          useNativeAndroidPickerStyle={false}
-          Icon={() => (
-            <MaterialCommunityIcons
-              name="chevron-down"
-              size={20}
-              color="#555"
-              style={styles.icon}
-            />
-          )}
-          style={{
-            inputIOS: { ...styles.pickerInput, paddingRight: 30 },
-            inputAndroid: { ...styles.pickerInput, paddingRight: 30 },
-            iconContainer: { right: 10 },
-          }}
-        />
       </View>
     </View>
   );

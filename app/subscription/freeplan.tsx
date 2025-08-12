@@ -29,95 +29,95 @@ const FreePlan = () => {
       return [
         {
           icon: "check-circle",
-          text: "Maximum of 3 chats allowed per day",
+          text: t('freePlan1'),
         },
         {
           icon: "check-circle",
-          text: "Maximum 1 form generation total",
+          text: t('freePlan2'),
         },
         {
           icon: "x-circle",
-          text: "Document storage is not available (vault feature is disabled)",
+          text: t('freePlan3'),
         },
         {
           icon: "x-circle",
-          text: "PDF downloads are not permitted",
+          text: t('freePlan4'),
         },
         {
           icon: "x-circle",
-          text: "Push and email notifications are disabled",
+          text: t('freePlan5'),
         },
       ];
     } else if (selectedPlan === 1) {
       return [
         {
           icon: "check-circle",
-          text: "Unlimited chats",
+          text: t('paidPlan1'),
         },
         {
           icon: "check-circle",
-          text: "Unlimited form generations",
+          text: t('paidPlan2'),
         },
         {
           icon: "check-circle",
-          text: "Save documents to vault",
+          text: t('paidPlan3'),
         },
         {
           icon: "check-circle",
-          text: "PDF download & email",
+          text: t('paidPlan4'),
         },
         {
           icon: "check-circle",
-          text: "Notifications enabled",
+          text: t('paidPlan5'),
         },
         {
           icon: "check-circle",
-          text: "Cancel anytime",
+          text: t('paidPlan6'),
         },
       ];
     } else {
       return [
         {
           icon: "check-circle",
-          text: "Unlimited chats",
+          text: t('paidPlan1')
         },
         {
           icon: "check-circle",
-          text: "Unlimited form generations",
+          text: t('paidPlan2')
         },
         {
           icon: "check-circle",
-          text: "Save documents to vault",
+          text: t('paidPlan3')
         },
         {
           icon: "check-circle",
-          text: "PDF download & email",
+          text: t('paidPlan4')
         },
         {
           icon: "check-circle",
-          text: "Notifications enabled",
+          text: t('paidPlan5')
         },
         {
           icon: "check-circle",
-          text: "Cancel anytime",
+          text: t('paidPlan6')
         },
         {
           icon: "check-circle",
-          text: "Save 14% over monthly",
+          text: t('paidPlan7')
         },
       ];
     }
   };
 
   const plans = [
-    { title: "Free Plan - 3 days", price: "€0.00 / month", id: null },
+    { title: t('freePlan3day'), price: "€0.00 / month", id: null },
     {
-      title: "Monthly Plan - Full Access",
+      title: t('monthlyPlanFullAccess'),
       price: "€4.99 / month",
       id: "price_1RtaE42SNvhd3XUdMxiwpVrc",
     },
     {
-      title: "Yearly Plan - Best Value",
+      title: t('yearlyPlanBestValue'),
       price: "€59.99 / year",
       id: "price_1RuFHLCe7yxtOx2Nu1ieMoba",
     },

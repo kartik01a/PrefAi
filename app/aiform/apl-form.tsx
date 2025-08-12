@@ -13,6 +13,7 @@ import { handleFormToPDF } from "@/components/PDF/ExportPdf";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -26,6 +27,7 @@ import {
 
 const CEFDeclarationForm = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(1);
   const steps = Array.from({ length: 8 }, (_, i) => i + 1);
 
@@ -176,21 +178,21 @@ const CEFDeclarationForm = () => {
   const getStepSubtitle = (step: number): string => {
     switch (step) {
       case 1:
-        return "Applicant Candidate";
+        return t("aplForm1");
       case 2:
-        return "Institution Types";
+        return t("aplForm2");
       case 3:
-        return "Project Categories";
+        return t("aplForm3");
       case 4:
-        return " Summary of Project";
+        return t("aplForm4");
       case 5:
-        return "Budget";
+        return t("aplForm5");
       case 6:
-        return "Contract Agreement";
+        return t("aplForm6");
       case 7:
-        return "Review and Signature";
+        return t("aplForm7");
       case 8:
-        return "Generate PDF and Download/Send";
+        return t("aplForm8");
       default:
         return "default form";
     }
@@ -227,15 +229,13 @@ const CEFDeclarationForm = () => {
                     color="white"
                   />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>
-                  Demande d’Aide au Logement (APL)
-                </Text>
+                <Text style={styles.headerTitle}>{t("formName2")}</Text>
               </View>
 
               <View style={styles.stepperContainer}>
                 <View style={styles.stepsRow}>
                   {steps.map((number, index) => (
-                    <React.Fragment key={`step-${number}`}>
+                    <React.Fragment key={`${t("step")}-${number}`}>
                       <View
                         style={[
                           styles.stepCircle,
@@ -295,7 +295,7 @@ const CEFDeclarationForm = () => {
                             styles.continueButtonTextDisabled,
                         ]}
                       >
-                        Continue
+                        {t("continue")}
                       </Text>
                     </TouchableOpacity>
                   )}

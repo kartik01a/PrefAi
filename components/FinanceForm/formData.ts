@@ -58,43 +58,44 @@ export type FormData = {
   rentalContext: RentalContext;
   contractAgreement: ContractAgreement;
   declaration: Declaration;
+  document: { uri: string };
 };
 
 export const getInitialFormData = (): FormData => ({
   applicantCandidate: {
-  cafBeneficiary: "",
-  msaBeneficiary: "",
-  title: "",
-  firstName: "",
-  usedName: "",
-  lastName: "",
-  dateOfBirth:  null,
-  countryOfBirth: "",
-  martialStatus: "",
-  socialSecurityNumber: "",
-  numberOfHouseholdMembers: "",
-  fullAddress: "",
+    cafBeneficiary: "",
+    msaBeneficiary: "",
+    title: "",
+    firstName: "",
+    usedName: "",
+    lastName: "",
+    dateOfBirth: null,
+    countryOfBirth: "",
+    martialStatus: "",
+    socialSecurityNumber: "",
+    numberOfHouseholdMembers: "",
+    fullAddress: "",
   },
 
   housingDetails: {
-   typeOfHousing: "",
-  typeOfLease: "",
-  moveInDate: null,
-  rentAmount: "",
-  chargesIfApplicable: "",
-  directPaymentByCAF: "",
+    typeOfHousing: "",
+    typeOfLease: "",
+    moveInDate: null,
+    rentAmount: "",
+    chargesIfApplicable: "",
+    directPaymentByCAF: "",
   },
 
   applicantSituation: {
-     incomeAndResourcesForThePastYearOrLast12Months: "",
-  employmentStatus: "",
-  socialSecurityCoverage: "",
+    incomeAndResourcesForThePastYearOrLast12Months: "",
+    employmentStatus: "",
+    socialSecurityCoverage: "",
   },
 
   rentalContext: {
-   mainSourceOfFunding: "",
-  isRentPaidDirectly: "",
-  coLesseDetailsIfColocated: "",
+    mainSourceOfFunding: "",
+    isRentPaidDirectly: "",
+    coLesseDetailsIfColocated: "",
   },
   contractAgreement: {
     nameAndTittleOfThePersonQualifiedToSignAGrantAgreementWithFace: "",
@@ -106,6 +107,9 @@ export const getInitialFormData = (): FormData => ({
     signature: "",
     declarationAccepted: false,
   },
+  document: {
+    uri: "",
+  },
 });
 
 export const isStepValid = (step: number, data: FormData): boolean => {
@@ -113,7 +117,7 @@ export const isStepValid = (step: number, data: FormData): boolean => {
   const p2 = data.housingDetails;
   const p3 = data.applicantSituation;
   const p4 = data.rentalContext;
- const p6 = data.declaration;
+  const p6 = data.declaration;
 
   switch (step) {
     case 1:
@@ -145,21 +149,20 @@ export const isStepValid = (step: number, data: FormData): boolean => {
       return (
         p3.incomeAndResourcesForThePastYearOrLast12Months.trim() !== "" ||
         p3.employmentStatus.trim() !== "" ||
-        p3.socialSecurityCoverage.trim() !== "" 
+        p3.socialSecurityCoverage.trim() !== ""
       );
 
     case 4:
-       return (
+      return (
         p4.mainSourceOfFunding.trim() !== "" ||
-        p4.isRentPaidDirectly.trim() !== "" ||
-        p4.coLesseDetailsIfColocated.trim() !== "" 
+        p4.isRentPaidDirectly.trim() !== ""
       );
 
     case 5:
       return true;
 
     case 6:
-       return (
+      return (
         p6.placeOfSignature.trim() !== "" &&
         p6.dateOfSignature.trim() !== "" &&
         p6.signature.trim() !== "" &&

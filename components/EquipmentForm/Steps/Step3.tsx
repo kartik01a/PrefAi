@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Platform,
   Text,
@@ -19,11 +20,12 @@ interface Step3Props {
 
 export const Step3 = ({ familySituation, setFamilySituation }: Step3Props) => {
   const [showDobPicker, setShowDobPicker] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <View style={{ gap: 16 }}>
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Marital Status</Text>
+        <Text style={styles.label}>{t("maritalStatus")}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setFamilySituation({ maritalStatus: value })
@@ -54,7 +56,7 @@ export const Step3 = ({ familySituation, setFamilySituation }: Step3Props) => {
       </View>
       <View style={styles.row}>
         <View style={styles.inputContainerFull}>
-          <Text style={styles.label}>Since When</Text>
+          <Text style={styles.label}>{t("sinceWhen")}</Text>
           <TouchableOpacity onPress={() => setShowDobPicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -100,10 +102,10 @@ export const Step3 = ({ familySituation, setFamilySituation }: Step3Props) => {
         </View>
       </View>
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Spouse Name (is applicable)</Text>
+        <Text style={styles.label}>{t("spouseName")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Input details"
+          placeholder={t("inputDetails")}
           value={familySituation.spouseName}
           onChangeText={(text) => setFamilySituation({ spouseName: text })}
         />

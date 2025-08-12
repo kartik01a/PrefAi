@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Platform,
   Text,
@@ -21,16 +22,17 @@ export const Step1 = ({
   applicantCandidate,
   setApplicantCandidate,
 }: Step1Props) => {
+  const { t } = useTranslation();
   const [showDobPicker, setShowDobPicker] = useState(false);
 
   return (
     <View style={{ gap: 16 }}>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>CAF Beneficiary</Text>
+          <Text style={styles.label}>{t("cafBeneficiary")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="CAF"
+            placeholder={t("inputDetails")}
             placeholderTextColor="#A0A0A0"
             value={applicantCandidate.cafBeneficiary}
             onChangeText={(text) =>
@@ -39,10 +41,10 @@ export const Step1 = ({
           />
         </View>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>MSA Beneficiary</Text>
+          <Text style={styles.label}>{t("msaBeneficiary")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="MSA"
+            placeholder={t("inputDetails")}
             placeholderTextColor="#A0A0A0"
             value={applicantCandidate.msaBeneficiary}
             onChangeText={(text) =>
@@ -53,19 +55,19 @@ export const Step1 = ({
       </View>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Title</Text>
+          <Text style={styles.label}>{t("title")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter title"
+            placeholder={t("inputDetails")}
             value={applicantCandidate.title}
             onChangeText={(text) => setApplicantCandidate({ title: text })}
           />
         </View>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>First Name</Text>
+          <Text style={styles.label}>{t("firstName")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter first name"
+            placeholder={t("inputDetails")}
             value={applicantCandidate.firstName}
             onChangeText={(text) => setApplicantCandidate({ firstName: text })}
           />
@@ -73,19 +75,19 @@ export const Step1 = ({
       </View>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Used Name</Text>
+          <Text style={styles.label}>{t("usedName")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter used name"
+            placeholder={t("inputDetails")}
             value={applicantCandidate.usedName}
             onChangeText={(text) => setApplicantCandidate({ usedName: text })}
           />
         </View>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Last Name</Text>
+          <Text style={styles.label}>{t("lastName")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter last name"
+            placeholder={t("inputDetails")}
             value={applicantCandidate.lastName}
             onChangeText={(text) => setApplicantCandidate({ lastName: text })}
           />
@@ -93,7 +95,7 @@ export const Step1 = ({
       </View>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Date of Birth</Text>
+          <Text style={styles.label}>{t("dateOfBirth")}</Text>
           <TouchableOpacity onPress={() => setShowDobPicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -139,10 +141,10 @@ export const Step1 = ({
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Country of Birth</Text>
+          <Text style={styles.label}>{t("countryOfBirth")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter country"
+            placeholder={t("inputDetails")}
             value={applicantCandidate.countryOfBirth}
             onChangeText={(text) =>
               setApplicantCandidate({ countryOfBirth: text })
@@ -152,7 +154,7 @@ export const Step1 = ({
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Marital Status</Text>
+        <Text style={styles.label}>{t("maritalStatus")}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setApplicantCandidate({ martialStatus: value })
@@ -183,10 +185,10 @@ export const Step1 = ({
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Social Security Number</Text>
+        <Text style={styles.label}>{t("socialSecurityNumber")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter number"
+          placeholder={t("inputDetails")}
           keyboardType="number-pad"
           value={applicantCandidate.socialSecurityNumber}
           onChangeText={(text) =>
@@ -196,10 +198,10 @@ export const Step1 = ({
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Number of Household Members</Text>
+        <Text style={styles.label}>{t("numberOfHouseholdMembers")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter number"
+          placeholder={t("inputDetails")}
           keyboardType="number-pad"
           value={applicantCandidate.numberOfHouseholdMembers}
           onChangeText={(text) =>
@@ -209,10 +211,10 @@ export const Step1 = ({
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Full Address</Text>
+        <Text style={styles.label}>{t("fullAddress")}</Text>
         <TextInput
           style={[styles.input, { height: 100, textAlignVertical: "top" }]}
-          placeholder="Enter full address"
+          placeholder={t("inputDetails")}
           multiline
           numberOfLines={4}
           value={applicantCandidate.fullAddress}

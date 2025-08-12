@@ -2,6 +2,7 @@ import { ChatType } from "@/app/(tabs)/chat";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Keyboard,
   StyleSheet,
@@ -30,6 +31,7 @@ function getCurrentTime(): string {
 }
 
 const ChatBar = ({ addChat }: IProps) => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -85,7 +87,7 @@ const ChatBar = ({ addChat }: IProps) => {
           style={styles.textInput}
           value={message}
           onChangeText={(text) => setMessage(text)}
-          placeholder="Ask me all about immigration topic"
+          placeholder={t("askMeAllAboutImmegrationTopic")}
           placeholderTextColor="#888"
           multiline
           textAlignVertical="center"

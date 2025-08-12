@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import ChatGlobe from "../../assets/images/chat-globe.svg";
 import ChatQuestion from "../../assets/images/chat-question.svg";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
   showDate?: boolean;
@@ -64,14 +65,16 @@ const DateSeparator = ({
 };
 
 const ChatHeader = ({ showDate = true }: IProps) => {
+  const { t } = useTranslation()
   const [language, setLanguage] = useState("english");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const languageItems = [
     { label: "English", value: "english" },
-    { label: "French", value: "french" },
-    { label: "Spanish", value: "spanish" },
-    { label: "German", value: "german" },
+    { label: "Russian", value: "russian" },
+    { label: "Portuguese", value: "portuguese" },
+    { label: "Chinese", value: "chinese" },
+    { label: "Georgian", value: "georgian" },
   ];
 
   const getLanguageLabel = () => {
@@ -146,7 +149,7 @@ const ChatHeader = ({ showDate = true }: IProps) => {
         </View>
         <View style={styles.helpContainer}>
           <ChatQuestion />
-          <Text style={styles.help}>Help</Text>
+          <Text style={styles.help}>{t('help')}</Text>
         </View>
       </View>
       {showDate && <DateSeparator />}

@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View } from "react-native";
 import { AdditionalInformation } from "../formData";
 import { styles } from "./stepStyles";
@@ -13,6 +14,7 @@ export const Step4 = ({
   additionalInformation,
   setAdditionalInformation,
 }: Step4Props) => {
+  const { t } = useTranslation();
   const handleRentPaidToggle = (value: string) => {
     setAdditionalInformation({
       repaymentTerms:
@@ -28,18 +30,17 @@ export const Step4 = ({
   const categoryItems = [
     {
       key: "debtDeclaration1",
-      label: "I do not have a debt file open with Banque de France",
+      label: t("debtDeclaration1Label"),
     },
     {
       key: "debtDeclaration2",
-      label:
-        "I do have a debt file (moratorium, repayment plan, personal recovery, etc.)",
+      label: t("debtDeclaration2Label"),
     },
   ] as const;
 
   return (
     <View style={{ gap: 16 }}>
-      <Text style={styles.label}>Debt Declaration (Surendettement)</Text>
+      <Text style={styles.label}>{t("debtDeclaration")}</Text>
       {categoryItems.map(({ key, label }) => (
         <TouchableOpacity
           key={key}
@@ -74,7 +75,7 @@ export const Step4 = ({
         </TouchableOpacity>
       ))}
 
-      <Text style={styles.label}>Repayment Terms (if complementary loan)</Text>
+      <Text style={styles.label}>{t("repaymentTerms")}</Text>
       <View style={styles.row}>
         <TouchableOpacity
           style={[

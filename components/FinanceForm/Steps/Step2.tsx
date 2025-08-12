@@ -11,6 +11,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { HousingDetails } from "../formData";
 import { styles } from "./stepStyles";
+import { useTranslation } from "react-i18next";
 
 interface Step2Props {
   housingDetails: HousingDetails;
@@ -18,13 +19,14 @@ interface Step2Props {
 }
 
 export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
+  const { t } = useTranslation()
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   return (
     <View style={{ gap: 16 }}>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Type of Housing</Text>
+          <Text style={styles.label}>{t('typeOfHousing')}</Text>
           <RNPickerSelect
             onValueChange={(value) => setHousingDetails({ typeOfHousing: value })}
             value={housingDetails.typeOfHousing}
@@ -52,7 +54,7 @@ export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Type of Lease</Text>
+          <Text style={styles.label}>{t('typeOfLease')}</Text>
           <RNPickerSelect
             onValueChange={(value) => setHousingDetails({ typeOfLease: value })}
             value={housingDetails.typeOfLease}
@@ -82,7 +84,7 @@ export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
 
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Move-In Date</Text>
+          <Text style={styles.label}>{t('moveInDate')}</Text>
           <TouchableOpacity onPress={() => setShowDatePicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -126,10 +128,10 @@ export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Rent Amount</Text>
+          <Text style={styles.label}>{t('rentAmount')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter amount"
+            placeholder={t("inputDetails")}
             placeholderTextColor="#A0A0A0"
             keyboardType="numeric"
             value={housingDetails.rentAmount}
@@ -139,10 +141,10 @@ export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Charges (If Applicable)</Text>
+        <Text style={styles.label}>{t('charges')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter charges"
+          placeholder={t("inputDetails")}
           placeholderTextColor="#A0A0A0"
           value={housingDetails.chargesIfApplicable}
           onChangeText={(text) =>
@@ -153,7 +155,7 @@ export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
 
  <View style={styles.row}>
   <View style={styles.inputHalf}>
-    <Text style={styles.label}>CAF</Text>
+    <Text style={styles.label}>{t("caf")}</Text>
     <TouchableOpacity
       onPress={() =>
         setHousingDetails({
@@ -182,14 +184,14 @@ export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
           fontWeight: "500",
         }}
       >
-        CAF
+        {t("caf")}
       </Text>
     </TouchableOpacity>
   </View>
 
   {/* MSA */}
   <View style={styles.inputHalf}>
-    <Text style={styles.label}>MSA</Text>
+    <Text style={styles.label}>{t("msa")}</Text>
     <TouchableOpacity
       onPress={() =>
         setHousingDetails({
@@ -218,7 +220,7 @@ export const Step2 = ({ housingDetails, setHousingDetails }: Step2Props) => {
           fontWeight: "500",
         }}
       >
-        MSA
+        {t("msa")}
       </Text>
     </TouchableOpacity>
   </View>

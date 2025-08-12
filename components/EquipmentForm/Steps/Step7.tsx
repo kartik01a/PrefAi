@@ -1,12 +1,13 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
-    GestureResponderEvent,
-    Image,
-    Text,
-    TouchableOpacity,
-    View,
+  GestureResponderEvent,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { styles } from "./stepStyles";
 
@@ -17,9 +18,18 @@ export const Step7 = ({
   exportToPDF: (formData: any) => Promise<void>;
   downloadPDF: (formData: any) => Promise<void>;
 }) => {
-    function handleNewForm(event: GestureResponderEvent): void {
-        router.push('/');
-    }
+  const { t } = useTranslation();
+  function handleNewForm(event: GestureResponderEvent): void {
+    router.push("/");
+  }
+
+  function generateCafNotificationFilenameWithDate(date?: Date): string {
+    const targetDate = date || new Date();
+    const month = targetDate.toLocaleString("en-US", { month: "long" });
+    const year = targetDate.getFullYear();
+
+    return `CAF_Notification_${month}${year}.pdf`;
+  }
 
   return (
     <View style={[styles.centeredContainer, { gap: 20 }]}>
@@ -29,34 +39,44 @@ export const Step7 = ({
         resizeMode="contain"
       />
 
-      <Text style={styles.successTitle}>Your CAF form is ready!</Text>
+      <Text style={styles.successTitle}>{t("yourCAFFormIsReady")}!</Text>
 
       <TouchableOpacity style={styles.pdfButton}>
         <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
-        <Text style={styles.pdfButtonText}>CAF_Notification_June2025.pdf</Text>
+        <Text style={styles.pdfButtonText}>
+          {generateCafNotificationFilenameWithDate()}
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.bulletList}>
-        <Text style={styles.bulletItem}>✔️ All required fields have been filled.</Text>
-        <Text style={styles.bulletItem}>✔️ Signature section is included.</Text>
-        <Text style={styles.bulletItem}>✔️ Ready to send or print.</Text>
+        <Text style={styles.bulletItem}>
+          ✔️ {t("allRequiredFieldsHaveBeenFilled")}.
+        </Text>
+        <Text style={styles.bulletItem}>
+          ✔️ {t("signatureSectionIsIncluded")}.
+        </Text>
+        <Text style={styles.bulletItem}>✔️ {t("readyToSendAndPrint")}.</Text>
       </View>
 
       <TouchableOpacity onPress={downloadPDF} style={styles.actionButton}>
-        <Text style={styles.actionButtonText}>Download PDF</Text>
+        <Text style={styles.actionButtonText}>{t("downloadPDF")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={exportToPDF} style={styles.actionButton}>
-        <Text style={styles.actionButtonText}>Share PDF</Text>
+        <Text style={styles.actionButtonText}>{t("sharePDF")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.actionButton}>
-        <Text style={styles.actionButtonText}>Save to My Document Vault</Text>
+        <Text style={styles.actionButtonText}>{t("saveToMyDocumentault")}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionButtonSecondary}
-      onPress={handleNewForm}>
-        <Text style={styles.actionButtonSecondaryText}>Start New Form</Text>
+      <TouchableOpacity
+        style={styles.actionButtonSecondary}
+        onPress={handleNewForm}
+      >
+        <Text style={styles.actionButtonSecondaryText}>
+          {t("startNewForm")}
+        </Text>
       </TouchableOpacity>
     </View>
   );

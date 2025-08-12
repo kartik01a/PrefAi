@@ -12,9 +12,13 @@ import { Step7 } from "@/components/FinanceForm/Steps/Step7";
 import { Step8 } from "@/components/FinanceForm/Steps/Step8";
 import { saveToDownloads } from "@/components/PDF/DownloadPdf";
 import { handleFormToPDF } from "@/components/PDF/ExportPdf";
+import cloudinaryService from "@/services/cloudinaryService";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 import { router, useNavigation } from "expo-router";
 import React, { useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -25,11 +29,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Loading from "@/components/Loading";
+import useFileStore from "../hooks/useDocumentStore";
 
 const FinanceForm = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
+  const { setSelectedFile } = useFileStore();
   const [activeStep, setActiveStep] = useState(1);
   const steps = Array.from({ length: 8 }, (_, i) => i + 1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState(() => getInitialFormData());
   const isCurrentStepValid = isStepValid(activeStep, formData);
@@ -47,7 +56,6 @@ const FinanceForm = () => {
     }
   };
   const downloadPDF = async () => {
-    console.log(formData, "formData");
     try {
       await saveToDownloads(formData);
       Alert.alert("Success", "PDF downloaded successfully!");
@@ -161,25 +169,160 @@ const FinanceForm = () => {
   };
 
   const handleUploadPress = () => {
-    console.log("Upload button pressed");
+    Alert.alert(
+      t("uploadDocument"),
+      t("chooseAnOption"),
+      [
+        {
+          text: t("cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("chooseFile"),
+          onPress: selectDocument,
+        },
+        {
+          text: t("selectFromGallery"),
+          onPress: selectFromGallery,
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const validateFileSize = (file: any) => {
+    const maxSizeImage = 25 * 1024 * 1024; // 25MB for images
+    const maxSizePdf = 10 * 1024 * 1024; // 10MB for PDFs
+
+    if (file.type && file.type.includes("image")) {
+      return file.fileSize <= maxSizeImage;
+    } else if (file.type && file.type.includes("pdf")) {
+      return file.size <= maxSizePdf;
+    }
+    return false;
+  };
+  const validateDocumentSize = (file: any) => {
+    const maxSizeImage = 25 * 1024 * 1024; // 25MB for images
+    const maxSizePdf = 10 * 1024 * 1024; // 10MB for PDFs
+
+    if (file.mimeType && file.mimeType.includes("image")) {
+      return file.size <= maxSizeImage;
+    } else if (file.mimeType && file.mimeType.includes("pdf")) {
+      return file.size <= maxSizePdf;
+    }
+    return false;
+  };
+
+  const selectFromGallery = async () => {
+    try {
+      // Request permission
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          t("permissionRequired"),
+          t("pleaseGrantGalleryAccessToSelectImages")
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 1,
+      });
+      if (!result.canceled && result.assets[0]) {
+        const file = result.assets[0];
+        setIsLoading(true);
+        if (!validateFileSize(file)) {
+          Alert.alert("File Too Large", "Images must be less than 25MB");
+          return;
+        }
+
+        const uploadResult = await cloudinaryService.uploadFile(
+          result.assets[0].uri,
+          {
+            folder: "app-uploads/images",
+            resourceType: "image",
+          }
+        );
+        setIsLoading(false);
+        setSelectedFile({
+          resource_type: uploadResult.resource_type,
+          uri: uploadResult.secure_url,
+          name: file.fileName || `image_${Date.now()}.jpg`,
+          type: file.type || "image/jpeg",
+          size: file.fileSize || 0,
+        });
+
+        setFormData((prev) => ({
+          ...prev,
+          document: { uri: uploadResult.secure_url },
+        }));
+      }
+    } catch (error) {
+      console.error("Error selecting image:", error);
+      Alert.alert("Error", t("failedToSelectImage"));
+    }
+  };
+
+  const selectDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["application/pdf", "image/*"],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const file = result.assets[0];
+        setIsLoading(true);
+
+        if (!validateDocumentSize(file)) {
+          const maxSize = file.mimeType?.includes("image") ? "25MB" : "10MB";
+          Alert.alert("File Too Large", `File must be less than ${maxSize}`);
+          return;
+        }
+        const uploadResult = await cloudinaryService.uploadFile(file.uri, {
+          folder: "app-uploads/documents",
+          resourceType: file.mimeType?.startsWith("image/") ? "image" : "raw",
+        });
+        setIsLoading(false);
+
+        setSelectedFile({
+          resource_type: uploadResult.resource_type,
+          uri: uploadResult.secure_url,
+          name: file.name || `image_${Date.now()}.jpg`,
+          type: file.mimeType || "image/jpeg",
+          size: file.size || 0,
+        });
+
+        setFormData((prev) => ({
+          ...prev,
+          document: { uri: uploadResult.secure_url },
+        }));
+      }
+    } catch (error) {
+      console.error("Error selecting document:", error);
+      Alert.alert("Error", t("failedToSelectDocument"));
+    }
   };
 
   const getStepSubtitle = (step: number): string => {
     switch (step) {
       case 1:
-        return "Personal Information – Applicant";
+        return t("housingForm1");
       case 2:
-        return "Housing & Tenancy Details";
+        return t("financialForm2");
       case 3:
-        return "Applicant’s Situation";
+        return t("financialForm3");
       case 4:
-        return "Financial & Rental Context";
+        return t("financialForm4");
       case 5:
-        return "Optional Attachments Checklist";
+        return t("equipmentForm5");
       case 6:
-        return "Review and Signature";
+        return t("housingForm7");
       case 7:
-        return "Generate PDF and Download/Send";
+        return t("housingForm8");
       default:
         return "default form";
     }
@@ -187,6 +330,7 @@ const FinanceForm = () => {
 
   return (
     <BaseLayout>
+    <Loading visible={isLoading} />
       <View style={{ flex: 1 }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -216,15 +360,13 @@ const FinanceForm = () => {
                     color="white"
                   />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>
-                  Formulaire de demande d’aide financière
-                </Text>
+                <Text style={styles.headerTitle}>{t("formName3")}</Text>
               </View>
 
               <View style={styles.stepperContainer}>
                 <View style={styles.stepsRow}>
                   {steps.map((number, index) => (
-                    <React.Fragment key={`step-${number}`}>
+                    <React.Fragment key={`${t("step")}-${number}`}>
                       <View
                         style={[
                           styles.stepCircle,
@@ -284,7 +426,7 @@ const FinanceForm = () => {
                             styles.continueButtonTextDisabled,
                         ]}
                       >
-                        Continue
+                        {t("continue")}
                       </Text>
                     </TouchableOpacity>
                   )}

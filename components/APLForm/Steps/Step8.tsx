@@ -55,7 +55,7 @@ export const Step8 = ({
         <Text style={styles.bulletItem}>
           ✔️ {t("signatureSectionIsIncluded")}.
         </Text>
-        <Text style={styles.bulletItem}>✔️ {t("")}.</Text>
+        <Text style={styles.bulletItem}>✔️ {t("readyToSendAndPrint")}.</Text>
       </View>
 
       <TouchableOpacity onPress={downloadPDF} style={styles.actionButton}>

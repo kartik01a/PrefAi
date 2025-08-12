@@ -4,6 +4,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { ApplicantSituation } from "../formData";
 import { styles } from "./stepStyles";
+import { useTranslation } from "react-i18next";
 
 interface Step3Props {
   applicantSituation: ApplicantSituation;
@@ -14,6 +15,7 @@ export const Step3 = ({
   applicantSituation,
   setApplicantSituation,
 }: Step3Props) => {
+  const { t } = useTranslation()
   const handleYesNoSelection = (value: string) => {
     setApplicantSituation({
       incomeAndResourcesForThePastYearOrLast12Months:
@@ -24,7 +26,7 @@ export const Step3 = ({
   return (
     <View style={{ gap: 16 }}>
       <Text style={styles.label}>
-        Income and Resources for the Past Year or Last 12 Months
+        {t('financeFormStep3Title')}
       </Text>
       <View style={styles.row}>
         <TouchableOpacity
@@ -57,7 +59,7 @@ export const Step3 = ({
               fontWeight: "500",
             }}
           >
-            Yes
+            {t('yes')}
           </Text>
         </TouchableOpacity>
 
@@ -91,13 +93,13 @@ export const Step3 = ({
               fontWeight: "500",
             }}
           >
-            No
+            {t('no')}
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Employment Status</Text>
+        <Text style={styles.label}>{t('employeeStatus')}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setApplicantSituation({ employmentStatus: value })
@@ -129,7 +131,7 @@ export const Step3 = ({
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Social Security Coverage</Text>
+        <Text style={styles.label}>{t('socialSecurityCoverage')}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setApplicantSituation({ socialSecurityCoverage: value })

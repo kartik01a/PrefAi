@@ -75,7 +75,7 @@ const WelcomePage = () => {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
 
-  const userId = useSelector((state: RootState) => state.auth.userInfo?.id);
+  const userId = useSelector((state: RootState) => state.auth.userInfo?._id);
   const [updateUserInfo] = useUpdateUserLanguageMutation();
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });

@@ -20,7 +20,7 @@ export const supportedLanguages = [
   { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
   { code: 'zh', name: 'Chinese', nativeName: '中文' },
   { code: 'ka', name: 'Georgian', nativeName: 'ქართული' },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
+  // { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
 ];
 
 // RTL languages

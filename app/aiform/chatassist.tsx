@@ -14,9 +14,15 @@ import {
 } from "react-native";
 
 import ServiceCard from "@/components/Home/ServiceCard";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 const ChatAssist: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
+  let userData = useSelector((state: RootState) => state.auth.userInfo);
+  const firstName = userData?.firstName || "User";
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useLayoutEffect(() => {
@@ -46,14 +52,14 @@ const ChatAssist: React.FC = () => {
   const services = [
     {
       icon: "home-document",
-      title: "CAF Declaration of Situation – Housing & Family Benefits",
+      title: t("formName1"),
     },
     {
       icon: "home-document",
-      title: "Application for Housing Assistance  (APL)",
+      title: t("formName2"),
     },
-    { icon: "home-document", title: "Financial Aid Application Form" },
-    { icon: "home-document", title: "Equipment loan" },
+    { icon: "home-document", title: t("formName3") },
+    { icon: "home-document", title: t("formName4") },
   ];
 
   function serviceMethod(index: number): void {
@@ -101,14 +107,16 @@ const ChatAssist: React.FC = () => {
               color="white"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Hi, John</Text>
+          <Text style={styles.headerTitle}>
+            {t("hi")}, {firstName}
+          </Text>
           <Text style={styles.sectionTitle}>
-            What documents would you like me to help you with?
+            {t("whatDocumentWouldYouLikeMeToHelpYouWith")}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>CAF Forms</Text>
+          <Text style={styles.sectionTitle}>{t("cafForms")}</Text>
           <View style={styles.servicesGrid}>
             {services.map((service, index) => (
               <ServiceCard

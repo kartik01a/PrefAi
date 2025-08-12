@@ -379,7 +379,7 @@ const EditProfileScreen = () => {
             onPress={handleUpdate}
           >
             <Text style={styles.autoFillText}>
-              {t("autoFillDataFromCAFForm")}
+              {t("editProfile")}
             </Text>
           </TouchableOpacity>
         </View>

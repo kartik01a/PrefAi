@@ -20,7 +20,7 @@ const LANGUAGE_LABELS = {
   en: "English",
   zh: "Chinese",
   ka: "Georgian",
-  ar: "Arabic",
+  // ar: "Arabic",
   ru: "Russian",
   pt: "Portuguese",
 };
@@ -196,7 +196,7 @@ const GeneralScreen = () => {
               { label: "English", value: "en" },
               { label: "Chinese ", value: "zh" },
               { label: "Georgian", value: "ka" },
-              { label: "Arabic", value: "ar" },
+              // { label: "Arabic", value: "ar" },
               { label: "Russian", value: "ru" },
               { label: "Portuguese", value: "pt" },
             ]}

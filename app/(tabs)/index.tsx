@@ -71,7 +71,7 @@ const HomeTab: React.FC = () => {
     <BaseLayout>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.greeting]}>Hi, John</Text>
+          <Text style={[styles.greeting]}>Hi, {userInfo?.firstName || "User"}</Text>
           <Text style={[styles.subtitle]}>{t("whatCanIDoToHelpYouToday")}</Text>
         </View>
         <TouchableOpacity style={styles.notificationButton}>

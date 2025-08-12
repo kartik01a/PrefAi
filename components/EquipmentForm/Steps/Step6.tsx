@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Platform,
   Text,
@@ -17,6 +18,7 @@ interface Step7Props {
 }
 
 export const Step6 = ({ declaration, setDeclaration }: Step7Props) => {
+  const { t } = useTranslation();
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -30,17 +32,17 @@ export const Step6 = ({ declaration, setDeclaration }: Step7Props) => {
   return (
     <View style={{ gap: 16 }}>
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Place of Signature</Text>
+        <Text style={styles.label}>{t("placeOfSignature")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter place of signature"
+          placeholder={t("inputDetails")}
           value={declaration.placeOfSignature}
           onChangeText={(text) => setDeclaration({ placeOfSignature: text })}
         />
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Date of Signature</Text>
+        <Text style={styles.label}>{t("dateOfSignature")}</Text>
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
           <View style={styles.inputWithIcon}>
             <TextInput
@@ -85,11 +87,11 @@ export const Step6 = ({ declaration, setDeclaration }: Step7Props) => {
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Signature</Text>
+        <Text style={styles.label}>{t("signature")}</Text>
         <TextInput
           style={[styles.input, { height: 100, textAlignVertical: "top" }]}
           multiline
-          placeholder="Type your signature"
+          placeholder={t("inputDetails")}
           value={declaration.signature}
           onChangeText={(text) => setDeclaration({ signature: text })}
         />
@@ -97,7 +99,7 @@ export const Step6 = ({ declaration, setDeclaration }: Step7Props) => {
 
       <View style={styles.dividerWithText}>
         <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>or</Text>
+        <Text style={styles.dividerText}>{t("or")}</Text>
         <View style={styles.dividerLine} />
       </View>
 
@@ -105,7 +107,7 @@ export const Step6 = ({ declaration, setDeclaration }: Step7Props) => {
         style={styles.button}
         onPress={() => setDeclaration({ signature: "Signed electronically" })}
       >
-        <Text style={styles.buttonText}>Use Auto Sign</Text>
+        <Text style={styles.buttonText}>{t("useAutoSign")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -125,9 +127,7 @@ export const Step6 = ({ declaration, setDeclaration }: Step7Props) => {
           size={24}
           color={declaration.declarationAccepted ? "#007AFF" : "#888"}
         />
-        <Text style={styles.checkboxLabel}>
-          I certify on my honor that this information is true and complete
-        </Text>
+        <Text style={styles.checkboxLabel}>{t("alpFormStep7Label")}</Text>
       </TouchableOpacity>
     </View>
   );

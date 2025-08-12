@@ -19,7 +19,6 @@ import {
 import { Menu } from "react-native-paper";
 import { useSelector } from "react-redux";
 import DocumentFolder from "../../assets/images/document-folder.svg";
-import DocumentPdf from "../../assets/images/document-pdf.svg";
 import UploadAdd from "../../assets/images/upload-add.svg";
 import BaseLayout from "../../components/BaseLayout";
 import {
@@ -33,7 +32,6 @@ import { RootState } from "../store";
 const DocumentTab = () => {
   const { setSelectedFile, setCurrentFolder, files } = useFileStore();
   let userData = useSelector((state: RootState) => state.auth.userInfo);
-  console.log(userData)
   const [addFolder, { isLoading: createFolderLoading }] =
     useCreateFolderMutation();
   const { data: folders, isLoading: getFolderLoading } = useGetFoldersQuery(
@@ -223,18 +221,18 @@ const DocumentTab = () => {
     );
   };
 
-  const renderDocumentItem = (document: StoredFile) => (
-    <TouchableOpacity
-      key={document.id}
-      style={styles.documentItem}
-      onPress={() => handleDocumentPress(document)}
-    >
-      <View style={styles.documentIcon}>
-        <DocumentPdf />
-      </View>
-      <Text style={styles.documentName}>{document.name}</Text>
-    </TouchableOpacity>
-  );
+  // const renderDocumentItem = (document: StoredFile) => (
+  //   <TouchableOpacity
+  //     key={document.id}
+  //     style={styles.documentItem}
+  //     onPress={() => handleDocumentPress(document)}
+  //   >
+  //     <View style={styles.documentIcon}>
+  //       <DocumentPdf />
+  //     </View>
+  //     <Text style={styles.documentName}>{document.name}</Text>
+  //   </TouchableOpacity>
+  // );
 
   return (
     <BaseLayout>
@@ -304,7 +302,7 @@ const DocumentTab = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Document</Text>
+          <Text style={styles.sectionTitle}>{t('recentDocument')}</Text>
           {/* <View style={styles.documentsContainer}>
             {files.length === 0 && <NotFoundComp text={t("noFilesFound")} />}
             {files.map((document) => renderDocumentItem(document))}

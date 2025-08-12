@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Platform,
   Text,
@@ -20,16 +21,17 @@ export const Step1 = ({
   applicantCandidate,
   setApplicantCandidate,
 }: Step1Props) => {
+  const { t } = useTranslation();
   const [showDobPicker, setShowDobPicker] = useState(false);
 
   return (
     <View style={{ gap: 16 }}>
       <View style={styles.row}>
         <View style={styles.inputContainerFull}>
-          <Text style={styles.label}>CAF Beneficiary</Text>
+          <Text style={styles.label}>{t("cafBeneficiary")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="CAF"
+            placeholder={t("inputDetails")}
             placeholderTextColor="#A0A0A0"
             value={applicantCandidate.cafBeneficiary}
             onChangeText={(text) =>
@@ -40,10 +42,13 @@ export const Step1 = ({
       </View>
       <View style={styles.row}>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Last Name <Text style={styles.smallLabel}>(in uppercase)</Text></Text>
+          <Text style={styles.label}>
+            {"lastName"}{" "}
+            <Text style={styles.smallLabel}>({t("inUppercase")})</Text>
+          </Text>
           <TextInput
             style={styles.input}
-            placeholder="eg JORDAN"
+            placeholder={t("inputDetails")}
             value={applicantCandidate.lastNameUppercase}
             onChangeText={(text) =>
               setApplicantCandidate({ lastNameUppercase: text })
@@ -51,10 +56,10 @@ export const Step1 = ({
           />
         </View>
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>First Name</Text>
+          <Text style={styles.label}>{t("firstName")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter last name"
+            placeholder={t("inputDetails")}
             value={applicantCandidate.lastName}
             onChangeText={(text) => setApplicantCandidate({ lastName: text })}
           />
@@ -62,7 +67,7 @@ export const Step1 = ({
       </View>
       <View style={styles.row}>
         <View style={styles.inputContainerFull}>
-          <Text style={styles.label}>Date of Birth</Text>
+          <Text style={styles.label}>{t("dateOfBirth")}</Text>
           <TouchableOpacity onPress={() => setShowDobPicker(true)}>
             <View style={styles.inputWithIcon}>
               <TextInput
@@ -109,10 +114,10 @@ export const Step1 = ({
       </View>
 
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>Current employee status</Text>
+        <Text style={styles.label}>{t("currentEmployeeStatus")}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter current status"
+          placeholder={t("inputDetails")}
           value={applicantCandidate.employeeStatus}
           onChangeText={(text) =>
             setApplicantCandidate({ employeeStatus: text })

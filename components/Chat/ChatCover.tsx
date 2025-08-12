@@ -1,15 +1,21 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import ChatLogo from "../../assets/images/chat-logo.svg";
+import { RootState } from "@/app/store";
+import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const ChatCover = () => {
+  const { t } = useTranslation()
+  let userData = useSelector((state: RootState) => state.auth.userInfo);
+  const firstName = userData?.firstName || "User"
   return (
     <View style={styles.container}>
       <ChatLogo />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>Hi, John</Text>
+        <Text style={styles.title}>{t('hi')}, {firstName}</Text>
         <Text style={styles.subTitle}>
-          What translations can I help you with today?
+          {t('whatTranslationCanIHelpYouWithToday')}
         </Text>
       </View>
     </View>
