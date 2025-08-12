@@ -1,9 +1,9 @@
 // app/freeplan.tsx
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import React, { useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Image,
@@ -11,17 +11,59 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { useCreateSubscriptionMutation } from "./subscriptionApiSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import {
+  useCreateSubscriptionMutation,
+  useGetMySubscriptionQuery,
+} from "./subscriptionApiSlice";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import React = require("react");
 
 const FreePlan = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const [selectedPlan, setSelectedPlan] = useState(0);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+  const { data: subscriptionData, refetch } = useGetMySubscriptionQuery();
+
+  const plans = [
+    { title: t("freePlan3day"), price: "€0.00 / month", id: null },
+    {
+      title: t("monthlyPlanFullAccess"),
+      price: "€4.99 / month",
+      id: "price_1RtaE42SNvhd3XUdMxiwpVrc",
+    },
+    {
+      title: t("yearlyPlanBestValue"),
+      price: "€59.99 / year",
+      id: "price_1RuFHLCe7yxtOx2Nu1ieMoba",
+    },
+  ];
+
+  useEffect(() => {
+    const planId = subscriptionData?.data?.planId;
+    if (planId) {
+      const foundIndex = plans.findIndex((plan) => plan.id === planId);
+      if (foundIndex !== -1) {
+        setSelectedPlan(foundIndex);
+        setIsSubscribed(true);
+      } else {
+        setSelectedPlan(0);
+        setIsSubscribed(false);
+      }
+    } else {
+      setSelectedPlan(0);
+      setIsSubscribed(false);
+    }
+  }, [subscriptionData]);
 
   const getIncludedItems = () => {
     if (selectedPlan === 0) {
@@ -29,109 +71,112 @@ const FreePlan = () => {
       return [
         {
           icon: "check-circle",
-          text: t('freePlan1'),
+          text: t("freePlan1"),
         },
         {
           icon: "check-circle",
-          text: t('freePlan2'),
+          text: t("freePlan2"),
         },
         {
           icon: "x-circle",
-          text: t('freePlan3'),
+          text: t("freePlan3"),
         },
         {
           icon: "x-circle",
-          text: t('freePlan4'),
+          text: t("freePlan4"),
         },
         {
           icon: "x-circle",
-          text: t('freePlan5'),
+          text: t("freePlan5"),
         },
       ];
     } else if (selectedPlan === 1) {
       return [
         {
           icon: "check-circle",
-          text: t('paidPlan1'),
+          text: t("paidPlan1"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan2'),
+          text: t("paidPlan2"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan3'),
+          text: t("paidPlan3"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan4'),
+          text: t("paidPlan4"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan5'),
+          text: t("paidPlan5"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan6'),
+          text: t("paidPlan6"),
         },
       ];
     } else {
       return [
         {
           icon: "check-circle",
-          text: t('paidPlan1')
+          text: t("paidPlan1"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan2')
+          text: t("paidPlan2"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan3')
+          text: t("paidPlan3"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan4')
+          text: t("paidPlan4"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan5')
+          text: t("paidPlan5"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan6')
+          text: t("paidPlan6"),
         },
         {
           icon: "check-circle",
-          text: t('paidPlan7')
+          text: t("paidPlan7"),
         },
       ];
     }
   };
 
-  const plans = [
-    { title: t('freePlan3day'), price: "€0.00 / month", id: null },
-    {
-      title: t('monthlyPlanFullAccess'),
-      price: "€4.99 / month",
-      id: "price_1RtaE42SNvhd3XUdMxiwpVrc",
-    },
-    {
-      title: t('yearlyPlanBestValue'),
-      price: "€59.99 / year",
-      id: "price_1RuFHLCe7yxtOx2Nu1ieMoba",
-    },
-  ];
+  useFocusEffect(
+    useCallback(() => {
+      if (userInfo?._id) {
+        refetch();
+      }
+    }, [userInfo?._id])
+  );
 
   const [createSubscription, { isLoading }] = useCreateSubscriptionMutation();
 
   const handleSelectPlan = async () => {
+    if (isSubscribed) {
+      Toast.show({
+        type: "info",
+        text1: t("alreadySubscribed"),
+        text2: t("youAlreadyHaveAnActiveSubscription"),
+      });
+      return;
+    }
+
     const selectedPlanId = plans[selectedPlan].id;
     if (!selectedPlanId) {
       Toast.show({
         type: "info",
-        text1: "Free plan selected",
-        text2: "You're already on a free plan.",
+        text1: t("freePlanSelected"),
+        text2: t("youAreAlreadyOnFreePlan"),
       });
       return;
     }
@@ -140,18 +185,19 @@ const FreePlan = () => {
         planId: selectedPlanId,
       }).unwrap();
       const url = response?.data?.url;
-      console.log("url", url);
       if (url) {
         await WebBrowser.openBrowserAsync(url);
       }
+      refetch();
     } catch (error) {
       console.error("Subscription error:", error);
       Toast.show({
         type: "error",
-        text1: "Failed to start subscription",
+        text1: t("failedToStartSubscription"),
       });
     }
   };
+
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
@@ -186,19 +232,30 @@ const FreePlan = () => {
                   <TouchableOpacity
                     key={index}
                     activeOpacity={0.7}
-                    onPress={() => setSelectedPlan(index)}
+                    onPress={() => {
+                      if (!isSubscribed) {
+                        setSelectedPlan(index);
+                      }
+                    }}
                     style={[
                       styles.planBox,
                       isTop && styles.planTop,
                       isBottom && styles.planBottom,
                       isSelected && styles.selectedPlanBox,
+                      isSubscribed && styles.disabledPlanBox,
                     ]}
+                    disabled={isSubscribed} // disable selecting plan if subscribed
                   >
                     <View style={styles.planContent}>
                       <Checkbox
                         status={isSelected ? "checked" : "unchecked"}
-                        onPress={() => setSelectedPlan(index)}
+                        onPress={() => {
+                          if (!isSubscribed) {
+                            setSelectedPlan(index);
+                          }
+                        }}
                         color="#00FFB3"
+                        disabled={isSubscribed}
                       />
                       <View style={styles.planTextContainer}>
                         <Text style={styles.planTitle}>{plan.title}</Text>
@@ -220,22 +277,24 @@ const FreePlan = () => {
 
             <Text style={styles.includedTitle}>{t("whatsIncluded")}</Text>
 
-            {getIncludedItems().map((item, index) => (
-              <View key={index} style={styles.includedItem}>
-                <View style={styles.includedIcon}>
-                  <Feather name={item.icon as any} size={18} color="white" />
+            {getIncludedItems().map((item, index) => {
+              return (
+                <View key={index} style={styles.includedItem}>
+                  <View style={styles.includedIcon}>
+                    <Feather name={item.icon as any} size={18} color="white" />
+                  </View>
+                  <Text
+                    style={[
+                      styles.includedText,
+                      item.text === "Save 14% over monthly" &&
+                        styles.semiBoldText,
+                    ]}
+                  >
+                    {item.text}
+                  </Text>
                 </View>
-                <Text
-                  style={[
-                    styles.includedText,
-                    item.text === "Save 14% over monthly" &&
-                      styles.semiBoldText,
-                  ]}
-                >
-                  {item.text}
-                </Text>
-              </View>
-            ))}
+              );
+            })}
 
             <Text style={styles.footerText}>
               • {t("termsOfUse")}
@@ -243,12 +302,19 @@ const FreePlan = () => {
             </Text>
 
             <TouchableOpacity
-              style={styles.selectButton}
+              style={[
+                styles.selectButton,
+                isSubscribed && styles.disabledButton,
+              ]}
               onPress={handleSelectPlan}
-              disabled={isLoading}
+              disabled={isLoading || isSubscribed}
             >
               <Text style={styles.selectButtonText}>
-                {isLoading ? "Processing..." : t("selectPlan")}
+                {isLoading
+                  ? t("processing")
+                  : isSubscribed
+                  ? t("Already Subscribed")
+                  : t("selectPlan")}
               </Text>
             </TouchableOpacity>
           </ScrollView>
@@ -261,6 +327,14 @@ const FreePlan = () => {
 export default FreePlan;
 
 const styles = StyleSheet.create({
+  disabledButton: {
+    opacity: 0.5,
+  },
+
+  disabledPlanBox: {
+    opacity: 0.5,
+  },
+
   safeArea: {
     flex: 1,
   },

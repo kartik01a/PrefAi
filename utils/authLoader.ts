@@ -1,3 +1,4 @@
+import { apiSlice } from '@/services/apiSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppDispatch } from '../app/store';
 import { AuthResponsePayload, logout, setCredentials } from '../features/auth/authSlice';
@@ -16,6 +17,7 @@ export const clearUser = () => async (dispatch: AppDispatch) => {
   try {
     await AsyncStorage.removeItem('userInfo');
     dispatch(logout());
+    dispatch(apiSlice.util.resetApiState());
   } catch (error) {
     console.error('Failed to clear user from storage:', error);
   }
