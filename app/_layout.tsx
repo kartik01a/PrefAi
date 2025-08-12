@@ -8,7 +8,7 @@ import {
 import { loadUserFromStorage } from "@/utils/authLoader";
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import {  Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
@@ -127,6 +127,18 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="file-viewer"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="cancel"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="success"
                 options={{
                   headerShown: false,
                 }}

@@ -262,10 +262,10 @@ const EditProfileScreen = () => {
                 onValueChange={setCountry}
                 value={country}
                 items={[
-                  { label: "France", value: "France" },
-                  { label: "Spain", value: "Spain" },
-                  { label: "Germany", value: "Germany" },
-                  { label: "India", value: "India" },
+                  { label: "Russia", value: "Russia" },
+                  { label: "China", value: "China" },
+                  { label: "Georgia", value: "Georgia" },
+                  { label: "Portugal", value: "Portugal" },
                   { label: "Other", value: "Other" },
                 ]}
                 style={pickerSelectStyles}

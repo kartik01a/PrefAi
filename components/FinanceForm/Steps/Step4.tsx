@@ -1,10 +1,10 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { RentalContext } from "../formData";
 import { styles } from "./stepStyles";
-import { useTranslation } from "react-i18next";
 
 interface Step4Props {
   rentalContext: RentalContext;
@@ -12,10 +12,11 @@ interface Step4Props {
 }
 
 export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const handleRentPaidToggle = (value: string) => {
     setRentalContext({
-      isRentPaidDirectly: rentalContext.isRentPaidDirectly === value ? "" : value,
+      isRentPaidDirectly:
+        rentalContext.isRentPaidDirectly === value ? "" : value,
     });
   };
 
@@ -23,16 +24,42 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
     <View style={{ gap: 16 }}>
       {/* Main Source of Funding */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>{t('mainSourceOfFunding')}</Text>
+        <Text style={styles.label}>{t("mainSourceOfFunding")}</Text>
         <RNPickerSelect
-          onValueChange={(value) => setRentalContext({ mainSourceOfFunding: value })}
+          onValueChange={(value) =>
+            setRentalContext({ mainSourceOfFunding: value })
+          }
           value={rentalContext.mainSourceOfFunding}
           placeholder={{ label: "Select source", value: "" }}
           items={[
-            { label: "Government Support", value: "Government Support" },
-            { label: "NGO/Non-profit", value: "NGO/Non-profit" },
-            { label: "Personal Savings", value: "Personal Savings" },
-            { label: "Other", value: "Other" },
+            { label: "Donations", value: "Donations" },
+            {
+              label: "Grants (from governments)",
+              value: "Grants (from governments)",
+            },
+            { label: "Membership fees", value: "Membership fees" },
+            { label: "Fundraising events", value: "Fundraising events" },
+            {
+              label: "Public or private sponsorships",
+              value: "Public or private sponsorships",
+            },
+            { label: "Crowdfunding", value: "Crowdfunding" },
+            {
+              label: "NGO or foundation support",
+              value: "NGO or foundation support",
+            },
+            {
+              label: "Grants or public innovation funds",
+              value: "Grants or public innovation funds",
+            },
+            {
+              label: "Strategic partnerships",
+              value: "Strategic partnerships",
+            },
+            {
+              label: "Voluntary donations (if allowed)",
+              value: "Voluntary donations (if allowed)",
+            },
           ]}
           useNativeAndroidPickerStyle={false}
           Icon={() => (
@@ -52,14 +79,16 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
       </View>
 
       {/* Is Rent Paid Directly (Yes/No) */}
-      <Text style={styles.label}>{t('isRentPaidDirectly')}</Text>
+      <Text style={styles.label}>{t("isRentPaidDirectly")}</Text>
       <View style={styles.row}>
         <TouchableOpacity
           style={[
             styles.inputHalf,
             {
-              backgroundColor: rentalContext.isRentPaidDirectly === "Yes" ? "#E6F0FC" : "#fff",
-              borderColor: rentalContext.isRentPaidDirectly === "Yes" ? "#2479CF" : "#ccc",
+              backgroundColor:
+                rentalContext.isRentPaidDirectly === "Yes" ? "#E6F0FC" : "#fff",
+              borderColor:
+                rentalContext.isRentPaidDirectly === "Yes" ? "#2479CF" : "#ccc",
               borderWidth: 1,
               borderRadius: 8,
               justifyContent: "center",
@@ -71,11 +100,12 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
         >
           <Text
             style={{
-              color: rentalContext.isRentPaidDirectly === "Yes" ? "#2479CF" : "#333",
+              color:
+                rentalContext.isRentPaidDirectly === "Yes" ? "#2479CF" : "#333",
               fontWeight: "500",
             }}
           >
-            {t('yes')}
+            {t("yes")}
           </Text>
         </TouchableOpacity>
 
@@ -83,8 +113,10 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
           style={[
             styles.inputHalf,
             {
-              backgroundColor: rentalContext.isRentPaidDirectly === "No" ? "#E6F0FC" : "#fff",
-              borderColor: rentalContext.isRentPaidDirectly === "No" ? "#2479CF" : "#ccc",
+              backgroundColor:
+                rentalContext.isRentPaidDirectly === "No" ? "#E6F0FC" : "#fff",
+              borderColor:
+                rentalContext.isRentPaidDirectly === "No" ? "#2479CF" : "#ccc",
               borderWidth: 1,
               borderRadius: 8,
               justifyContent: "center",
@@ -96,11 +128,12 @@ export const Step4 = ({ rentalContext, setRentalContext }: Step4Props) => {
         >
           <Text
             style={{
-              color: rentalContext.isRentPaidDirectly === "No" ? "#2479CF" : "#333",
+              color:
+                rentalContext.isRentPaidDirectly === "No" ? "#2479CF" : "#333",
               fontWeight: "500",
             }}
           >
-            {t('no')}
+            {t("no")}
           </Text>
         </TouchableOpacity>
       </View>

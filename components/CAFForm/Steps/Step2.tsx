@@ -142,9 +142,11 @@ export const Step2 = ({ partnerSpouse, setPartnerSpouse }: Step2Props) => {
             value={partnerSpouse.countryOfBirth}
             placeholder={{ label: t("selectCountry"), value: "" }}
             items={[
-              { label: "France", value: "France" },
-              { label: "India", value: "India" },
-              { label: "USA", value: "USA" },
+              { label: "Russia", value: "Russia" },
+              { label: "China", value: "China" },
+              { label: "Georgia", value: "Georgia" },
+              { label: "Portugal", value: "Portugal" },
+              { label: "Other", value: "Other" },
             ]}
             useNativeAndroidPickerStyle={false}
             Icon={() => (

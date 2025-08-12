@@ -255,7 +255,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
 
       {/* Social Contribution */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>{t('socialContribution')}</Text>
+        <Text style={styles.label}>{t("socialContribution")}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setEmployment({ socialContribution: value })
@@ -286,7 +286,7 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
 
       {/* Foreign Contribution Country */}
       <View style={styles.inputContainerFull}>
-        <Text style={styles.label}>{t('foreignContributionCountry')}</Text>
+        <Text style={styles.label}>{t("foreignContributionCountry")}</Text>
         <RNPickerSelect
           onValueChange={(value) =>
             setEmployment({ foreignContributionCountry: value })
@@ -294,11 +294,11 @@ export const Step6 = ({ employment, setEmployment }: Step6Props) => {
           value={employment.foreignContributionCountry}
           placeholder={{ label: "Select country", value: "" }}
           items={[
-            { label: "France", value: "France" },
-            { label: "India", value: "India" },
-            { label: "USA", value: "USA" },
-            { label: "Germany", value: "Germany" },
-            { label: "Others", value: "Others" },
+            { label: "Russia", value: "Russia" },
+            { label: "China", value: "China" },
+            { label: "Georgia", value: "Georgia" },
+            { label: "Portugal", value: "Portugal" },
+            { label: "Other", value: "Other" },
           ]}
           useNativeAndroidPickerStyle={false}
           Icon={() => (

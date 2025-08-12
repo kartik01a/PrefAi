@@ -27,8 +27,10 @@ export const Step1 = ({
           value={applicantCandidate.nameOfTheNonProfitInstitution}
           placeholder={{ label: t('inputDetails'), value: "" }}
           items={[
-            { label: "Institution A", value: "Institution A" },
-            { label: "Institution B", value: "Institution B" },
+            { label: "CPAM", value: "CPAM" },
+            { label: "Prefecture", value: "Prefecture" },
+            { label: "Taxes", value: "Taxes" },
+            { label: "Job Center", value: "Job Center" },
           ]}
           useNativeAndroidPickerStyle={false}
           Icon={() => (

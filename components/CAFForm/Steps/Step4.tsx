@@ -181,9 +181,11 @@ export const Step4 = ({ contactInfo, setContactInfo }: Step4Props) => {
               value={contactInfo.partnerAbroadCountry}
               placeholder={{ label: "Select Country", value: "" }}
               items={[
-                { label: "France", value: "France" },
-                { label: "India", value: "India" },
-                { label: "USA", value: "USA" },
+                { label: "Russia", value: "Russia" },
+                { label: "China", value: "China" },
+                { label: "Georgia", value: "Georgia" },
+                { label: "Portugal", value: "Portugal" },
+                { label: "Other", value: "Other" },
               ]}
               useNativeAndroidPickerStyle={false}
               Icon={() => (

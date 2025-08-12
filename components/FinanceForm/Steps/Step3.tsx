@@ -139,9 +139,11 @@ export const Step3 = ({
           value={applicantSituation.socialSecurityCoverage}
           placeholder={{ label: "Select coverage", value: "" }}
           items={[
-            { label: "Yes", value: "Yes" },
-            { label: "No", value: "No" },
-            { label: "Partially Covered", value: "Partially Covered" },
+            { label: "Health care", value: "Health care" },
+            { label: "Retirement pensions", value: "Retirement pensions" },
+            { label: "Unemployment benefits ", value: "Unemployment benefits " },
+            { label: "Family allowances (CAF)", value: "Family allowances (CAF)" },
+            { label: "Disability or work accident benefits", value: "Disability or work accident benefits" },
           ]}
           useNativeAndroidPickerStyle={false}
           Icon={() => (

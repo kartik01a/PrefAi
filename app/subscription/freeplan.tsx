@@ -1,7 +1,7 @@
 // app/freeplan.tsx
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect, useNavigation } from "expo-router";
+import { router, useFocusEffect, useNavigation } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -39,12 +39,12 @@ const FreePlan = () => {
     {
       title: t("monthlyPlanFullAccess"),
       price: "€4.99 / month",
-      id: "price_1RtaE42SNvhd3XUdMxiwpVrc",
+      id: "price_1RvOlYCe7yxtOx2NygoTZ3Nb",
     },
     {
       title: t("yearlyPlanBestValue"),
       price: "€59.99 / year",
-      id: "price_1RuFHLCe7yxtOx2Nu1ieMoba",
+      id: "price_1RvOmxCe7yxtOx2N6z2yzpLp",
     },
   ];
 
@@ -185,9 +185,12 @@ const FreePlan = () => {
         planId: selectedPlanId,
       }).unwrap();
       const url = response?.data?.url;
-      if (url) {
-        await WebBrowser.openBrowserAsync(url);
-      }
+      const result = await WebBrowser.openAuthSessionAsync(
+        url,
+        "prefai://success"
+      );
+
+      router.push("/success");
       refetch();
     } catch (error) {
       console.error("Subscription error:", error);
