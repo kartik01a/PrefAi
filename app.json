@@ -19,8 +19,6 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
       ],
       "package": "com.anonymous.prefai"
@@ -59,8 +57,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "3bb6f710-22e6-4aeb-88df-33f8bf6ee4a5"
+        "projectId": "193989f8-3ac9-4d67-a12f-946c4e311ecf"
       }
-    }
+    },
+    "owner": "kartik_01a"
   }
 }
