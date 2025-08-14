@@ -178,13 +178,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: "Poppins-SemiBold",
     marginBottom: 2,
     color: "#ffffff",
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "Poppins-Medium",
     color: "#ffffff",
   },
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   premiumTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: "Poppins-SemiBold",
     color: "#2479CF",
   },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "Poppins-SemiBold",
     marginBottom: 8,
   },
