@@ -12,10 +12,6 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#2479CF"
-      },
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
