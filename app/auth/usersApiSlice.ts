@@ -30,6 +30,7 @@ export interface AuthResponse {
   blocked?: boolean;
   blockReason?: string;
   facebookId?: string;
+  googleId?: string;
   linkedinId?: string;
   image?: string;
   userName?: string;
@@ -54,6 +55,7 @@ export interface AuthResponsePayload {
   lastName: string | undefined;
   passportNumber: string | undefined;
   facebookId: string | undefined;
+  googleId: string | undefined;
   linkedinId: string | undefined;
   image: string | undefined;
   userName: string | undefined;
@@ -85,6 +87,7 @@ export interface updateRequest {
   blocked?: boolean;
   blockReason?: string;
   facebookId?: string;
+  googleId?: string;
   linkedinId?: string;
   image?: string;
   userName?: string;
@@ -181,10 +184,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Folder"],
     }),
-    createFolder: builder.mutation<
-      void,
-      { folderName: string; userId: string }
-    >({
+    createFolder: builder.mutation<void,{ folderName: string; userId: string }>({
       query: (data) => ({
         method: "POST",
         url: `${DOCUMENTS_URL}/folder`,
@@ -192,6 +192,20 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Folder"],
     }),
+    socialLoginGoogle: builder.mutation<AuthResponsePayload, { idToken: string }>({
+  query: ({ idToken }) => ({
+    url: `${USERS_URL}/social/google`,
+    method: "POST",
+    body: { idToken },
+  }),
+}),
+socialLoginFacebook: builder.mutation<AuthResponsePayload, { accessToken: string }>({
+  query: ({ accessToken }) => ({
+    url: `${USERS_URL}/social/facebook`,
+    method: "POST",
+    body: { accessToken },
+  }),
+}),
   }),
 });
 
@@ -206,4 +220,6 @@ export const {
   useGetFoldersQuery,
   useCreateDocumentMutation,
   useCreateFolderMutation,
+  useSocialLoginFacebookMutation,
+  useSocialLoginGoogleMutation
 } = usersApiSlice;
