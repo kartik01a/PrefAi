@@ -4,3 +4,4 @@ export const DOCUMENTS_URL = "/api/documents";
 export const POSTS_URL = '/api/posts';
 export const USERS_URL = '/api/users';
 export const SUBSCRIPTION_URL = '/api/subscription';
+export const CHAT_URL = '/api/chat';
