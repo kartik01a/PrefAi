@@ -12,22 +12,6 @@ import {
   View,
 } from "react-native";
 
-async function sendMessageToBackend(message: string): Promise<ChatType> {
-  const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ message }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to send message");
-  }
-
-  return await res.json();
-}
-
 interface IProps {
   addChat: (chat: ChatType) => void;
   onUploadFile: (file: { uri: string; name: string; type: string }) => void | Promise<void>;
@@ -51,26 +35,14 @@ const ChatBar = ({ addChat, onUploadFile }: IProps) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const handleAddChat = async () => {
+  const handleAddChat = () => {
     if (!message.trim()) return;
     const time = getCurrentTime();
 
-    // Optimistically add to UI
+    // Optimistically add user message
     const newChat: ChatType = { message, time, messageBy: 1 };
     addChat(newChat);
     setMessage("");
-
-    try {
-      setLoading(true);
-      const backendChat = await sendMessageToBackend(message);
-      if (backendChat) {
-        addChat({ ...backendChat, time: getCurrentTime(), messageBy: 2 });
-      }
-    } catch (err) {
-      console.error("Chat send error:", err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleUploadPress = async () => {
