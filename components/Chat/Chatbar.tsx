@@ -1,6 +1,7 @@
 import { ChatType } from "@/app/(tabs)/chat";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import * as DocumentPicker from "expo-document-picker";
+import { router, useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -13,34 +14,61 @@ import {
 
 interface IProps {
   addChat: (chat: ChatType) => void;
+  onUploadFile: (file: {
+    uri: string;
+    name: string;
+    type: string;
+  }) => void | Promise<void>;
 }
 
 function getCurrentTime(): string {
   const now = new Date();
-
   let hours = now.getHours();
   const minutes = now.getMinutes();
   const ampm = hours >= 12 ? "PM" : "AM";
-
   hours = hours % 12;
   hours = hours ? hours : 12;
-
   const formattedMinutes = minutes.toString().padStart(2, "0");
-
   return `${hours}.${formattedMinutes} ${ampm}`;
 }
 
-const ChatBar = ({ addChat }: IProps) => {
+const ChatBar = ({ addChat, onUploadFile }: IProps) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handleAddChat = () => {
+    if (!message.trim()) return;
     const time = getCurrentTime();
-    if (message && time) {
-      addChat({ message, time, messageBy: 1 });
-      setMessage("");
+
+    // Optimistically add user message
+    const newChat: ChatType = { message, time, messageBy: 1 };
+    addChat(newChat);
+    setMessage("");
+  };
+
+  const handleUploadPress = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled) return;
+
+      const file = result.assets[0];
+      if (file) {
+        const fileData = {
+          uri: file.uri,
+          name: file.name,
+          type: file.mimeType ?? "application/octet-stream",
+        };
+        await onUploadFile(fileData);
+      }
+    } catch (err) {
+      console.error("File upload error:", err);
     }
   };
 
@@ -51,15 +79,11 @@ const ChatBar = ({ addChat }: IProps) => {
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
-      (e) => {
-        setKeyboardHeight(e.endCoordinates.height);
-      }
+      (e) => setKeyboardHeight(e.endCoordinates.height)
     );
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
-      () => {
-        setKeyboardHeight(0);
-      }
+      () => setKeyboardHeight(0)
     );
 
     return () => {
@@ -79,25 +103,37 @@ const ChatBar = ({ addChat }: IProps) => {
       ]}
     >
       <View style={styles.chatInputWrapper}>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={styles.iconButton} onPress={handleUploadPress}>
           <MaterialCommunityIcons name="plus" size={22} color="#2479CF" />
         </TouchableOpacity>
 
         <TextInput
           style={styles.textInput}
           value={message}
-          onChangeText={(text) => setMessage(text)}
+          onChangeText={setMessage}
           placeholder={t("askMeAllAboutImmegrationTopic")}
           placeholderTextColor="#888"
           multiline
           textAlignVertical="center"
         />
 
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => router.push("/voice-translation")}
+          style={styles.iconButton}
+        >
           <MaterialCommunityIcons name="microphone" size={22} color="#2479CF" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleAddChat} style={styles.iconButton}>
-          <MaterialCommunityIcons name="send" size={22} color="#2479CF" />
+
+        <TouchableOpacity
+          onPress={handleAddChat}
+          style={styles.iconButton}
+          disabled={loading}
+        >
+          <MaterialCommunityIcons
+            name={loading ? "clock-outline" : "send"}
+            size={22}
+            color="#2479CF"
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -122,7 +158,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 8,
   },
-
   chatInputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -131,7 +166,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     minHeight: 44,
   },
-
   textInput: {
     flex: 1,
     fontSize: 11,
@@ -142,7 +176,6 @@ const styles = StyleSheet.create({
     maxHeight: 120,
     minHeight: 20,
   },
-
   iconButton: {
     paddingHorizontal: 4,
     paddingVertical: 4,

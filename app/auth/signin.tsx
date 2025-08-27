@@ -1,8 +1,12 @@
+import * as AuthSession from "expo-auth-session";
+import * as Google from "expo-auth-session/providers/google";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -11,14 +15,25 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import { persistUser } from "../../utils/authLoader";
 import { AppDispatch, RootState } from "../store";
-import { useLoginMutation } from "./usersApiSlice";
+import {
+  useLoginMutation,
+  useSocialLoginFacebookMutation,
+  useSocialLoginGoogleMutation,
+} from "./usersApiSlice";
+
+WebBrowser.maybeCompleteAuthSession();
+
+// When you use expo-auth-session/providers/google, Expo generates a redirect URI like:
+// On dev: exp://YOUR_LOCAL_IP:8081
+// On Expo Go: https://auth.expo.io/@your-username/your-app-slug
+// On production build: yourapp://redirect
 
 const SignIn = () => {
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
@@ -31,15 +46,89 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [login, { isLoading }] = useLoginMutation();
 
-  useEffect(() => {
+
+  // --- GOOGLE LOGIN ---
+  const [requestGoogle, responseGoogle, promptGoogle] = Google.useAuthRequest({
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_ID,
+    responseType: "id_token",
+    scopes: ["openid", "profile", "email"],
+    redirectUri: AuthSession.makeRedirectUri({
+      native: "prefai:/oauthredirect", // for standalone builds
+    }),
+  });
+
+  const [socialLoginGoogle] = useSocialLoginGoogleMutation();
+
+  // const [requestFb, responseFb, promptFb] = Facebook.useAuthRequest(
+  //   {
+  //     clientId: process.env.EXPO_PUBLIC_FACEBOOK_ID!,
+  //     scopes: ["public_profile", "email"],
+  //   },
+  //   {
+  //     useProxy: isExpoGo, // ✅ required for Expo Go
+  //   }
+  // );
+
+  const [socialLoginFacebook] = useSocialLoginFacebookMutation();
+  // useEffect(() => {
+  //   const handleFbResponse = async () => {
+  //     if (
+  //       responseFb?.type === "success" &&
+  //       responseFb.authentication?.accessToken
+  //     ) {
+  //       try {
+  //         // Fetch Facebook user profile
+  //         const res = await fetch(
+  //           `https://graph.facebook.com/me?access_token=${responseFb.authentication.accessToken}&fields=id,name,email,picture.type(large)`
+  //         );
+  //         const fbUser = await res.json();
+
+  //         // Call your backend mutation
+  //         const user = await socialLoginFacebook(fbUser).unwrap();
+  //         await dispatch(persistUser(user));
+
+  //         Toast.show({ type: "success", text1: "Logged In with Facebook" });
+  //         router.replace("/");
+  //       } catch (err) {
+  //         Toast.show({ type: "error", text1: "Facebook login failed" });
+  //       }
+  //     }
+  //   };
+  //   handleFbResponse();
+  // }, [dispatch, responseFb, socialLoginFacebook]);
+
+
+
+  useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
+
+    useEffect(() => {
     if (userInfo) {
       router.replace("/");
     }
   }, [userInfo]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
+  useEffect(() => {
+    const handleGoogleResponse = async () => {
+      if (responseGoogle?.type === "success") {
+        const idToken = responseGoogle.params.id_token;
+        if (idToken) {
+          try {
+            const user = await socialLoginGoogle({ idToken }).unwrap();
+            await dispatch(persistUser(user));
+            Toast.show({ type: "success", text1: "Logged In with Google" });
+            router.replace("/");
+          } catch {
+            Toast.show({ type: "error", text1: "Google login failed" });
+          }
+        }
+      }
+    };
+    handleGoogleResponse();
+  }, [dispatch, responseGoogle, socialLoginGoogle]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -90,7 +179,12 @@ const SignIn = () => {
             </Text>
 
             <View style={styles.socialButtonsContainer}>
-              <TouchableOpacity style={styles.socialButton}>
+              {/* Google */}
+              <TouchableOpacity
+                style={styles.socialButton}
+                onPress={() => promptGoogle()}
+                disabled={!requestGoogle}
+              >
                 <Image
                   source={require("../../assets/images/google.png")}
                   style={styles.socialIcon}
@@ -98,7 +192,12 @@ const SignIn = () => {
                 <Text style={styles.socialButtonText}>{t("google")}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.socialButton}>
+              {/* Facebook */}
+              <TouchableOpacity
+                style={styles.socialButton}
+                // onPress={() => promptFb()}
+                // disabled={!requestFb}
+              >
                 <Image
                   source={require("../../assets/images/facebook.png")}
                   style={styles.socialIcon}
@@ -156,9 +255,11 @@ const SignIn = () => {
               onPress={handleLogin}
               disabled={isLoading}
             >
-              <Text style={styles.bottomButtonTextLogIn}>
-                {isLoading ? "Logging In..." : t("login")}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.bottomButtonTextLogIn}>{t("login")}</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>

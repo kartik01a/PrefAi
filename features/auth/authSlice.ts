@@ -16,6 +16,7 @@ export interface UserInfo {
   facebookId?: string;
   linkedinId?: string;
   image?: string;
+   googleId?: string;
   userName?: string;
   securityNumber?: string;
   title?: string;

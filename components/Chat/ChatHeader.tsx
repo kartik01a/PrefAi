@@ -1,6 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ScrollView,
   StyleSheet,
@@ -10,7 +11,6 @@ import {
 } from "react-native";
 import ChatGlobe from "../../assets/images/chat-globe.svg";
 import ChatQuestion from "../../assets/images/chat-question.svg";
-import { useTranslation } from "react-i18next";
 
 interface IProps {
   showDate?: boolean;
@@ -65,7 +65,7 @@ const DateSeparator = ({
 };
 
 const ChatHeader = ({ showDate = true }: IProps) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const [language, setLanguage] = useState("english");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -118,7 +118,7 @@ const ChatHeader = ({ showDate = true }: IProps) => {
             <View style={styles.dropdownList}>
               <ScrollView
                 style={styles.scrollView}
-                showsVerticalScrollIndicator={false}
+                showsVerticalScrollIndicator={true}
               >
                 {languageItems.map((item) => (
                   <TouchableOpacity
@@ -149,7 +149,7 @@ const ChatHeader = ({ showDate = true }: IProps) => {
         </View>
         <View style={styles.helpContainer}>
           <ChatQuestion />
-          <Text style={styles.help}>{t('help')}</Text>
+          <Text style={styles.help}>{t("help")}</Text>
         </View>
       </View>
       {showDate && <DateSeparator />}
@@ -229,7 +229,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   scrollView: {
-    maxHeight: 200,
+    height: 220,
+    overflowY: "auto",
   },
   dropdownItem: {
     flexDirection: "row",

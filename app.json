@@ -8,14 +8,21 @@
     "scheme": "prefai",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "permissions": ["RECORD_AUDIO"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "This app uses the microphone to record voice for translation.",
+        "NSSpeechRecognitionUsageDescription": "This app uses speech recognition to convert voice to text for translation."
+      }
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE"
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET"
       ],
       "package": "com.anonymous.prefai"
     },
@@ -27,6 +34,19 @@
     "plugins": [
       "expo-router",
       "expo-localization",
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "This app uses the microphone to translate your speech.",
+          "speechRecognitionPermission": "This app uses speech recognition to translate your speech."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow this app to access your microphone for voice translation."
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -45,7 +65,8 @@
         }
       ],
       "expo-localization",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-facebook"
     ],
     "experiments": {
       "typedRoutes": true
