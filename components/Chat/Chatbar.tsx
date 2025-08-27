@@ -1,7 +1,7 @@
 import { ChatType } from "@/app/(tabs)/chat";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,7 +14,11 @@ import {
 
 interface IProps {
   addChat: (chat: ChatType) => void;
-  onUploadFile: (file: { uri: string; name: string; type: string }) => void | Promise<void>;
+  onUploadFile: (file: {
+    uri: string;
+    name: string;
+    type: string;
+  }) => void | Promise<void>;
 }
 
 function getCurrentTime(): string {
@@ -73,11 +77,13 @@ const ChatBar = ({ addChat, onUploadFile }: IProps) => {
   }, [navigation]);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", (e) =>
-      setKeyboardHeight(e.endCoordinates.height)
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (e) => setKeyboardHeight(e.endCoordinates.height)
     );
-    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () =>
-      setKeyboardHeight(0)
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardHeight(0)
     );
 
     return () => {
@@ -111,7 +117,10 @@ const ChatBar = ({ addChat, onUploadFile }: IProps) => {
           textAlignVertical="center"
         />
 
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => router.push("/voice-translation")}
+          style={styles.iconButton}
+        >
           <MaterialCommunityIcons name="microphone" size={22} color="#2479CF" />
         </TouchableOpacity>
 

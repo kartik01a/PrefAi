@@ -12,11 +12,24 @@ export interface ChatResponse {
   reply: string;
 }
 
+export interface TranslateRequest{
+  text: string;
+  from: string;
+  to: string;
+}
+
 export const chatApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     sendMessage: builder.mutation<ChatResponse, ChatRequest>({
       query: (data) => ({
         url: `${CHAT_URL}`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    sentMessageToTranslate: builder.mutation<any, TranslateRequest>({
+      query: (data) => ({
+        url: `${CHAT_URL}/translate`,
         method: "POST",
         body: data,
       }),
@@ -33,4 +46,4 @@ export const chatApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useSendMessageMutation, useUploadFileMutation } = chatApiSlice;
+export const { useSendMessageMutation, useUploadFileMutation, useSentMessageToTranslateMutation } = chatApiSlice;

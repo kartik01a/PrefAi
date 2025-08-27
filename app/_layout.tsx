@@ -6,16 +6,16 @@ import {
   loadSavedLanguage,
 } from "@/i18n";
 import { loadUserFromStorage } from "@/utils/authLoader";
-import { StripeProvider } from '@stripe/stripe-react-native';
+import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "expo-font";
-import {  Stack } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { I18nManager, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import { Provider as ReduxProvider } from "react-redux";
 
 SplashScreen.preventAutoHideAsync();
@@ -85,70 +85,76 @@ export default function RootLayout() {
 
   return (
     <ReduxProvider store={store}>
-       <StripeProvider publishableKey={process.env.PUBLISHABLE_KEY}>
-      <SafeAreaProvider>
-        <PaperProvider>
-          <View key={appKey} style={{ flex: 1 }}>
-            <StatusBar />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                // Apply RTL-aware animations
-                animationTypeForReplace: "push",
-                animation: I18nManager.isRTL
-                  ? "slide_from_left"
-                  : "slide_from_right",
-              }}
-            >
-              <Stack.Screen
-                name="(tabs)"
-                options={{
+      <StripeProvider publishableKey={process.env.PUBLISHABLE_KEY}>
+        <SafeAreaProvider>
+          <PaperProvider>
+            <View key={appKey} style={{ flex: 1 }}>
+              <StatusBar />
+              <Stack
+                screenOptions={{
                   headerShown: false,
+                  // Apply RTL-aware animations
+                  animationTypeForReplace: "push",
+                  animation: I18nManager.isRTL
+                    ? "slide_from_left"
+                    : "slide_from_right",
                 }}
-              />
-              <Stack.Screen
-                name="upload-document"
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="upload-location"
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="document-files"
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="file-viewer"
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="cancel"
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="success"
-                options={{
-                  headerShown: false,
-                }}
-              />
-            </Stack>
-             <Toast />
-          </View>
-        </PaperProvider>
-      </SafeAreaProvider>
+              >
+                <Stack.Screen
+                  name="(tabs)"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="upload-document"
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="upload-location"
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="document-files"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="file-viewer"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="voice-translation"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="cancel"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="success"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+              </Stack>
+              <Toast />
+            </View>
+          </PaperProvider>
+        </SafeAreaProvider>
       </StripeProvider>
     </ReduxProvider>
   );
