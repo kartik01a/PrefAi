@@ -39,16 +39,17 @@ const FreePlan = () => {
     {
       title: t("monthlyPlanFullAccess"),
       price: "€4.99 / month",
-      id: "price_1RvOlYCe7yxtOx2NygoTZ3Nb",
+      id: "price_1S195y2SNvhd3XUdTisAWsga",
     },
     {
       title: t("yearlyPlanBestValue"),
       price: "€59.99 / year",
-      id: "price_1RvOmxCe7yxtOx2N6z2yzpLp",
+      id: "price_1S197J2SNvhd3XUdOtbO6bBr",
     },
   ];
 
   useEffect(() => {
+    console.log("subscriptionData", subscriptionData);
     const planId = subscriptionData?.data?.planId;
     if (planId) {
       const foundIndex = plans.findIndex((plan) => plan.id === planId);
