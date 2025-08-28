@@ -15,13 +15,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSendMessageMutation, useUploadFileMutation } from "../aiform/chatApiSlice";
-
+import {
+  useSendMessageMutation,
+  useUploadFileMutation,
+} from "../aiform/chatApiSlice";
 
 export interface ChatType {
   message: string;
   time: string;
-  messageBy?: 1 | 2; 
+  messageBy?: 1 | 2;
 }
 
 const ChatTab = () => {
@@ -31,12 +33,21 @@ const ChatTab = () => {
   const [sendMessage] = useSendMessageMutation();
   const [uploadFile] = useUploadFileMutation();
 
+  const [language, setLanguage] = useState("english");
+
+  const onLanguageChange = (value: string) => {
+    if (value) setLanguage(value);
+  };
+
   const addChat = async (newChat: ChatType) => {
     setChat((prev) => [...prev, newChat]);
 
     if (newChat.messageBy === 1) {
       try {
-        const res = await sendMessage({ message: newChat.message }).unwrap();
+        const res = await sendMessage({
+          message: newChat.message,
+          language,
+        }).unwrap();
 
         setChat((prev) => [
           ...prev,
@@ -51,118 +62,126 @@ const ChatTab = () => {
       }
     }
   };
-  const handleFileUpload = async (file: { uri: string; name: string; type: string }) => {
-  setChat((prev) => [
-    ...prev,
-    {
-      message: `📄 ${file.name}`,
-      time: moment().format("hh:mm A"),
-      messageBy: 1,
-    },
-  ]);
-
-  const formData = new FormData();
-  formData.append("file", {
-    uri: file.uri,
-    name: file.name,
-    type: file.type,
-  } as any);
-
-  try {
-    const res = await uploadFile(formData).unwrap();
+  const handleFileUpload = async (file: {
+    uri: string;
+    name: string;
+    type: string;
+  }) => {
     setChat((prev) => [
       ...prev,
       {
-        message: res.reply,
+        message: `📄 ${file.name}`,
         time: moment().format("hh:mm A"),
-        messageBy: 2,
+        messageBy: 1,
       },
     ]);
-  } catch (err) {
-    console.log("Upload error:", err);
-    setChat((prev) => [
-      ...prev,
-      {
-        message: "⚠️ File upload failed. Try again.",
-        time: moment().format("hh:mm A"),
-        messageBy: 2,
-      },
-    ]);
-  }
-};
 
+    const formData = new FormData();
+    formData.append("file", {
+      uri: file.uri,
+      name: file.name,
+      type: file.type,
+    } as any);
 
-return (
-  <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
-    <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-    <LinearGradient
-      colors={["#0072BB", "#4fa4f3ff"]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={styles.gradient}
-    >
-      <View style={styles.outerView}>
-        <ChatHeader showDate={chat.length !== 0} />
-        {chat.length === 0 ? (
-          <ChatCover />
-        ) : (
-          <ScrollView
-            style={styles.scrollArea}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {chat.map((item, index) => (
-              <React.Fragment key={index}>
-                <View
-                  style={[
-                    styles.outerContainer,
-                    { alignItems: item.messageBy === 1 ? "flex-end" : "flex-start" },
-                  ]}
-                >
-                <View style={styles.timeRow}>
-                  <Text style={styles.timeText}>{item.time}</Text>
-                  {item.messageBy === 1 && (
-                    <Text style={styles.timeText}>{t("you")}</Text>
-                  )}
-                  <Image
-                    source={{
-                      uri: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
-                    }}
-                    style={styles.avatar}
-                  />
-                </View>
-                <View style={styles.singleChatContainer}>
-                  <Text style={styles.singleChat}>{item.message}</Text>
-                </View>
-                </View>
-              </React.Fragment>
-            ))}
-          </ScrollView>
-        )}
+    try {
+      const res = await uploadFile(formData).unwrap();
+      setChat((prev) => [
+        ...prev,
+        {
+          message: res.reply,
+          time: moment().format("hh:mm A"),
+          messageBy: 2,
+        },
+      ]);
+    } catch (err) {
+      console.log("Upload error:", err);
+      setChat((prev) => [
+        ...prev,
+        {
+          message: "⚠️ File upload failed. Try again.",
+          time: moment().format("hh:mm A"),
+          messageBy: 2,
+        },
+      ]);
+    }
+  };
 
-        <View style={styles.chatAssistant}>
-          <ChatBar addChat={addChat} onUploadFile={handleFileUpload} />
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+      <LinearGradient
+        colors={["#0072BB", "#4fa4f3ff"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.gradient}
+      >
+        <View style={styles.outerView}>
+          <ChatHeader
+            onLanguageChange={onLanguageChange}
+            showDate={chat.length !== 0}
+          />
+          {chat.length === 0 ? (
+            <ChatCover />
+          ) : (
+            <ScrollView
+              style={styles.scrollArea}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {chat.map((item, index) => (
+                <React.Fragment key={index}>
+                  <View
+                    style={[
+                      styles.outerContainer,
+                      {
+                        alignItems:
+                          item.messageBy === 1 ? "flex-end" : "flex-start",
+                      },
+                    ]}
+                  >
+                    <View style={styles.timeRow}>
+                      <Text style={styles.timeText}>{item.time}</Text>
+                      {item.messageBy === 1 && (
+                        <Text style={styles.timeText}>{t("you")}</Text>
+                      )}
+                      <Image
+                        source={{
+                          uri: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
+                        }}
+                        style={styles.avatar}
+                      />
+                    </View>
+                    <View style={styles.singleChatContainer}>
+                      <Text style={styles.singleChat}>{item.message}</Text>
+                    </View>
+                  </View>
+                </React.Fragment>
+              ))}
+            </ScrollView>
+          )}
+
+          <View style={styles.chatAssistant}>
+            <ChatBar addChat={addChat} onUploadFile={handleFileUpload} />
+          </View>
         </View>
-      </View>
-    </LinearGradient>
-  </SafeAreaView>
-);
-
+      </LinearGradient>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   gradient: { flex: 1, paddingTop: 30 },
   outerView: { flex: 1, paddingHorizontal: 20, marginTop: 30 },
-  scrollArea: { 
-    flex: 1, 
-    marginBottom: 80, 
+  scrollArea: {
+    flex: 1,
+    marginBottom: 80,
   },
-  scrollContent: { 
-    paddingVertical: 10, 
-    paddingBottom: 20, 
-    flexGrow: 1 
+  scrollContent: {
+    paddingVertical: 10,
+    paddingBottom: 20,
+    flexGrow: 1,
   },
   chatAssistant: {
     position: "absolute",

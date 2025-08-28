@@ -4,6 +4,7 @@ import { apiSlice } from "../../services/apiSlice";
 
 export interface ChatRequest {
   message: string;
+  language: string;
   context?: { role: "system" | "user" | "assistant"; content: string }[];
 }
 

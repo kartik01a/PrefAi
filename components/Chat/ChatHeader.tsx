@@ -14,6 +14,7 @@ import ChatQuestion from "../../assets/images/chat-question.svg";
 
 interface IProps {
   showDate?: boolean;
+  onLanguageChange?: (language: string)=> void
 }
 
 type DateFormatType = "short" | "long";
@@ -64,7 +65,7 @@ const DateSeparator = ({
   );
 };
 
-const ChatHeader = ({ showDate = true }: IProps) => {
+const ChatHeader = ({ showDate = true, onLanguageChange }: IProps) => {
   const { t } = useTranslation();
   const [language, setLanguage] = useState("english");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -84,6 +85,9 @@ const ChatHeader = ({ showDate = true }: IProps) => {
 
   const handleLanguageSelect = (value: string) => {
     setLanguage(value);
+    if(onLanguageChange){
+      onLanguageChange(value)
+    }
     setIsDropdownOpen(false);
   };
 
