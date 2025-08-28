@@ -7,6 +7,7 @@ import moment from "moment";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -24,6 +25,7 @@ export interface ChatType {
   message: string;
   time: string;
   messageBy?: 1 | 2;
+  loading?: boolean;
 }
 
 const ChatTab = () => {
@@ -38,30 +40,56 @@ const ChatTab = () => {
   const onLanguageChange = (value: string) => {
     if (value) setLanguage(value);
   };
-
+  
   const addChat = async (newChat: ChatType) => {
     setChat((prev) => [...prev, newChat]);
 
     if (newChat.messageBy === 1) {
+      const loaderId = Date.now();
+      setChat((prev) => [
+        ...prev,
+        {
+          message: "Typing...",
+          time: moment().format("hh:mm A"),
+          messageBy: 2,
+          loading: true, 
+          id: loaderId,
+        },
+      ]);
       try {
         const res = await sendMessage({
           message: newChat.message,
           language,
         }).unwrap();
 
-        setChat((prev) => [
-          ...prev,
-          {
-            message: res.reply,
-            time: moment().format("hh:mm A"),
-            messageBy: 2,
-          },
-        ]);
+        setChat((prev) =>
+          prev.map((c) =>
+            c.loading
+              ? {
+                  ...c,
+                  message: res.reply,
+                  loading: false,
+                }
+              : c
+          )
+        );
       } catch (err) {
         console.log("Chat error:", err);
+        setChat((prev) =>
+          prev.map((c) =>
+            c.loading
+              ? {
+                  ...c,
+                  message: "⚠️ Failed to get response.",
+                  loading: false,
+                }
+              : c
+          )
+        );
       }
     }
   };
+
   const handleFileUpload = async (file: {
     uri: string;
     name: string;
@@ -75,34 +103,41 @@ const ChatTab = () => {
         messageBy: 1,
       },
     ]);
-
+    setChat((prev) => [
+      ...prev,
+      {
+        message: "Uploading...",
+        time: moment().format("hh:mm A"),
+        messageBy: 2,
+        loading: true,
+      },
+    ]);
     const formData = new FormData();
     formData.append("file", {
       uri: file.uri,
       name: file.name,
       type: file.type,
     } as any);
-
     try {
       const res = await uploadFile(formData).unwrap();
-      setChat((prev) => [
-        ...prev,
-        {
-          message: res.reply,
-          time: moment().format("hh:mm A"),
-          messageBy: 2,
-        },
-      ]);
+      setChat((prev) =>
+        prev.map((c) =>
+          c.loading ? { ...c, message: res.reply, loading: false } : c
+        )
+      );
     } catch (err) {
       console.log("Upload error:", err);
-      setChat((prev) => [
-        ...prev,
-        {
-          message: "⚠️ File upload failed. Try again.",
-          time: moment().format("hh:mm A"),
-          messageBy: 2,
-        },
-      ]);
+      setChat((prev) =>
+        prev.map((c) =>
+          c.loading
+            ? {
+                ...c,
+                message: "⚠️ File upload failed. Try again.",
+                loading: false,
+              }
+            : c
+        )
+      );
     }
   };
 
@@ -153,7 +188,11 @@ const ChatTab = () => {
                       />
                     </View>
                     <View style={styles.singleChatContainer}>
-                      <Text style={styles.singleChat}>{item.message}</Text>
+                      {item.loading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                      ) : (
+                        <Text style={styles.singleChat}>{item.message}</Text>
+                      )}
                     </View>
                   </View>
                 </React.Fragment>
