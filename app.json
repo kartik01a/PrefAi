@@ -8,7 +8,6 @@
     "scheme": "prefai",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "permissions": ["RECORD_AUDIO"],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -18,11 +17,14 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
+      "allowBackup": false,
       "permissions": [
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.INTERNET"
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "RECORD_AUDIO",
+        "INTERNET"
       ],
       "package": "com.anonymous.prefai"
     },
@@ -42,12 +44,6 @@
         }
       ],
       [
-        "expo-av",
-        {
-          "microphonePermission": "Allow this app to access your microphone for voice translation."
-        }
-      ],
-      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
@@ -64,7 +60,6 @@
           "savePhotosPermission": "Allow access to save PDFs to your device"
         }
       ],
-      "expo-localization",
       "expo-web-browser"
     ],
     "experiments": {
