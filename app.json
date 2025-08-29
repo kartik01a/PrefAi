@@ -18,6 +18,14 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "allowBackup": false,
+      "manifest": {
+        "application": {
+          "attributes": {
+            "tools:replace": "android:appComponentFactory",
+            "android:appComponentFactory": "androidx.core.app.CoreComponentFactory"
+          }
+        }
+      },
       "permissions": [
         "READ_MEDIA_IMAGES",
         "READ_MEDIA_VIDEO",
