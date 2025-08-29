@@ -32,7 +32,8 @@
         "READ_MEDIA_AUDIO",
         "READ_EXTERNAL_STORAGE",
         "RECORD_AUDIO",
-        "INTERNET"
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
       ],
       "package": "com.anonymous.prefai"
     },

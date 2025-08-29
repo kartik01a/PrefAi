@@ -55,32 +55,12 @@ const VoiceTranslationScreen: React.FC = () => {
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
   const [micAnimation] = useState(new Animated.Value(1));
   const [listeningText, setListeningText] = useState<string>("");
+  const [voiceServiceReady, setVoiceServiceReady] = useState(false);
 
   const [sendToTranslate] = useSentMessageToTranslateMutation();
 
   useEffect(() => {
-    const setupVoice = async () => {
-      try {
-        // Check if voice recognition is available
-        const isAvailable = await Voice.isAvailable();
-        console.log("Voice recognition available:", isAvailable);
-
-        // Set up voice recognition events
-        Voice.onSpeechStart = onSpeechStart;
-        Voice.onSpeechRecognized = onSpeechRecognized;
-        Voice.onSpeechEnd = onSpeechEnd;
-        Voice.onSpeechError = onSpeechError;
-        Voice.onSpeechResults = onSpeechResults;
-        Voice.onSpeechPartialResults = onSpeechPartialResults;
-      } catch (error) {
-        console.error("Error setting up voice recognition:", error);
-      }
-    };
-
-    setupVoice();
-
     return () => {
-      // Clean up voice recognition
       Voice.destroy()
         .then(() => {
           Voice.removeAllListeners();
@@ -90,6 +70,50 @@ const VoiceTranslationScreen: React.FC = () => {
         });
     };
   }, []);
+
+  const setupVoice = async () => {
+    try {
+      console.log("🔧 Setting up voice service...");
+
+      // Always destroy existing instance first
+      try {
+        await Voice.destroy();
+      } catch (e) {
+        console.log("No existing voice instance to destroy");
+      }
+
+      // Wait a bit for cleanup
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Check availability
+      const isAvailable = await Voice.isAvailable();
+      console.log("Voice recognition available:", isAvailable);
+
+      if (!isAvailable) {
+        throw new Error("Voice recognition not supported on this device");
+      }
+
+      // Set up event listeners
+      Voice.onSpeechStart = onSpeechStart;
+      Voice.onSpeechRecognized = onSpeechRecognized;
+      Voice.onSpeechEnd = onSpeechEnd;
+      Voice.onSpeechError = onSpeechError;
+      Voice.onSpeechResults = onSpeechResults;
+      Voice.onSpeechPartialResults = onSpeechPartialResults;
+
+      console.log("✅ Voice service ready");
+      setVoiceServiceReady(true);
+      return true;
+    } catch (error) {
+      console.error("❌ Voice setup failed:", error);
+      setVoiceServiceReady(false);
+      Alert.alert(
+        "Voice Recognition Unavailable",
+        "Voice recognition could not be initialized. Please restart the app and try again."
+      );
+      return false;
+    }
+  };
 
   useEffect(() => {
     if (isListening) {
@@ -186,49 +210,112 @@ const VoiceTranslationScreen: React.FC = () => {
   const requestMicrophonePermission = async (): Promise<boolean> => {
     if (Platform.OS === "android") {
       try {
+        console.log("Checking microphone permission...");
+
+        // Check current permission status
+        const currentPermission = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+        );
+
+        console.log("Current permission status:", currentPermission);
+
+        if (currentPermission) {
+          console.log("✅ Microphone permission already granted");
+          return true;
+        }
+
+        console.log("🔄 Requesting microphone permission...");
+
+        // Request permission
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
           {
-            title: "Microphone Permission",
+            title: "Microphone Access Required",
             message:
-              "This app needs access to your microphone to record voice for translation.",
+              "This app needs microphone access to record your voice for translation.",
             buttonNeutral: "Ask Me Later",
-            buttonNegative: "Cancel",
-            buttonPositive: "OK",
+            buttonNegative: "Deny",
+            buttonPositive: "Allow",
           }
         );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
+
+        console.log("Permission request result:", granted);
+
+        const isGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
+
+        if (isGranted) {
+          console.log("✅ Microphone permission granted");
+        } else {
+          console.log("❌ Microphone permission denied");
+          Alert.alert(
+            "Permission Required",
+            "Voice translation requires microphone access. Please enable it in your device settings:\n\nSettings > Apps > [App Name] > Permissions > Microphone",
+            [{ text: "OK" }]
+          );
+        }
+
+        return isGranted;
       } catch (err) {
-        console.warn(err);
+        console.error("❌ Permission request error:", err);
         return false;
       }
     }
+
+    // iOS - permissions are handled automatically
     return true;
   };
 
   const startListening = async () => {
     try {
+      console.log("🎙️ Starting voice recognition...");
+
+      // Ensure voice service is ready
+      if (!voiceServiceReady) {
+        console.log("Voice service not ready, setting up...");
+        const isReady = await setupVoice();
+        if (!isReady) return;
+      }
+
+      // Check permissions
       const hasPermission = await requestMicrophonePermission();
       if (!hasPermission) {
-        Alert.alert(
-          "Permission Required",
-          "Microphone permission is required for voice translation."
-        );
+        console.log("❌ No microphone permission");
         return;
       }
+
+      // Stop if already listening
+      if (isListening) {
+        await stopListening();
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+
+      // Clear states
       setListeningText("");
       setIsListening(true);
 
+      // Get language
       const inputLang = languages.find((lang) => lang.code === inputLanguage);
       const locale = inputLang?.voiceCode || "en-US";
 
+      console.log(`🌍 Starting with locale: ${locale}`);
+
+      // Start voice recognition
       await Voice.start(locale);
+      console.log("✅ Voice recognition started");
     } catch (error) {
-      console.log("Error starting voice recognition:", error);
+      console.error("❌ Start listening error:", error);
       setIsListening(false);
+
+      // Reset voice service on error
+      setVoiceServiceReady(false);
+
       Alert.alert(
         "Voice Recognition Error",
-        "Unable to start voice recognition. Please make sure you have granted microphone permissions."
+        "Unable to start voice recognition. Please try again.",
+        [
+          { text: "Retry", onPress: () => setTimeout(startListening, 1000) },
+          { text: "Cancel", style: "cancel" },
+        ]
       );
     }
   };
