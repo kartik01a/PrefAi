@@ -1,11 +1,6 @@
 import ChatHeader from "@/components/Chat/ChatHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import Voice, {
-  SpeechErrorEvent,
-  SpeechRecognizedEvent,
-  SpeechResultsEvent,
-} from "@react-native-voice/voice";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Speech from "expo-speech";
 import { StatusBar } from "expo-status-bar";
@@ -14,11 +9,10 @@ import {
   Alert,
   Animated,
   Easing,
-  PermissionsAndroid,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -47,148 +41,32 @@ const languages: Language[] = [
 ];
 
 const VoiceTranslationScreen: React.FC = () => {
-  const [inputLanguage, setInputLanguage] = useState<string>("en");
-  const [outputLanguage, setOutputLanguage] = useState<string>("fr");
-  const [inputText, setInputText] = useState<string>("");
-  const [outputText, setOutputText] = useState<string>("");
-  const [isListening, setIsListening] = useState<boolean>(false);
-  const [isTranslating, setIsTranslating] = useState<boolean>(false);
-  const [micAnimation] = useState(new Animated.Value(1));
-  const [listeningText, setListeningText] = useState<string>("");
-  const [voiceServiceReady, setVoiceServiceReady] = useState(false);
+  const [inputLanguage, setInputLanguage] = useState("en");
+  const [outputLanguage, setOutputLanguage] = useState("fr");
+  const [inputText, setInputText] = useState("");
+  const [outputText, setOutputText] = useState("");
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [pulseAnimation] = useState(new Animated.Value(1));
+  const [showVoiceUnavailable, setShowVoiceUnavailable] = useState(false);
 
   const [sendToTranslate] = useSentMessageToTranslateMutation();
 
   useEffect(() => {
-    return () => {
-      Voice.destroy()
-        .then(() => {
-          Voice.removeAllListeners();
-        })
-        .catch((error) => {
-          console.error("Error cleaning up voice recognition:", error);
-        });
-    };
+    if (__DEV__) {
+      setShowVoiceUnavailable(true);
+    }
   }, []);
-
-  const setupVoice = async () => {
-    try {
-      console.log("🔧 Setting up voice service...");
-
-      // Always destroy existing instance first
-      try {
-        await Voice.destroy();
-      } catch (e) {
-        console.log("No existing voice instance to destroy");
-      }
-
-      // Wait a bit for cleanup
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Check availability
-      const isAvailable = await Voice.isAvailable();
-      console.log("Voice recognition available:", isAvailable);
-
-      if (!isAvailable) {
-        throw new Error("Voice recognition not supported on this device");
-      }
-
-      // Set up event listeners
-      Voice.onSpeechStart = onSpeechStart;
-      Voice.onSpeechRecognized = onSpeechRecognized;
-      Voice.onSpeechEnd = onSpeechEnd;
-      Voice.onSpeechError = onSpeechError;
-      Voice.onSpeechResults = onSpeechResults;
-      Voice.onSpeechPartialResults = onSpeechPartialResults;
-
-      console.log("✅ Voice service ready");
-      setVoiceServiceReady(true);
-      return true;
-    } catch (error) {
-      console.error("❌ Voice setup failed:", error);
-      setVoiceServiceReady(false);
-      Alert.alert(
-        "Voice Recognition Unavailable",
-        "Voice recognition could not be initialized. Please restart the app and try again."
-      );
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    if (isListening) {
-      startPulseAnimation();
-    } else {
-      stopPulseAnimation();
-    }
-  }, [isListening]);
-
-  const onSpeechStart = (e: any) => {
-    console.log("Speech recognition started");
-    setListeningText("Listening...");
-  };
-
-  const onSpeechRecognized = (e: SpeechRecognizedEvent) => {
-    console.log("Speech recognized", e);
-  };
-
-  const onSpeechEnd = (e: any) => {
-    console.log("Speech recognition ended");
-    setIsListening(false);
-  };
-
-  const onSpeechError = (e: SpeechErrorEvent) => {
-    console.log("Speech recognition error:", e.error);
-    setIsListening(false);
-    setListeningText("");
-
-    let errorMessage = "Speech recognition failed. Please try again.";
-
-    if (e.error?.message) {
-      if (e.error.message.includes("network")) {
-        errorMessage = "Network error. Please check your connection.";
-      } else if (e.error.message.includes("permission")) {
-        errorMessage =
-          "Microphone permission denied. Please enable it in settings.";
-      } else if (e.error.message.includes("busy")) {
-        errorMessage = "Speech recognition is busy. Please wait and try again.";
-      }
-    }
-
-    Alert.alert("Speech Recognition Error", errorMessage);
-  };
-
-  const onSpeechResults = (e: SpeechResultsEvent) => {
-    console.log("Speech results:", e.value);
-
-    if (e.value && e.value.length > 0) {
-      const recognizedText = e.value[0];
-      setInputText(recognizedText);
-      setListeningText("");
-      translateText(recognizedText);
-    }
-
-    setIsListening(false);
-  };
-
-  const onSpeechPartialResults = (e: SpeechResultsEvent) => {
-    console.log("Partial results:", e.value);
-
-    if (e.value && e.value.length > 0) {
-      setListeningText(e.value[0]);
-    }
-  };
 
   const startPulseAnimation = () => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(micAnimation, {
-          toValue: 1.2,
+        Animated.timing(pulseAnimation, {
+          toValue: 1.1,
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-        Animated.timing(micAnimation, {
+        Animated.timing(pulseAnimation, {
           toValue: 1,
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
@@ -199,162 +77,54 @@ const VoiceTranslationScreen: React.FC = () => {
   };
 
   const stopPulseAnimation = () => {
-    micAnimation.stopAnimation();
-    Animated.timing(micAnimation, {
+    pulseAnimation.stopAnimation();
+    Animated.timing(pulseAnimation, {
       toValue: 1,
       duration: 200,
       useNativeDriver: true,
     }).start();
   };
 
-  const requestMicrophonePermission = async (): Promise<boolean> => {
-    if (Platform.OS === "android") {
-      try {
-        console.log("Checking microphone permission...");
-
-        // Check current permission status
-        const currentPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
-        );
-
-        console.log("Current permission status:", currentPermission);
-
-        if (currentPermission) {
-          console.log("✅ Microphone permission already granted");
-          return true;
-        }
-
-        console.log("🔄 Requesting microphone permission...");
-
-        // Request permission
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-          {
-            title: "Microphone Access Required",
-            message:
-              "This app needs microphone access to record your voice for translation.",
-            buttonNeutral: "Ask Me Later",
-            buttonNegative: "Deny",
-            buttonPositive: "Allow",
-          }
-        );
-
-        console.log("Permission request result:", granted);
-
-        const isGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
-
-        if (isGranted) {
-          console.log("✅ Microphone permission granted");
-        } else {
-          console.log("❌ Microphone permission denied");
-          Alert.alert(
-            "Permission Required",
-            "Voice translation requires microphone access. Please enable it in your device settings:\n\nSettings > Apps > [App Name] > Permissions > Microphone",
-            [{ text: "OK" }]
-          );
-        }
-
-        return isGranted;
-      } catch (err) {
-        console.error("❌ Permission request error:", err);
-        return false;
-      }
-    }
-
-    // iOS - permissions are handled automatically
-    return true;
-  };
-
-  const startListening = async () => {
-    try {
-      console.log("🎙️ Starting voice recognition...");
-
-      // Ensure voice service is ready
-      if (!voiceServiceReady) {
-        console.log("Voice service not ready, setting up...");
-        const isReady = await setupVoice();
-        if (!isReady) return;
-      }
-
-      // Check permissions
-      const hasPermission = await requestMicrophonePermission();
-      if (!hasPermission) {
-        console.log("❌ No microphone permission");
-        return;
-      }
-
-      // Stop if already listening
-      if (isListening) {
-        await stopListening();
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-
-      // Clear states
-      setListeningText("");
-      setIsListening(true);
-
-      // Get language
-      const inputLang = languages.find((lang) => lang.code === inputLanguage);
-      const locale = inputLang?.voiceCode || "en-US";
-
-      console.log(`🌍 Starting with locale: ${locale}`);
-
-      // Start voice recognition
-      await Voice.start(locale);
-      console.log("✅ Voice recognition started");
-    } catch (error) {
-      console.error("❌ Start listening error:", error);
-      setIsListening(false);
-
-      // Reset voice service on error
-      setVoiceServiceReady(false);
-
-      Alert.alert(
-        "Voice Recognition Error",
-        "Unable to start voice recognition. Please try again.",
-        [
-          { text: "Retry", onPress: () => setTimeout(startListening, 1000) },
-          { text: "Cancel", style: "cancel" },
-        ]
-      );
-    }
-  };
-
-  const stopListening = async () => {
-    try {
-      await Voice.stop();
-      setIsListening(false);
-      setListeningText("");
-    } catch (error) {
-      console.error("Error stopping voice recognition:", error);
-      setIsListening(false);
-      setListeningText("");
-    }
-  };
-
-  const translateText = async (text: string) => {
-    if (!text.trim()) return;
+  const translateText = async (text?: string) => {
+    const textToTranslate = text || inputText;
+    if (!textToTranslate.trim()) return;
 
     setIsTranslating(true);
     try {
       const data = {
-        text: text,
+        text: textToTranslate,
         from: inputLanguage,
         to: outputLanguage,
       };
-      const result = await sendToTranslate(data);
 
-      console.log(result.data, "result");
+      // Timeout wrapper
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timeout")), 10000)
+      );
 
-      if (result?.data?.reply?.success) {
-        setOutputText(result?.data?.reply.translatedText);
-        speakText(result?.data?.reply.translatedText, outputLanguage);
+      const result: any = await Promise.race([
+        sendToTranslate(data).unwrap(),
+        timeoutPromise,
+      ]);
+
+      if (result?.reply?.success) {
+        const translated = result.reply.translatedText;
+        setOutputText(translated);
+        speakText(translated, outputLanguage);
       } else {
         Alert.alert("Translation Error", "Failed to translate text");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log("Translation error:", error);
-      Alert.alert("Error", "Translation failed. Please check your connection.");
+
+      let errorMessage = "Translation failed. Please try again.";
+      if (error.message === "Request timeout") {
+        errorMessage = "Translation timed out. Please check your connection.";
+      } else if (error.message?.includes("network")) {
+        errorMessage = "Network error. Please check your internet connection.";
+      }
+
+      Alert.alert("Error", errorMessage);
     } finally {
       setIsTranslating(false);
     }
@@ -362,14 +132,12 @@ const VoiceTranslationScreen: React.FC = () => {
 
   const speakText = async (text: string, languageCode: string) => {
     try {
-      await Speech.stop();
-
-      const language = languages.find((lang) => lang.code === languageCode);
-
+      Speech.stop();
+      const language = languages.find((l) => l.code === languageCode);
       Speech.speak(text, {
         language: language?.voiceCode || "en-US",
         pitch: 1,
-        rate: 0.8,
+        rate: 0.9,
       });
     } catch (error) {
       console.error("Speech error:", error);
@@ -377,20 +145,22 @@ const VoiceTranslationScreen: React.FC = () => {
   };
 
   const swapLanguages = () => {
-    const temp = inputLanguage;
     setInputLanguage(outputLanguage);
-    setOutputLanguage(temp);
-
-    // Also swap the texts
-    const tempText = inputText;
+    setOutputLanguage(inputLanguage);
     setInputText(outputText);
-    setOutputText(tempText);
+    setOutputText(inputText);
   };
 
   const clearText = () => {
     setInputText("");
     setOutputText("");
-    setListeningText("");
+  };
+
+  const handleVoicePress = () => {
+    Alert.alert(
+      "Voice Recognition Unavailable",
+      "Voice input is not available in Expo Go. Please type your text or build a standalone app for full voice features."
+    );
   };
 
   return (
@@ -408,9 +178,13 @@ const VoiceTranslationScreen: React.FC = () => {
 
           {/* Title */}
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Translate My Voice</Text>
-            {isListening && (
-              <Text style={styles.listeningIndicator}>🎤 Listening...</Text>
+            <Text style={styles.title}>
+              {showVoiceUnavailable ? "Text Translator" : "Translate My Voice"}
+            </Text>
+            {showVoiceUnavailable && (
+              <Text style={styles.subtitle}>
+                Voice features available in standalone app
+              </Text>
             )}
           </View>
 
@@ -427,7 +201,7 @@ const VoiceTranslationScreen: React.FC = () => {
                         width: 200 + index * 40,
                         transform: [
                           {
-                            scaleX: isListening
+                            scaleX: isTranslating
                               ? Math.sin(Date.now() * 0.01 + index) * 0.5 + 1
                               : 1,
                           },
@@ -437,10 +211,9 @@ const VoiceTranslationScreen: React.FC = () => {
                   />
                 ))}
               </View>
-
-              {listeningText && (
+              {isTranslating && (
                 <View style={styles.listeningTextContainer}>
-                  <Text style={styles.listeningText}>{listeningText}</Text>
+                  <Text style={styles.listeningText}>Translating...</Text>
                 </View>
               )}
             </View>
@@ -448,6 +221,7 @@ const VoiceTranslationScreen: React.FC = () => {
         </View>
 
         <View style={styles.bottomContainer}>
+          {/* Language Pickers */}
           <View style={styles.languageRow}>
             <View style={styles.languageColumn}>
               <Text style={styles.languageLabel}>From</Text>
@@ -459,7 +233,6 @@ const VoiceTranslationScreen: React.FC = () => {
                 >
                   {languages.map((lang) => (
                     <Picker.Item
-                      key={lang.code}
                       label={lang.name}
                       value={lang.code}
                     />
@@ -468,12 +241,10 @@ const VoiceTranslationScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Swap Button */}
             <TouchableOpacity onPress={swapLanguages} style={styles.swapButton}>
               <Ionicons name="swap-horizontal" size={24} color="#3B82F6" />
             </TouchableOpacity>
 
-            {/* Output Language */}
             <View style={styles.languageColumn}>
               <Text style={styles.languageLabel}>To</Text>
               <View style={styles.pickerContainer}>
@@ -484,7 +255,6 @@ const VoiceTranslationScreen: React.FC = () => {
                 >
                   {languages.map((lang) => (
                     <Picker.Item
-                      key={lang.code}
                       label={lang.name}
                       value={lang.code}
                     />
@@ -498,25 +268,27 @@ const VoiceTranslationScreen: React.FC = () => {
           <ScrollView
             style={styles.textAreasContainer}
             contentContainerStyle={{ paddingBottom: 20 }}
-            showsVerticalScrollIndicator={true}
           >
-            {/* Input Text */}
             <View style={styles.textAreaWrapper}>
-              <Text
-                style={[styles.textArea, !inputText && styles.placeholderText]}
-              >
-                {inputText || "Press microphone to speak"}
-              </Text>
+              <TextInput
+                style={[styles.textArea, styles.textInput]}
+                value={inputText}
+                onChangeText={setInputText}
+                placeholder="Type your text here or press microphone"
+                placeholderTextColor="#9CA3AF"
+                multiline
+                textAlignVertical="top"
+                onSubmitEditing={() => translateText()}
+                returnKeyType="done"
+              />
             </View>
 
-            {/* Translation Status */}
             {isTranslating && (
               <View style={styles.translatingContainer}>
                 <Text style={styles.translatingText}>Translating...</Text>
               </View>
             )}
 
-            {/* Output Text */}
             <View style={styles.textAreaWrapper}>
               <Text
                 style={[styles.textArea, !outputText && styles.placeholderText]}
@@ -528,35 +300,54 @@ const VoiceTranslationScreen: React.FC = () => {
 
           {/* Bottom Controls */}
           <View style={styles.bottomControls}>
-            {/* Clear Button */}
             <TouchableOpacity style={styles.controlButton} onPress={clearText}>
               <Ionicons name="trash-outline" size={24} color="#6B7280" />
             </TouchableOpacity>
 
-            {/* Microphone Button */}
-            <Animated.View style={{ transform: [{ scale: micAnimation }] }}>
+            <Animated.View style={{ transform: [{ scale: pulseAnimation }] }}>
               <TouchableOpacity
-                onPress={isListening ? stopListening : startListening}
+                onPress={handleVoicePress}
                 style={[
                   styles.micButton,
-                  { backgroundColor: isListening ? "#EF4444" : "#3B82F6" },
+                  {
+                    backgroundColor: showVoiceUnavailable
+                      ? "#9CA3AF"
+                      : "#3B82F6",
+                    opacity: showVoiceUnavailable ? 0.6 : 1,
+                  },
                 ]}
                 disabled={isTranslating}
               >
                 <Ionicons
-                  name={isListening ? "stop" : "mic"}
+                  name={showVoiceUnavailable ? "mic-off" : "mic"}
                   size={28}
                   color="white"
                 />
               </TouchableOpacity>
             </Animated.View>
 
-            {/* Play Button */}
+            <TouchableOpacity
+              style={[
+                styles.controlButton,
+                {
+                  backgroundColor: inputText ? "#3B82F6" : "transparent",
+                  borderRadius: 8,
+                  paddingHorizontal: 16,
+                },
+              ]}
+              onPress={() => translateText()}
+              disabled={!inputText || isTranslating}
+            >
+              <Ionicons
+                name="language"
+                size={24}
+                color={inputText ? "white" : "#6B7280"}
+              />
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.controlButton}
-              onPress={() =>
-                outputText && speakText(outputText, outputLanguage)
-              }
+              onPress={() => outputText && speakText(outputText, outputLanguage)}
               disabled={!outputText}
             >
               <Ionicons
@@ -571,6 +362,7 @@ const VoiceTranslationScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -604,6 +396,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     fontFamily: "Poppins-Medium",
+  },
+  subtitle: {
+    color: "rgba(255, 255, 255, 0.8)",
+    fontSize: 12,
+    marginTop: 4,
   },
   listeningIndicator: {
     color: "white",
@@ -694,6 +491,10 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#F9FAFB",
     borderRadius: 8,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
   },
   placeholderText: {
     color: "#9CA3AF",
