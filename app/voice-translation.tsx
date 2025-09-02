@@ -19,7 +19,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSentMessageToTranslateMutation } from "./aiform/chatApiSlice";
+import { useSentMessageToTranslateMutation, useTranscribeAudioMutation } from "./aiform/chatApiSlice";
 
 interface Language {
   code: string;
@@ -54,6 +54,7 @@ const VoiceTranslationScreen: React.FC = () => {
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
   const [sendToTranslate] = useSentMessageToTranslateMutation();
+  const [transcribeAudio] = useTranscribeAudioMutation();
 
   useEffect(() => {
     setupAudio();
@@ -169,47 +170,32 @@ const VoiceTranslationScreen: React.FC = () => {
     }
   };
 
-  const processAudioToText = async (audioUri: string) => {
-    try {
-      setIsTranslating(true);
-      const fileInfo = await FileSystem.getInfoAsync(audioUri);
-      if (!fileInfo.exists) {
-        throw new Error('Audio file not found');
-      }
-      // for now prompt and in production speech-to-text service integration 
-      Alert.prompt(
-        'Voice Input',
-        'Please type what you said (Speech recognition integration coming soon):',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-            onPress: () => {
-              setIsTranslating(false);
-            },
-          },
-          {
-            text: 'Translate',
-            onPress: (text) => {
-              if (text && text.trim()) {
-                setInputText(text.trim());
-                translateText(text.trim());
-              } else {
-                setIsTranslating(false);
-              }
-            },
-          },
-        ],
-        'plain-text',
-        ''
-      );
-      
-    } catch (error) {
-      console.error('Error processing audio:', error);
-      Alert.alert('Error', 'Failed to process audio recording.');
+const processAudioToText = async (audioUri: string) => {
+  try {
+    setIsTranslating(true);
+    const fileInfo = await FileSystem.getInfoAsync(audioUri);
+    if (!fileInfo.exists) throw new Error("Audio file not found");
+    const base64Audio = await FileSystem.readAsStringAsync(audioUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    const result: any = await transcribeAudio({
+      audio: base64Audio,
+      language: inputLanguage,
+    }).unwrap();
+    if (result?.text) {
+      setInputText(result.text);
+      await translateText(result.text);
+    } else {
+      Alert.alert("Error", "Failed to transcribe audio.");
       setIsTranslating(false);
     }
-  };
+  } catch (error) {
+    console.error("Error processing audio:", error);
+    Alert.alert("Error", "Failed to process audio recording.");
+    setIsTranslating(false);
+  }
+};
+
 
   const translateText = async (text?: string) => {
     const textToTranslate = text || inputText;
@@ -303,14 +289,13 @@ const VoiceTranslationScreen: React.FC = () => {
   const clearText = () => {
     setInputText("");
     setOutputText("");
-    Speech.stop(); // Stop any ongoing speech
+    Speech.stop(); 
   };
 
   const handleVoicePress = async () => {
     if (isRecording) {
       await stopRecording();
     } else {
-      // Check permissions first
       if (permissionResponse?.status !== 'granted') {
         const permission = await requestPermission();
         if (permission.status !== 'granted') {
@@ -319,7 +304,6 @@ const VoiceTranslationScreen: React.FC = () => {
             'Please enable microphone access in your device settings to use voice recording.',
             [
               { text: 'Settings', onPress: () => {
-                // In a real app, you might open settings here
                 console.log('Open settings');
               }},
               { text: 'Cancel', style: 'cancel' }
