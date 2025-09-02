@@ -44,7 +44,14 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         body: formData,
       }),
     }),
+       transcribeAudio: builder.mutation<any, { audio: string; language: string }>({
+      query: (data) => ({
+        url: `${CHAT_URL}/transcribe`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useSendMessageMutation, useUploadFileMutation, useSentMessageToTranslateMutation } = chatApiSlice;
+export const { useSendMessageMutation, useUploadFileMutation, useSentMessageToTranslateMutation, useTranscribeAudioMutation } = chatApiSlice;
