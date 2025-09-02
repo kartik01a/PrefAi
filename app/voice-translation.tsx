@@ -1,8 +1,8 @@
 import ChatHeader from "@/components/Chat/ChatHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Speech from "expo-speech";
 import { StatusBar } from "expo-status-bar";
@@ -16,10 +16,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSentMessageToTranslateMutation, useTranscribeAudioMutation } from "./aiform/chatApiSlice";
+import {
+  useSentMessageToTranslateMutation,
+  useTranscribeAudioMutation,
+} from "./aiform/chatApiSlice";
 
 interface Language {
   code: string;
@@ -77,7 +80,7 @@ const VoiceTranslationScreen: React.FC = () => {
         playsInSilentModeIOS: true,
       });
     } catch (error) {
-      console.error('Error setting up audio:', error);
+      console.error("Error setting up audio:", error);
     }
   };
 
@@ -111,8 +114,8 @@ const VoiceTranslationScreen: React.FC = () => {
 
   const startRecording = async () => {
     try {
-      if (permissionResponse?.status !== 'granted') {
-        console.log('Requesting permission..');
+      if (permissionResponse?.status !== "granted") {
+        console.log("Requesting permission..");
         await requestPermission();
       }
 
@@ -121,25 +124,28 @@ const VoiceTranslationScreen: React.FC = () => {
         playsInSilentModeIOS: true,
       });
 
-      console.log('Starting recording..');
+      console.log("Starting recording..");
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
       setRecording(recording);
       setIsRecording(true);
       startPulseAnimation();
-      console.log('Recording started');
+      console.log("Recording started");
     } catch (err) {
-      console.error('Failed to start recording', err);
-      Alert.alert('Error', 'Failed to start recording. Please check microphone permissions.');
+      console.error("Failed to start recording", err);
+      Alert.alert(
+        "Error",
+        "Failed to start recording. Please check microphone permissions."
+      );
     }
   };
 
   const stopRecording = async () => {
-    console.log('Stopping recording..');
+    console.log("Stopping recording..");
     setIsRecording(false);
     stopPulseAnimation();
-    
+
     if (!recording) {
       setIsTranslating(false);
       return;
@@ -150,52 +156,93 @@ const VoiceTranslationScreen: React.FC = () => {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
       });
-      
+
       const uri = recording.getURI();
-      console.log('Recording stopped and stored at', uri);
-      
+      console.log("Recording stopped and stored at", uri);
+
       setRecording(null);
-      
+
       if (uri) {
         // Process the audio
         await processAudioToText(uri);
       } else {
         setIsTranslating(false);
-        Alert.alert('Error', 'No audio recorded.');
+        Alert.alert("Error", "No audio recorded.");
       }
     } catch (error) {
-      console.error('Error stopping recording:', error);
+      console.error("Error stopping recording:", error);
       setIsTranslating(false);
-      Alert.alert('Error', 'Failed to stop recording.');
+      Alert.alert("Error", "Failed to stop recording.");
     }
   };
 
-const processAudioToText = async (audioUri: string) => {
-  try {
-    setIsTranslating(true);
-    const fileInfo = await FileSystem.getInfoAsync(audioUri);
-    if (!fileInfo.exists) throw new Error("Audio file not found");
-    const base64Audio = await FileSystem.readAsStringAsync(audioUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    const result: any = await transcribeAudio({
-      audio: base64Audio,
-      language: inputLanguage,
-    }).unwrap();
-    if (result?.text) {
-      setInputText(result.text);
-      await translateText(result.text);
-    } else {
-      Alert.alert("Error", "Failed to transcribe audio.");
+  // const processAudioToText = async (audioUri: string) => {
+  //   try {
+  //     setIsTranslating(true);
+  //     const fileInfo = await FileSystem.getInfoAsync(audioUri);
+  //     if (!fileInfo.exists) throw new Error("Audio file not found");
+  //     const base64Audio = await FileSystem.readAsStringAsync(audioUri, {
+  //       encoding: FileSystem.EncodingType.Base64,
+  //     });
+  //     console.log("hello")
+  //     const result: any = await transcribeAudio({
+  //       audio: base64Audio,
+  //       language: inputLanguage,
+  //     }).unwrap();
+  //     if (result?.text) {
+  //       setInputText(result.text);
+  //       await translateText(result.text);
+  //     } else {
+  //       Alert.alert("Error", "Failed to transcribe audio.");
+  //       setIsTranslating(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error processing audio:", error);
+  //     Alert.alert("Error", "Failed to process audio recording.");
+  //     setIsTranslating(false);
+  //   }
+  // };
+
+  const processAudioToText = async (audioUri: string) => {
+    try {
+      setIsTranslating(true);
+
+      const fileInfo = await FileSystem.getInfoAsync(audioUri);
+      if (!fileInfo.exists) throw new Error("Audio file not found");
+
+      const formData = new FormData();
+      formData.append("audio", {
+        uri: audioUri,
+        type: "audio/mp4", // or "audio/wav" based on your recording format
+        name: "recording.m4a",
+      } as any);
+
+      formData.append("language", inputLanguage);
+
+      const response = await fetch("http://192.168.31.192:5000/api/chat/transcribe", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const result = await response.json();
+
+      if (result?.text) {
+        setInputText(result.text);
+        await translateText(result.text);
+      } else {
+        Alert.alert("Error", "Failed to transcribe audio.");
+      }
+
+      setIsTranslating(false);
+    } catch (error) {
+      console.error("Error processing audio:", error);
+      Alert.alert("Error", "Failed to process audio recording.");
       setIsTranslating(false);
     }
-  } catch (error) {
-    console.error("Error processing audio:", error);
-    Alert.alert("Error", "Failed to process audio recording.");
-    setIsTranslating(false);
-  }
-};
-
+  };
 
   const translateText = async (text?: string) => {
     const textToTranslate = text || inputText;
@@ -230,7 +277,10 @@ const processAudioToText = async (audioUri: string) => {
         }
       } else {
         console.error("Translation failed:", result);
-        Alert.alert("Translation Error", "Failed to translate text. Please try again.");
+        Alert.alert(
+          "Translation Error",
+          "Failed to translate text. Please try again."
+        );
         setOutputText("");
       }
     } catch (error: any) {
@@ -255,10 +305,10 @@ const processAudioToText = async (audioUri: string) => {
   const speakText = async (text: string, languageCode: string) => {
     try {
       if (!text.trim()) return;
-      
+
       Speech.stop();
       const language = languages.find((l) => l.code === languageCode);
-      
+
       await Speech.speak(text, {
         language: language?.voiceCode || "en-US",
         pitch: 1,
@@ -274,12 +324,12 @@ const processAudioToText = async (audioUri: string) => {
   const swapLanguages = () => {
     const tempInput = inputLanguage;
     const tempInputText = inputText;
-    
+
     setInputLanguage(outputLanguage);
     setOutputLanguage(tempInput);
     setInputText(outputText);
     setOutputText(tempInputText);
-    
+
     // If there's text to translate after swapping, translate it
     if (outputText.trim()) {
       setTimeout(() => translateText(outputText), 100);
@@ -289,24 +339,27 @@ const processAudioToText = async (audioUri: string) => {
   const clearText = () => {
     setInputText("");
     setOutputText("");
-    Speech.stop(); 
+    Speech.stop();
   };
 
   const handleVoicePress = async () => {
     if (isRecording) {
       await stopRecording();
     } else {
-      if (permissionResponse?.status !== 'granted') {
+      if (permissionResponse?.status !== "granted") {
         const permission = await requestPermission();
-        if (permission.status !== 'granted') {
+        if (permission.status !== "granted") {
           Alert.alert(
-            'Microphone Permission Required',
-            'Please enable microphone access in your device settings to use voice recording.',
+            "Microphone Permission Required",
+            "Please enable microphone access in your device settings to use voice recording.",
             [
-              { text: 'Settings', onPress: () => {
-                console.log('Open settings');
-              }},
-              { text: 'Cancel', style: 'cancel' }
+              {
+                text: "Settings",
+                onPress: () => {
+                  console.log("Open settings");
+                },
+              },
+              { text: "Cancel", style: "cancel" },
             ]
           );
           return;
@@ -374,9 +427,10 @@ const processAudioToText = async (audioUri: string) => {
                         width: 200 + index * 40,
                         transform: [
                           {
-                            scaleX: (isTranslating || isRecording)
-                              ? Math.sin(Date.now() * 0.01 + index) * 0.5 + 1
-                              : 1,
+                            scaleX:
+                              isTranslating || isRecording
+                                ? Math.sin(Date.now() * 0.01 + index) * 0.5 + 1
+                                : 1,
                           },
                         ],
                       },
@@ -424,8 +478,8 @@ const processAudioToText = async (audioUri: string) => {
               </View>
             </View>
 
-            <TouchableOpacity 
-              onPress={swapLanguages} 
+            <TouchableOpacity
+              onPress={swapLanguages}
               style={styles.swapButton}
               disabled={isRecording || isTranslating}
             >
@@ -495,16 +549,18 @@ const processAudioToText = async (audioUri: string) => {
             )}
 
             <View style={styles.textAreaWrapper}>
-              <TouchableOpacity 
-                onPress={() => outputText && speakText(outputText, outputLanguage)}
+              <TouchableOpacity
+                onPress={() =>
+                  outputText && speakText(outputText, outputLanguage)
+                }
                 disabled={!outputText}
                 style={styles.outputTextContainer}
               >
                 <Text
                   style={[
-                    styles.textArea, 
+                    styles.textArea,
                     !outputText && styles.placeholderText,
-                    outputText && styles.clickableOutput
+                    outputText && styles.clickableOutput,
                   ]}
                 >
                   {outputText || "Translation will appear here"}
@@ -520,8 +576,8 @@ const processAudioToText = async (audioUri: string) => {
 
           {/* Bottom Controls */}
           <View style={styles.bottomControls}>
-            <TouchableOpacity 
-              style={styles.controlButton} 
+            <TouchableOpacity
+              style={styles.controlButton}
               onPress={clearText}
               disabled={isRecording}
             >
@@ -534,11 +590,7 @@ const processAudioToText = async (audioUri: string) => {
                 style={getMicButtonStyle()}
                 disabled={isTranslating && !isRecording}
               >
-                <Ionicons
-                  name={getMicIcon()}
-                  size={28}
-                  color="white"
-                />
+                <Ionicons name={getMicIcon()} size={28} color="white" />
               </TouchableOpacity>
             </Animated.View>
 
@@ -563,7 +615,9 @@ const processAudioToText = async (audioUri: string) => {
 
             <TouchableOpacity
               style={styles.controlButton}
-              onPress={() => outputText && speakText(outputText, outputLanguage)}
+              onPress={() =>
+                outputText && speakText(outputText, outputLanguage)
+              }
               disabled={!outputText || isRecording}
             >
               <Ionicons
