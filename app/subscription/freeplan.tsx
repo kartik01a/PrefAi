@@ -39,12 +39,12 @@ const FreePlan = () => {
     {
       title: t("monthlyPlanFullAccess"),
       price: "€4.99 / month",
-      id: "price_1S195y2SNvhd3XUdTisAWsga",
+      id: process.env.STRIPE_PRICE_ID_MONTHLY,
     },
     {
       title: t("yearlyPlanBestValue"),
       price: "€59.99 / year",
-      id: "price_1S197J2SNvhd3XUdOtbO6bBr",
+      id: process.env.STRIPE_PRICE_ID_YEARLY,
     },
   ];
 
