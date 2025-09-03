@@ -30,6 +30,8 @@ interface Language {
   voiceCode: string;
 }
 
+const baseUrl = process.env.EXPO_PUBLIC_BASE_URL;
+
 const languages: Language[] = [
   { code: "en", name: "English", voiceCode: "en-US" },
   { code: "fr", name: "Français", voiceCode: "fr-FR" },
@@ -219,7 +221,7 @@ const VoiceTranslationScreen: React.FC = () => {
 
       formData.append("language", inputLanguage);
 
-      const response = await fetch("http://192.168.31.192:5000/api/chat/transcribe", {
+      const response = await fetch(`${baseUrl}/api/chat/transcribe`, {
         method: "POST",
         body: formData,
         headers: {
