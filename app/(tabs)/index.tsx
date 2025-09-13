@@ -47,6 +47,7 @@ const HomeTab: React.FC = () => {
   const routes = {
     0: "/chat",
     1: "/aiform/chatassist",
+    2: "/calendar/calendarscreen", 
     3: "/document",
   } as const;
 

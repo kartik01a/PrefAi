@@ -41,6 +41,7 @@ export interface AuthResponse {
   dob?: string;
   arrivalDate?: string;
   language?: string;
+  fcmToken?: string;
 }
 
 export interface AuthResponsePayload {
@@ -98,6 +99,7 @@ export interface updateRequest {
   dob?: string;
   arrivalDate?: string;
   language?: string;
+  fcmToken?: string;
 }
 
 export interface IDocument {
