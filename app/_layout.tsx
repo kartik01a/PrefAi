@@ -17,6 +17,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { Provider as ReduxProvider } from "react-redux";
+import * as Notifications from "expo-notifications";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,6 +32,18 @@ export default function RootLayout() {
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
   });
+  
+
+// Configure notification display behavior
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+})
 
   useEffect(() => {
     const setupApp = async () => {

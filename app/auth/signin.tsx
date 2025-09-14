@@ -1,6 +1,5 @@
 // import { registerForPushNotificationsAsync } from "@/services/pushNotificationService";
 import {
-  listenForTokenRefresh,
   registerForPushNotificationsAsync,
 } from "@/services/pushNotificationService";
 import * as AuthSession from "expo-auth-session";
@@ -161,15 +160,15 @@ const SignIn = () => {
   };
 
   // --- Listen for FCM token refresh ---
-  useEffect(() => {
-    if (!userInfo?._id) return;
+  // useEffect(() => {
+  //   if (!userInfo?._id) return;
 
-    const unsubscribe = listenForTokenRefresh(async (token) => {
-      await updateUser({ id: userInfo._id, data: { fcmToken: token } });
-    });
+  //   const unsubscribe = listenForTokenRefresh(async (token) => {
+  //     await updateUser({ id: userInfo._id, data: { fcmToken: token } });
+  //   });
 
-    return unsubscribe;
-  }, [userInfo]);
+  //   return unsubscribe;
+  // }, [userInfo]);
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
