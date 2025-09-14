@@ -16,6 +16,8 @@
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-native-checkbox/checkbox": "^0.5.8",
     "@react-native-community/datetimepicker": "^8.4.2",
+    "@react-native-firebase/app": "^23.3.1",
+    "@react-native-firebase/messaging": "^23.3.1",
     "@react-native-picker/picker": "2.11.1",
     "@react-native-voice/voice": "^3.2.4",
     "@react-navigation/bottom-tabs": "^7.3.10",
@@ -74,7 +76,9 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "react-redux": "^9.2.0",
-    "zustand": "^5.0.6"
+    "zustand": "^5.0.6",
+    "expo-notifications": "~0.31.4",
+    "expo-device": "~7.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

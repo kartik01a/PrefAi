@@ -1,4 +1,7 @@
 // import { registerForPushNotificationsAsync } from "@/services/pushNotificationService";
+import {
+  registerForPushNotificationsAsync,
+} from "@/services/pushNotificationService";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import { LinearGradient } from "expo-linear-gradient";
@@ -101,19 +104,14 @@ const SignIn = () => {
   //   handleFbResponse();
   // }, [dispatch, responseFb, socialLoginFacebook]);
 
-
-
-
-
-
- useEffect(() => {
+  useEffect(() => {
     const handleGoogleResponse = async () => {
       if (responseGoogle?.type === "success") {
         const idToken = responseGoogle.params.id_token;
         if (idToken) {
           try {
-            // const fcmToken = await registerForPushNotificationsAsync();
-            const fcmToken = "";
+            const fcmToken = await registerForPushNotificationsAsync();
+
             const user = await socialLoginGoogle({
               idToken,
               fcmToken: fcmToken ?? undefined,
@@ -122,12 +120,14 @@ const SignIn = () => {
             await dispatch(persistUser(user));
             Toast.show({ type: "success", text1: "Logged In with Google" });
             router.replace("/");
-          } catch {
+          } catch (e) {
+            console.log("❌ Google login error:", e);
             Toast.show({ type: "error", text1: "Google login failed" });
           }
         }
       }
     };
+
     handleGoogleResponse();
   }, [dispatch, responseGoogle, socialLoginGoogle]);
 
@@ -140,45 +140,41 @@ const SignIn = () => {
       });
       return;
     }
+
     try {
-      // const fcmToken  = await registerForPushNotificationsAsync();
-      const fcmToken= "";
-      const user = await login({ email, password, fcmToken: fcmToken  ?? undefined }).unwrap();
+      const fcmToken = await registerForPushNotificationsAsync();
+
+      const user = await login({
+        email,
+        password,
+        fcmToken: fcmToken ?? undefined,
+      }).unwrap();
+
       await dispatch(persistUser(user));
-      Toast.show({
-        type: "success",
-        text1: "Logged In Successful",
-      });
+      Toast.show({ type: "success", text1: "Logged In Successful" });
       router.replace("/");
     } catch (error: any) {
-      Toast.show({
-        type: "error",
-        text1: "Login Failed",
-      });
+      console.log("❌ Login error:", error);
+      Toast.show({ type: "error", text1: "Login Failed" });
     }
   };
-  
 
+  // --- Listen for FCM token refresh ---
   // useEffect(() => {
-  //   const unsubscribe = messaging().onTokenRefresh(async (token) => {
-  //     console.log("🔄 FCM Token refreshed:", token);
-  //     if (userInfo?._id) {
-  //       try {
-  //         await updateUser({ id: userInfo._id, data: { fcmToken: token } });
-  //       } catch (e) {
-  //         console.log("❌ Failed to update token on refresh", e);
-  //       }
-  //     }
+  //   if (!userInfo?._id) return;
+
+  //   const unsubscribe = listenForTokenRefresh(async (token) => {
+  //     await updateUser({ id: userInfo._id, data: { fcmToken: token } });
   //   });
+
   //   return unsubscribe;
   // }, [userInfo]);
 
-
-    useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (userInfo) {
       router.replace("/");
     }
