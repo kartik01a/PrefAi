@@ -1,6 +1,6 @@
 import { logout } from "@/features/auth/authSlice";
 import { router, useNavigation } from "expo-router";
-import React, { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
@@ -14,8 +14,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
+import { useUpdateUserLanguageMutation } from "../../slices/usersApiSlice";
 import { AppDispatch, RootState } from "../store";
-import { useUpdateUserLanguageMutation } from "./usersApiSlice";
 
 const languages = [
   {

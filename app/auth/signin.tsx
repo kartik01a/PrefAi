@@ -1,9 +1,10 @@
+// import { registerForPushNotificationsAsync } from "@/services/pushNotificationService";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -20,13 +21,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
-import { persistUser } from "../../utils/authLoader";
-import { AppDispatch, RootState } from "../store";
 import {
   useLoginMutation,
   useSocialLoginFacebookMutation,
   useSocialLoginGoogleMutation,
-} from "./usersApiSlice";
+  useUpdateUserMutation,
+} from "../../slices/usersApiSlice";
+import { persistUser } from "../../utils/authLoader";
+import { AppDispatch, RootState } from "../store";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -45,7 +47,7 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [login, { isLoading }] = useLoginMutation();
-
+  const [updateUser] = useUpdateUserMutation();
 
   // --- GOOGLE LOGIN ---
   const [requestGoogle, responseGoogle, promptGoogle] = Google.useAuthRequest({
@@ -101,23 +103,22 @@ const SignIn = () => {
 
 
 
-  useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
-    useEffect(() => {
-    if (userInfo) {
-      router.replace("/");
-    }
-  }, [userInfo]);
 
-  useEffect(() => {
+
+ useEffect(() => {
     const handleGoogleResponse = async () => {
       if (responseGoogle?.type === "success") {
         const idToken = responseGoogle.params.id_token;
         if (idToken) {
           try {
-            const user = await socialLoginGoogle({ idToken }).unwrap();
+            // const fcmToken = await registerForPushNotificationsAsync();
+            const fcmToken = "";
+            const user = await socialLoginGoogle({
+              idToken,
+              fcmToken: fcmToken ?? undefined,
+            }).unwrap();
+
             await dispatch(persistUser(user));
             Toast.show({ type: "success", text1: "Logged In with Google" });
             router.replace("/");
@@ -130,6 +131,7 @@ const SignIn = () => {
     handleGoogleResponse();
   }, [dispatch, responseGoogle, socialLoginGoogle]);
 
+  // --- NORMAL LOGIN HANDLER ---
   const handleLogin = async () => {
     if (!email || !password) {
       Toast.show({
@@ -139,7 +141,9 @@ const SignIn = () => {
       return;
     }
     try {
-      const user = await login({ email, password }).unwrap();
+      // const fcmToken  = await registerForPushNotificationsAsync();
+      const fcmToken= "";
+      const user = await login({ email, password, fcmToken: fcmToken  ?? undefined }).unwrap();
       await dispatch(persistUser(user));
       Toast.show({
         type: "success",
@@ -149,11 +153,36 @@ const SignIn = () => {
     } catch (error: any) {
       Toast.show({
         type: "error",
-        text1: "Logged In Failed",
+        text1: "Login Failed",
       });
     }
   };
+  
 
+  // useEffect(() => {
+  //   const unsubscribe = messaging().onTokenRefresh(async (token) => {
+  //     console.log("🔄 FCM Token refreshed:", token);
+  //     if (userInfo?._id) {
+  //       try {
+  //         await updateUser({ id: userInfo._id, data: { fcmToken: token } });
+  //       } catch (e) {
+  //         console.log("❌ Failed to update token on refresh", e);
+  //       }
+  //     }
+  //   });
+  //   return unsubscribe;
+  // }, [userInfo]);
+
+
+    useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
+
+    useEffect(() => {
+    if (userInfo) {
+      router.replace("/");
+    }
+  }, [userInfo]);
   return (
     <LinearGradient colors={["#0072BB", "#003972"]} style={styles.container}>
       <KeyboardAvoidingView

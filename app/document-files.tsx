@@ -2,11 +2,10 @@ import Loading from "@/components/Loading";
 import NotFoundComp from "@/components/NotFoundComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import DocumentPdf from "../assets/images/document-pdf.svg";
 import BaseLayout from "../components/BaseLayout";
-import { IDocument, useGetDocumentsQuery } from "./auth/usersApiSlice";
+import { IDocument, useGetDocumentsQuery } from "../slices/usersApiSlice";
 import useFileStore from "./hooks/useDocumentStore";
 
 const DocumentFilesScreen = () => {

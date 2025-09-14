@@ -4,12 +4,12 @@ import BaseLayout from "@/components/BaseLayout";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useNavigation } from "expo-router";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useUpdateUserMutation } from "@/app/auth/usersApiSlice";
 import { AppDispatch, RootState } from "@/app/store";
 import { UserInfo } from "@/features/auth/authSlice";
+import { useUpdateUserMutation } from "@/slices/usersApiSlice";
 import { persistUser } from "@/utils/authLoader";
 import {
   Image,

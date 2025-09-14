@@ -1,6 +1,6 @@
 import { UserInfo } from "@/features/auth/authSlice";
-import { DOCUMENTS_URL, USERS_URL } from "../../constants/constants";
-import { apiSlice } from "../../services/apiSlice";
+import { DOCUMENTS_URL, USERS_URL } from "../constants/constants";
+import { apiSlice } from "../services/apiSlice";
 
 export interface RegisterRequest {
   firstName: string;
@@ -52,20 +52,21 @@ export interface AuthResponsePayload {
   role: "USER" | "ADMIN";
   provider: "manual" | "facebook" | "google" | "linkedin" | "apple";
   active: boolean;
-  firstName: string | undefined;
-  lastName: string | undefined;
-  passportNumber: string | undefined;
-  facebookId: string | undefined;
-  googleId: string | undefined;
-  linkedinId: string | undefined;
-  image: string | undefined;
-  userName: string | undefined;
-  securityNumber: string | undefined;
-  title: string | undefined;
-  country: string | undefined;
-  maritalStatus: string | undefined;
-  dob: string | undefined;
-  arrivalDate: string | undefined;
+  firstName: string | null;
+  lastName: string | null;
+  passportNumber: string | null;
+  facebookId: string | null;
+  googleId: string | null;
+  linkedinId: string | null;
+  image: string | null;
+  userName: string | null;
+  securityNumber: string | null;
+  title: string | null;
+  country: string | null;
+  maritalStatus: string | null;
+  dob: string | null;
+  arrivalDate: string | null;
+  fcmToken: string | null;
   data: {
     accessToken: string;
     refreshToken: string;
@@ -77,6 +78,7 @@ export interface AuthResponsePayload {
 export interface LoginRequest {
   email: string;
   password: string;
+  fcmToken?: string;
 }
 
 export interface updateRequest {
@@ -144,7 +146,10 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    updateUserLanguage: builder.mutation<void,{ id: string; language: string }>({
+    updateUserLanguage: builder.mutation<
+      void,
+      { id: string; language: string }
+    >({
       query: ({ id, language }) => ({
         url: `${USERS_URL}/language/${id}`,
         method: "PATCH",
@@ -157,13 +162,16 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-    updateUser: builder.mutation<UserInfo, { id: string; data: updateRequest }>({
-      query: ({ id, data }) => ({
-        method: "PUT",
-        url: `${USERS_URL}/${id}`,
-        body: data,
-      }),
-    }),
+    updateUser: builder.mutation<UserInfo, { id: string; data: updateRequest }>(
+      {
+        query: ({ id, data }) => ({
+          url: `${USERS_URL}/${id}`,
+          method: "PUT",
+          body: data,
+        }),
+        invalidatesTags: ["User"],
+      }
+    ),
     getDocuments: builder.query<ApiResponse<IDocument[]>, string>({
       query: (id) => ({
         url: `${DOCUMENTS_URL}/${id}`,
@@ -186,7 +194,10 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Folder"],
     }),
-    createFolder: builder.mutation<void,{ folderName: string; userId: string }>({
+    createFolder: builder.mutation<
+      void,
+      { folderName: string; userId: string }
+    >({
       query: (data) => ({
         method: "POST",
         url: `${DOCUMENTS_URL}/folder`,
@@ -194,20 +205,27 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Folder"],
     }),
-    socialLoginGoogle: builder.mutation<AuthResponsePayload, { idToken: string }>({
-  query: ({ idToken }) => ({
-    url: `${USERS_URL}/social/google`,
-    method: "POST",
-    body: { idToken },
-  }),
-}),
-socialLoginFacebook: builder.mutation<AuthResponsePayload, { accessToken: string }>({
-  query: ({ accessToken }) => ({
-    url: `${USERS_URL}/social/facebook`,
-    method: "POST",
-    body: { accessToken },
-  }),
-}),
+    socialLoginGoogle: builder.mutation<
+      AuthResponsePayload,
+      { idToken: string; fcmToken?: string }
+    >({
+      query: ({ idToken, fcmToken }) => ({
+        url: `${USERS_URL}/social/google`,
+        method: "POST",
+        body: { idToken, fcmToken },
+      }),
+    }),
+
+    socialLoginFacebook: builder.mutation<
+      AuthResponsePayload,
+      { accessToken: string; fcmToken?: string }
+    >({
+      query: ({ accessToken, fcmToken }) => ({
+        url: `${USERS_URL}/social/facebook`,
+        method: "POST",
+        body: { accessToken, fcmToken },
+      }),
+    }),
   }),
 });
 
@@ -223,5 +241,5 @@ export const {
   useCreateDocumentMutation,
   useCreateFolderMutation,
   useSocialLoginFacebookMutation,
-  useSocialLoginGoogleMutation
+  useSocialLoginGoogleMutation,
 } = usersApiSlice;

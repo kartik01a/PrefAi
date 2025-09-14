@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import CustomModal from "@/components/CustomModal";
 import Loading from "@/components/Loading";
 import NotFoundComp from "@/components/NotFoundComp";
@@ -7,6 +6,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -25,7 +25,7 @@ import {
   IFolder,
   useCreateFolderMutation,
   useGetFoldersQuery,
-} from "../auth/usersApiSlice";
+} from "../../slices/usersApiSlice";
 import useFileStore, { StoredFile } from "../hooks/useDocumentStore";
 import { RootState } from "../store";
 

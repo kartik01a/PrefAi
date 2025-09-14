@@ -18,6 +18,14 @@ import { Calendar, LocaleConfig } from "react-native-calendars";
 import Modal from "react-native-modal";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
+import {
+  useCreateEventMutation,
+  useDeleteEventMutation,
+  useGetEventsQuery,
+  useUpdateEventMutation,
+} from "../../slices/calendarApiSlice";
+import { RootState } from "../store";
 
 // Optionally configure calendar locale if needed
 LocaleConfig.locales["en"] = {
@@ -68,30 +76,41 @@ type EventItem = {
   startDateISO: string;
   endDateISO: string;
   startTime?: string;
+  endTime?: string;
 };
 
 const { width } = Dimensions.get("window");
 
 const CalendarScreen: React.FC = () => {
-  const [eventsById, setEventsById] = useState<Record<string, EventItem>>({});
+  // In real app get userId from redux/auth context
+  const userId = useSelector((state: RootState) => state.auth.userInfo?._id)!;
+
+  // RTK Query hooks
+  const {
+    data: eventsData,
+    refetch,
+    isLoading,
+    error,
+  } = useGetEventsQuery(userId, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
+  const [createEvent, { isLoading: isCreating }] = useCreateEventMutation();
+  const [updateEvent, { isLoading: isUpdating }] = useUpdateEventMutation();
+  const [deleteEventApi, { isLoading: isDeleting }] = useDeleteEventMutation();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = useState<string>(
-    moment().format("YYYY-MM-DD")
-  );
+  const [selectedDay, setSelectedDay] = useState(moment().format("YYYY-MM-DD"));
 
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
-  const [startTime, setStartTime] = useState<Date>(new Date());
 
   const [showPicker, setShowPicker] = useState<{
     mode: "date" | "time";
     field: "start" | "end" | null;
-  }>({
-    mode: "date",
-    field: null,
-  });
+  }>({ mode: "date", field: null });
 
   const [fadeAnim] = useState(new Animated.Value(0));
 
@@ -102,6 +121,26 @@ const CalendarScreen: React.FC = () => {
       useNativeDriver: true,
     }).start();
   }, []);
+
+  const eventsById: Record<string, EventItem> = useMemo(() => {
+    const map: Record<string, EventItem> = {};
+    const events = Array.isArray(eventsData)
+      ? eventsData
+      : eventsData?.data || [];
+
+    events.forEach((ev: any) => {
+      map[ev._id] = {
+        id: ev._id,
+        title: ev.title,
+        startDateISO: ev.startDate,
+        endDateISO: ev.endDate,
+        startTime: ev.startTime,
+        endTime: ev.endTime,
+      };
+    });
+
+    return map;
+  }, [eventsData]);
 
   const markedDates = useMemo(() => {
     const marks: Record<string, any> = {};
@@ -127,90 +166,124 @@ const CalendarScreen: React.FC = () => {
     return marks;
   }, [eventsById, selectedDay]);
 
-  const openCreateModal = () => {
+  const resetModalState = (dateString?: string) => {
     setEditingEventId(null);
     setTitle("");
-    const base = moment(selectedDay).startOf("day").toDate();
+    const base = moment(dateString || selectedDay)
+      .startOf("day")
+      .toDate();
     setStartDate(base);
     setEndDate(base);
-    setStartTime(base);
+  };
+
+  const openCreateModal = (dateString?: string) => {
+    const base = moment(dateString || selectedDay)
+      .startOf("day")
+      .toDate();
+    setEditingEventId(null);
+    setTitle("");
+    setStartDate(base);
+    setEndDate(base);
+
     setModalVisible(true);
   };
 
   const openEditModalForEvent = (id: string) => {
+    resetModalState();
+
     const ev = eventsById[id];
     if (!ev) return;
+
     setEditingEventId(id);
     setTitle(ev.title);
     setStartDate(new Date(ev.startDateISO));
     setEndDate(new Date(ev.endDateISO));
-    setStartTime(
-      ev.startTime
-        ? moment(ev.startTime, "hh:mm A").toDate()
-        : new Date(ev.startDateISO)
-    );
     setModalVisible(true);
   };
 
-  const saveEvent = () => {
-    if (!title.trim()) return alert("Please enter title");
-
-    const startISO = moment(startDate)
-      .hour(moment(startTime).hour())
-      .minute(moment(startTime).minute())
-      .second(0)
-      .toISOString();
-    const endISO = moment(endDate)
-      .hour(moment(startTime).hour())
-      .minute(moment(startTime).minute())
-      .second(0)
-      .toISOString();
-
-    if (editingEventId) {
-      setEventsById((prev) => ({
-        ...prev,
-        [editingEventId]: {
-          ...prev[editingEventId],
-          title: title.trim(),
-          startDateISO: startISO,
-          endDateISO: endISO,
-          startTime: moment(startTime).format("hh:mm A"),
-        },
-      }));
-    } else {
-      const id = String(Date.now());
-      setEventsById((prev) => ({
-        ...prev,
-        [id]: {
-          id,
-          title: title.trim(),
-          startDateISO: startISO,
-          endDateISO: endISO,
-          startTime: moment(startTime).format("hh:mm A"),
-        },
-      }));
+  const saveEvent = async () => {
+    if (!title.trim()) {
+      alert("Please enter title");
+      return;
     }
-    setModalVisible(false);
+
+    const currentTime = moment();
+    const startTime = currentTime.format("HH:mm");
+    const endTime = "23:59"; // 11:59 PM
+    const startTimestamp = startDate.getTime();
+    const endTimestamp = endDate.getTime();
+    try {
+      if (editingEventId) {
+        // Update existing event
+        await updateEvent({
+          id: editingEventId,
+          title: title.trim(),
+          startDate: startTimestamp,
+          endDate: endTimestamp,
+          startTime: startTime,
+          endTime: endTime,
+        }).unwrap();
+      } else {
+        // Create new event
+        await createEvent({
+          title: title.trim(),
+          startDate: startTimestamp,
+          endDate: endTimestamp,
+          startTime: startTime,
+          endTime: endTime,
+          userId,
+        }).unwrap();
+      }
+
+      await refetch();
+      setModalVisible(false);
+
+      // Reset form
+      setTitle("");
+      setEditingEventId(null);
+    } catch (err: any) {
+      console.error("Save failed", err);
+      const errorMessage =
+        err?.data?.message || err?.message || "Failed to save event";
+      alert(errorMessage);
+    }
   };
 
-  const deleteEvent = (id: string) => {
-    setEventsById((prev) => {
-      const copy = { ...prev };
-      delete copy[id];
-      return copy;
-    });
-    if (editingEventId === id) {
-      setModalVisible(false);
-      setEditingEventId(null);
+  const deleteEvent = async (id: string) => {
+    try {
+      await deleteEventApi(id).unwrap();
+      await refetch();
+
+      if (editingEventId === id) {
+        setModalVisible(false);
+        setEditingEventId(null);
+      }
+    } catch (err: any) {
+      console.error("Delete failed", err);
+      const errorMessage =
+        err?.data?.message || err?.message || "Failed to delete event";
+      alert(errorMessage);
     }
   };
 
   const eventsOnSelectedDay = useMemo(() => {
-    const key = selectedDay;
     return Object.values(eventsById).filter(
-      (ev) => moment(ev.startDateISO).format("YYYY-MM-DD") === key
+      (ev) => moment(ev.startDateISO).format("YYYY-MM-DD") === selectedDay
     );
   }, [eventsById, selectedDay]);
+
+  const showEventsModal = (dateString?: string) => {
+    const day = dateString || selectedDay;
+    const events = Object.values(eventsById).filter(
+      (ev) => moment(ev.startDateISO).format("YYYY-MM-DD") === day
+    );
+
+    if (events.length === 0) {
+      openCreateModal(day); // pass day directly
+      return;
+    }
+    openEditModalForEvent(events[0].id);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -226,17 +299,8 @@ const CalendarScreen: React.FC = () => {
           <Calendar
             onDayPress={(day) => {
               setSelectedDay(day.dateString);
-              const key = day.dateString;
-              const has = Object.values(eventsById).some(
-                (ev) => moment(ev.startDateISO).format("YYYY-MM-DD") === key
-              );
-              if (has) {
-                setModalVisible(true);
-                setEditingEventId(null);
-              } else {
-                setSelectedDay(day.dateString);
-                openCreateModal();
-              }
+              // resetModalState(day.dateString);
+              showEventsModal(day.dateString);
             }}
             markedDates={markedDates}
             markingType={"multi-dot"}
@@ -261,7 +325,7 @@ const CalendarScreen: React.FC = () => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.createButton}
-              onPress={openCreateModal}
+              onPress={() => openCreateModal("")}
               activeOpacity={0.8}
             >
               <Ionicons name="add" size={24} color="#2479CF" />
@@ -269,6 +333,23 @@ const CalendarScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Show loading indicator */}
+        {(isLoading || isCreating || isUpdating || isDeleting) && (
+          <View style={styles.loadingOverlay}>
+            <Text style={styles.loadingText}>
+              {isLoading
+                ? "Loading events..."
+                : isCreating
+                ? "Creating event..."
+                : isUpdating
+                ? "Updating event..."
+                : isDeleting
+                ? "Deleting event..."
+                : "Processing..."}
+            </Text>
+          </View>
+        )}
       </BaseLayout>
 
       <Modal
@@ -345,47 +426,44 @@ const CalendarScreen: React.FC = () => {
                 </View>
               </View>
 
-              <View style={styles.fieldContainer}>
-                <Text style={styles.fieldLabel}>Start Time</Text>
-                <TouchableOpacity
-                  style={styles.fieldBtn}
-                  onPress={() =>
-                    setShowPicker({ mode: "time", field: "start" })
-                  }
-                >
-                  <Ionicons name="time-outline" size={18} color="#5E81AC" />
-                  <Text style={styles.fieldValue}>
-                    {moment(startTime).format("hh:mm A")}
-                  </Text>
-                </TouchableOpacity>
+              {/* Time info display (read-only) */}
+              <View style={styles.timeInfoContainer}>
+                <Text style={styles.timeInfoText}>
+                  Time: Current time to 11:59 PM (Auto-set)
+                </Text>
               </View>
-
-              {/* <View style={styles.actionRow}>
-                {editingEventId && (
-                  <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => deleteEvent(editingEventId)}
-                  >
-                    <Text style={styles.deleteButtonText}>Delete</Text>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity style={styles.saveBtn} onPress={saveEvent}>
-                  <Text style={styles.saveBtnText}>Save</Text>
-                </TouchableOpacity>
-              </View> */}
 
               <View style={styles.buttonContainer}>
                 {editingEventId && (
                   <TouchableOpacity
-                    style={styles.deleteButton}
+                    style={[
+                      styles.deleteButton,
+                      isDeleting && styles.buttonDisabled,
+                    ]}
                     onPress={() => deleteEvent(editingEventId)}
+                    disabled={isDeleting}
                   >
-                    <Text style={styles.deleteButtonText}>Delete</Text>
+                    <Text style={styles.deleteButtonText}>
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </Text>
                   </TouchableOpacity>
                 )}
                 <View style={styles.buttonSpacer} />
-                <TouchableOpacity style={styles.saveBtn} onPress={saveEvent}>
-                  <Text style={styles.saveBtnText}>Save</Text>
+                <TouchableOpacity
+                  style={[
+                    styles.saveBtn,
+                    (isCreating || isUpdating) && styles.buttonDisabled,
+                  ]}
+                  onPress={saveEvent}
+                  disabled={isCreating || isUpdating}
+                >
+                  <Text style={styles.saveBtnText}>
+                    {isCreating
+                      ? "Creating..."
+                      : isUpdating
+                      ? "Updating..."
+                      : "Save"}
+                  </Text>
                 </TouchableOpacity>
                 <View style={styles.buttonSpacer} />
                 <TouchableOpacity
@@ -409,11 +487,6 @@ const CalendarScreen: React.FC = () => {
             setStartDate(dt);
           } else if (showPicker.field === "end" && showPicker.mode === "date") {
             setEndDate(dt);
-          } else if (
-            showPicker.field === "start" &&
-            showPicker.mode === "time"
-          ) {
-            setStartTime(dt);
           }
           setShowPicker({ mode: "date", field: null });
         }}
@@ -425,6 +498,37 @@ const CalendarScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    color: "white",
+    fontSize: 16,
+    fontFamily: "Poppins-Medium",
+  },
+  timeInfoContainer: {
+    backgroundColor: "#f8f9fa",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  timeInfoText: {
+    color: "#666",
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    textAlign: "center",
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+
   gradientBg: {
     flex: 1,
     padding: 20,

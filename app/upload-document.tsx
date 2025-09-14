@@ -1,7 +1,7 @@
 import Loading from "@/components/Loading";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -14,7 +14,7 @@ import {
 import { useSelector } from "react-redux";
 import DocumentPdf from "../assets/images/document-pdf.svg";
 import BaseLayout from "../components/BaseLayout";
-import { useCreateDocumentMutation } from "./auth/usersApiSlice";
+import { useCreateDocumentMutation } from "../slices/usersApiSlice";
 import useFileStore from "./hooks/useDocumentStore";
 import { RootState } from "./store";
 

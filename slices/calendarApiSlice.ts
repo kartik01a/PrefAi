@@ -5,10 +5,14 @@ export const calendarApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // ✅ Get all events for a specific user
     getEvents: builder.query({
-      query: (userId: string) => ({
-        url: `${CALENDAR_URL}/user/${userId}`,
+      query: (id: string) => ({
+        url: `${CALENDAR_URL}/${id}`,
         method: "GET",
       }),
+      // providesTags: (result, error, userId) => [
+      //   { type: 'Event', id: 'LIST' },
+      //   { type: 'Event', id: userId },
+      // ],
     }),
 
     // ✅ Create a new event
@@ -25,15 +29,21 @@ export const calendarApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: newEvent,
       }),
+      // invalidatesTags: (result, error, { userId }) => [
+      //   { type: 'Event', id: 'LIST' },
+      //   { type: 'Event', id: userId },
+      // ],
     }),
 
     // ✅ Update event
     updateEvent: builder.mutation({
       query: ({
         id,
+        userId,
         ...data
       }: {
         id: string;
+        userId?: string;
         title?: string;
         startDate?: number;
         endDate?: number;
@@ -44,6 +54,10 @@ export const calendarApiSlice = apiSlice.injectEndpoints({
         method: "PUT",
         body: data,
       }),
+      // invalidatesTags: (result, error, { userId }) => [
+      //   { type: 'Event', id: 'LIST' },
+      //   ...(userId ? [{ type: 'Event' as const, id: userId }] : []),
+      // ],
     }),
 
     // ✅ Delete event
@@ -52,6 +66,9 @@ export const calendarApiSlice = apiSlice.injectEndpoints({
         url: `${CALENDAR_URL}/${id}`,
         method: "DELETE",
       }),
+      // invalidatesTags: [
+      //   { type: 'Event', id: 'LIST' },
+      // ],
     }),
   }),
 });

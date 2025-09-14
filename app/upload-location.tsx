@@ -1,8 +1,8 @@
-import React, { useState } from "react";
 import CustomModal from "@/components/CustomModal";
 import Loading from "@/components/Loading";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   StyleSheet,
@@ -19,7 +19,7 @@ import {
   IFolder,
   useCreateFolderMutation,
   useGetFoldersQuery,
-} from "./auth/usersApiSlice";
+} from "../slices/usersApiSlice";
 import useFileStore from "./hooks/useDocumentStore";
 import { RootState } from "./store";
 

@@ -17,11 +17,11 @@ import { Checkbox } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
 import {
   useCreateSubscriptionMutation,
   useGetMySubscriptionQuery,
-} from "./subscriptionApiSlice";
+} from "../../slices/subscriptionApiSlice";
+import { RootState } from "../store";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import React = require("react");
 

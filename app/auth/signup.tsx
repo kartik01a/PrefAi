@@ -1,7 +1,7 @@
 import { setUserIdOnly } from "@/features/auth/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useNavigation } from "expo-router";
-import React, { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Image,
@@ -17,8 +17,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
+import { useRegisterMutation } from "../../slices/usersApiSlice";
 import { AppDispatch } from "../store";
-import { useRegisterMutation } from "./usersApiSlice";
 
 const SignUp = () => {
   const dispatch = useDispatch<AppDispatch>();

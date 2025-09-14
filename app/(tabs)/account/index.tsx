@@ -1,6 +1,6 @@
-import { useLogoutMutation } from "@/app/auth/usersApiSlice";
 import { AppDispatch, RootState } from "@/app/store";
 import BaseLayout from "@/components/BaseLayout";
+import { useLogoutMutation } from "@/slices/usersApiSlice";
 import { clearUser } from "@/utils/authLoader";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
