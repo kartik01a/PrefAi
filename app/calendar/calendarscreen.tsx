@@ -106,10 +106,11 @@ const CalendarScreen: React.FC = () => {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
+  const [startTime, setStartTime] = useState<Date>(new Date());
 
   const [showPicker, setShowPicker] = useState<{
     mode: "date" | "time";
-    field: "start" | "end" | null;
+    field: "start" | "end" | "startTime" | null;
   }>({ mode: "date", field: null });
 
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -174,6 +175,7 @@ const CalendarScreen: React.FC = () => {
       .toDate();
     setStartDate(base);
     setEndDate(base);
+    setStartTime(new Date());
   };
 
   const openCreateModal = (dateString?: string) => {
@@ -184,7 +186,7 @@ const CalendarScreen: React.FC = () => {
     setTitle("");
     setStartDate(base);
     setEndDate(base);
-
+    setStartTime(new Date());
     setModalVisible(true);
   };
 
@@ -198,6 +200,16 @@ const CalendarScreen: React.FC = () => {
     setTitle(ev.title);
     setStartDate(new Date(ev.startDateISO));
     setEndDate(new Date(ev.endDateISO));
+
+    if (ev.startTime) {
+      const [hours, minutes] = ev.startTime.split(":");
+      const timeDate = new Date();
+      timeDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+      setStartTime(timeDate);
+    } else {
+      setStartTime(new Date());
+    }
+
     setModalVisible(true);
   };
 
@@ -207,8 +219,8 @@ const CalendarScreen: React.FC = () => {
       return;
     }
 
-    const currentTime = moment();
-    const startTime = currentTime.format("HH:mm");
+    // const currentTime = moment();
+    const startTimeString = moment(startTime).format("HH:mm");
     const endTime = "23:59"; // 11:59 PM
     const startTimestamp = startDate.getTime();
     const endTimestamp = endDate.getTime();
@@ -220,7 +232,7 @@ const CalendarScreen: React.FC = () => {
           title: title.trim(),
           startDate: startTimestamp,
           endDate: endTimestamp,
-          startTime: startTime,
+          startTime: startTimeString,
           endTime: endTime,
         }).unwrap();
       } else {
@@ -229,7 +241,7 @@ const CalendarScreen: React.FC = () => {
           title: title.trim(),
           startDate: startTimestamp,
           endDate: endTimestamp,
-          startTime: startTime,
+          startTime: startTimeString,
           endTime: endTime,
           userId,
         }).unwrap();
@@ -427,10 +439,21 @@ const CalendarScreen: React.FC = () => {
               </View>
 
               {/* Time info display (read-only) */}
-              <View style={styles.timeInfoContainer}>
-                <Text style={styles.timeInfoText}>
-                  Time: Current time to 11:59 PM (Auto-set)
-                </Text>
+              <View style={styles.row}>
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.fieldLabel}>Start Time</Text>
+                  <TouchableOpacity
+                    style={styles.fieldBtn}
+                    onPress={() =>
+                      setShowPicker({ mode: "time", field: "startTime" })
+                    }
+                  >
+                    <Ionicons name="time-outline" size={18} color="#5E81AC" />
+                    <Text style={styles.fieldValue}>
+                      {moment(startTime).format("HH:mm")}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <View style={styles.buttonContainer}>
@@ -481,12 +504,23 @@ const CalendarScreen: React.FC = () => {
       <DateTimePickerModal
         isVisible={showPicker.field !== null}
         mode={showPicker.mode}
-        date={showPicker.field === "end" ? endDate : startDate}
+        date={
+          showPicker.field === "end"
+            ? endDate
+            : showPicker.field === "startTime"
+            ? startTime
+            : startDate
+        }
         onConfirm={(dt: Date) => {
           if (showPicker.field === "start" && showPicker.mode === "date") {
             setStartDate(dt);
           } else if (showPicker.field === "end" && showPicker.mode === "date") {
             setEndDate(dt);
+          } else if (
+            showPicker.field === "startTime" &&
+            showPicker.mode === "time"
+          ) {
+            setStartTime(dt);
           }
           setShowPicker({ mode: "date", field: null });
         }}
