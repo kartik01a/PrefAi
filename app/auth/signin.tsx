@@ -1,10 +1,11 @@
 // import { registerForPushNotificationsAsync } from "@/services/pushNotificationService";
 import {
-  registerForPushNotificationsAsync,
+  registerForPushNotificationsAsync
 } from "@/services/pushNotificationService";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Notifications from "expo-notifications";
 import { router, useNavigation } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -42,6 +43,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const SignIn = () => {
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+  console.log("userInfo", userInfo);
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -132,43 +134,53 @@ const SignIn = () => {
   }, [dispatch, responseGoogle, socialLoginGoogle]);
 
   // --- NORMAL LOGIN HANDLER ---
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Toast.show({
-        type: "error",
-        text1: "Please enter email and password.",
-      });
-      return;
+const handleLogin = async () => {
+  if (!email || !password) {
+    Toast.show({
+      type: "error",
+      text1: "Please enter email and password.",
+    });
+    return;
+  }
+
+  try {
+    // Get Expo push token
+    const expoPushToken = await registerForPushNotificationsAsync();
+
+    const user = await login({
+      email,
+      password,
+      fcmToken: expoPushToken ?? undefined, // ✅ send to backend
+    }).unwrap();
+
+    await dispatch(persistUser(user));
+    Toast.show({ type: "success", text1: "Logged In Successful" });
+    router.replace("/");
+  } catch (error: any) {
+    console.log("❌ Login error:", error);
+    Toast.show({ type: "error", text1: "Login Failed" });
+  }
+};
+
+useEffect(() => {
+  const receivedSub = Notifications.addNotificationReceivedListener(
+    (notification) => {
+      console.log("📩 Notification received in foreground:", notification);
     }
+  );
 
-    try {
-      const fcmToken = await registerForPushNotificationsAsync();
-
-      const user = await login({
-        email,
-        password,
-        fcmToken: fcmToken ?? undefined,
-      }).unwrap();
-
-      await dispatch(persistUser(user));
-      Toast.show({ type: "success", text1: "Logged In Successful" });
-      router.replace("/");
-    } catch (error: any) {
-      console.log("❌ Login error:", error);
-      Toast.show({ type: "error", text1: "Login Failed" });
+  const responseSub = Notifications.addNotificationResponseReceivedListener(
+    (response) => {
+      console.log("📲 User tapped notification:", response);
     }
+  );
+
+  return () => {
+    receivedSub.remove();
+    responseSub.remove();
   };
+}, []);
 
-  // --- Listen for FCM token refresh ---
-  // useEffect(() => {
-  //   if (!userInfo?._id) return;
-
-  //   const unsubscribe = listenForTokenRefresh(async (token) => {
-  //     await updateUser({ id: userInfo._id, data: { fcmToken: token } });
-  //   });
-
-  //   return unsubscribe;
-  // }, [userInfo]);
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });

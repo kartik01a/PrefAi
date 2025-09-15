@@ -1,5 +1,6 @@
-import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
 /**
@@ -26,9 +27,15 @@ export async function registerForPushNotificationsAsync() {
       return null;
     }
 
-    // Get Expo push token
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log("✅ Expo Push Token:", token);
+    // ✅ Get Expo push token WITH projectId (required in Expo Go / SDK 51+)
+    const projectId =
+      Constants.expoConfig?.extra?.eas?.projectId ??
+      Constants.easConfig?.projectId; // fallback for managed workflow
+    const { data: expoPushToken } = await Notifications.getExpoPushTokenAsync({
+      projectId,
+    });
+
+    console.log("✅ Expo Push Token:", expoPushToken);
 
     // Android channel setup
     if (Platform.OS === "android") {
@@ -38,7 +45,7 @@ export async function registerForPushNotificationsAsync() {
       });
     }
 
-    return token;
+    return expoPushToken;
   } catch (e) {
     console.log("❌ Failed to get Expo push token", e);
     return null;
