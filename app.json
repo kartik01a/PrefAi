@@ -35,8 +35,7 @@
         "INTERNET",
         "ACCESS_NETWORK_STATE"
       ],
-      "package": "com.anonymous.prefai",
-      "googleServicesFile": "google-services.json"
+      "package": "com.anonymous.prefai"
     },
     "web": {
       "bundler": "metro",
