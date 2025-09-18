@@ -35,7 +35,8 @@
         "INTERNET",
         "ACCESS_NETWORK_STATE"
       ],
-      "package": "com.anonymous.prefai"
+      "package": "com.anonymous.prefai",
+      "googleServicesFile": "./android/app/google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -70,7 +71,9 @@
           "savePhotosPermission": "Allow access to save PDFs to your device"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging"
     ],
     "experiments": {
       "typedRoutes": true
