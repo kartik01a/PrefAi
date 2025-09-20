@@ -1,18 +1,20 @@
-import { withDangerousMod } from "@expo/config-plugins";
-import { Buffer } from "buffer";
-import fs from "fs";
+const fs = require("fs");
+const { withDangerousMod } = require("@expo/config-plugins");
+const { Buffer } = require("buffer");
 
-export default function withGoogleServicesFile(config) {
+// CommonJS module, works with EAS prebuild
+module.exports = function withGoogleServicesFile(config) {
   return withDangerousMod(config, [
     "android",
     async (config) => {
       const base64 = process.env.GOOGLE_SERVICES_JSON_BASE64;
-      if (!base64)
-        throw new Error("Missing GOOGLE_SERVICES_JSON_BASE64 secret");
+      if (!base64) throw new Error("Missing GOOGLE_SERVICES_JSON_BASE64 secret");
 
+      // Node.js buffer
       const buffer = Buffer.from(base64, "base64");
-      const path = "android/app/google-services.json";
 
+      // Ensure android/app exists
+      const path = "android/app/google-services.json";
       fs.mkdirSync("android/app", { recursive: true });
       fs.writeFileSync(path, buffer);
 
@@ -20,4 +22,4 @@ export default function withGoogleServicesFile(config) {
       return config;
     },
   ]);
-}
+};
