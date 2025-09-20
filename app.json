@@ -28,6 +28,7 @@
         "ACCESS_NETWORK_STATE",
         "POST_NOTIFICATIONS"
       ],
+      "googleServicesFile": "./android/app/google-services.json",
       "package": "com.anonymous.prefai"
     },
     "web": {
