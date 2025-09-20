@@ -1,6 +1,5 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import messaging from "@react-native-firebase/messaging";
 import { Platform } from "react-native";
 
 // Configure notification behavior
@@ -9,8 +8,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
-    shouldShowBanner: true, 
-    shouldShowList: true,  
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -24,9 +23,8 @@ export async function registerForPushNotificationsAsync() {
       return null;
     }
 
-    // Request system notification permissions (Expo Notifications)
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
+    // Request notification permissions
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
     if (existingStatus !== "granted") {
@@ -39,7 +37,7 @@ export async function registerForPushNotificationsAsync() {
       return null;
     }
 
-    // Setup Android channel
+    // Android: setup notification channel (required for Android 13+)
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync("default", {
         name: "default",
@@ -49,11 +47,9 @@ export async function registerForPushNotificationsAsync() {
       });
     }
 
-    // Request permission for FCM (needed for iOS, safe on Android)
-    await messaging().requestPermission();
-
-    // ✅ Get real FCM token
-    const fcmToken = await messaging().getToken();
+    // ✅ Get the real FCM device token
+    const tokenResponse = await Notifications.getDevicePushTokenAsync();
+    const fcmToken = tokenResponse.data;
     console.log("✅ FCM Token:", fcmToken);
 
     return fcmToken;
@@ -79,15 +75,4 @@ export function listenForNotificationInteractions(
   onInteraction: (response: Notifications.NotificationResponse) => void
 ) {
   return Notifications.addNotificationResponseReceivedListener(onInteraction);
-}
-
-/**
- * Listen for FCM foreground messages (from Firebase)
- */
-export function listenForFCMMessages(
-  onMessage: (payload: any) => void
-) {
-  return messaging().onMessage(async remoteMessage => {
-    onMessage(remoteMessage);
-  });
 }
