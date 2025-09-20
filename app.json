@@ -37,6 +37,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "./plugins/withGoogleServices.js",
       "expo-router",
       "./withJetifier",
       "expo-localization",
@@ -65,7 +66,7 @@
         }
       ],
       "expo-web-browser",
-         [
+      [
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
