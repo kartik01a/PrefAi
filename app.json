@@ -37,7 +37,6 @@
         "POST_NOTIFICATIONS"
       ],
       "package": "com.anonymous.prefai",
-      "googleServicesFile": "./android/app/google-services.json"
     },
     "web": {
       "bundler": "metro",
