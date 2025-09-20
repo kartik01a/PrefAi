@@ -36,7 +36,7 @@
         "ACCESS_NETWORK_STATE",
         "POST_NOTIFICATIONS"
       ],
-      "package": "com.anonymous.prefai",
+      "package": "com.anonymous.prefai"
     },
     "web": {
       "bundler": "metro",
