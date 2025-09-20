@@ -33,7 +33,8 @@
         "READ_EXTERNAL_STORAGE",
         "RECORD_AUDIO",
         "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "ACCESS_NETWORK_STATE",
+        "POST_NOTIFICATIONS"
       ],
       "package": "com.anonymous.prefai",
       "googleServicesFile": "./android/app/google-services.json"
@@ -71,7 +72,17 @@
           "savePhotosPermission": "Allow access to save PDFs to your device"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+         [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "sounds": [],
+          "enableBackgroundRemoteNotifications": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -142,15 +142,15 @@ const handleLogin = async () => {
     });
     return;
   }
-
   try {
-    // Get Expo push token
-    const expoPushToken = await registerForPushNotificationsAsync();
-
+     const token = await registerForPushNotificationsAsync();
+      if (token) {
+        console.log("📲 Device registered for notifications:", token);
+      }
     const user = await login({
       email,
       password,
-      fcmToken: expoPushToken ?? undefined, // ✅ send to backend
+      fcmToken: token ?? undefined, // ✅ send to backend
     }).unwrap();
 
     await dispatch(persistUser(user));
