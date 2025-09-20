@@ -27,9 +27,8 @@ import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useLoginMutation,
-  useSocialLoginFacebookMutation,
   useSocialLoginGoogleMutation,
-  useUpdateUserMutation,
+  useUpdateUserTokenMutation
 } from "../../slices/usersApiSlice";
 import { persistUser } from "../../utils/authLoader";
 import { AppDispatch, RootState } from "../store";
@@ -43,7 +42,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 const SignIn = () => {
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
-  console.log("userInfo", userInfo);
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -52,7 +50,8 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [login, { isLoading }] = useLoginMutation();
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUserToken] = useUpdateUserTokenMutation();
+  const [socialLoginGoogle] = useSocialLoginGoogleMutation();
 
   // --- GOOGLE LOGIN ---
   const [requestGoogle, responseGoogle, promptGoogle] = Google.useAuthRequest({
@@ -62,50 +61,56 @@ const SignIn = () => {
     responseType: "id_token",
     scopes: ["openid", "profile", "email"],
     redirectUri: AuthSession.makeRedirectUri({
-      native: "prefai:/oauthredirect", // for standalone builds
+      native: "prefai:/oauthredirect",
     }),
   });
 
-  const [socialLoginGoogle] = useSocialLoginGoogleMutation();
+  // -----------------------------
+  // Notification Hook
+  // -----------------------------
+  const useNotifications = (user?: any) => {
+    useEffect(() => {
+      if (!user) return;
 
-  // const [requestFb, responseFb, promptFb] = Facebook.useAuthRequest(
-  //   {
-  //     clientId: process.env.EXPO_PUBLIC_FACEBOOK_ID!,
-  //     scopes: ["public_profile", "email"],
-  //   },
-  //   {
-  //     useProxy: isExpoGo, // ✅ required for Expo Go
-  //   }
-  // );
+      const syncPushToken = async () => {
+        const token = await registerForPushNotificationsAsync();
+        if (token && user.fcmToken !== token) {
+          console.log("🔄 Updating stale push token:", token);
+          try {
+            await updateUserToken({ id: user._id, fcmToken: token }).unwrap();
+            dispatch(persistUser({ ...user, fcmToken: token }));
+          } catch (err) {
+            console.log("⚠️ Failed to update token:", err);
+          }
+        }
+      };
+      syncPushToken();
 
-  const [socialLoginFacebook] = useSocialLoginFacebookMutation();
-  // useEffect(() => {
-  //   const handleFbResponse = async () => {
-  //     if (
-  //       responseFb?.type === "success" &&
-  //       responseFb.authentication?.accessToken
-  //     ) {
-  //       try {
-  //         // Fetch Facebook user profile
-  //         const res = await fetch(
-  //           `https://graph.facebook.com/me?access_token=${responseFb.authentication.accessToken}&fields=id,name,email,picture.type(large)`
-  //         );
-  //         const fbUser = await res.json();
+      const receivedSub = Notifications.addNotificationReceivedListener(
+        (notification) => {
+          console.log("📩 Notification received (foreground):", notification);
+        }
+      );
 
-  //         // Call your backend mutation
-  //         const user = await socialLoginFacebook(fbUser).unwrap();
-  //         await dispatch(persistUser(user));
+      const responseSub = Notifications.addNotificationResponseReceivedListener(
+        (response) => {
+          console.log("📲 User tapped notification:", response);
+        }
+      );
 
-  //         Toast.show({ type: "success", text1: "Logged In with Facebook" });
-  //         router.replace("/");
-  //       } catch (err) {
-  //         Toast.show({ type: "error", text1: "Facebook login failed" });
-  //       }
-  //     }
-  //   };
-  //   handleFbResponse();
-  // }, [dispatch, responseFb, socialLoginFacebook]);
+      return () => {
+        receivedSub.remove();
+        responseSub.remove();
+      };
+    }, [user]);
+  };
 
+  // ✅ Call the hook at the top level
+  useNotifications(userInfo);
+
+  // -----------------------------
+  // Google login effect
+  // -----------------------------
   useEffect(() => {
     const handleGoogleResponse = async () => {
       if (responseGoogle?.type === "success") {
@@ -129,58 +134,36 @@ const SignIn = () => {
         }
       }
     };
-
     handleGoogleResponse();
   }, [dispatch, responseGoogle, socialLoginGoogle]);
 
-  // --- NORMAL LOGIN HANDLER ---
-const handleLogin = async () => {
-  if (!email || !password) {
-    Toast.show({
-      type: "error",
-      text1: "Please enter email and password.",
-    });
-    return;
-  }
-  try {
-     const token = await registerForPushNotificationsAsync();
-      if (token) {
-        console.log("📲 Device registered for notifications:", token);
-      }
-    const user = await login({
-      email,
-      password,
-      fcmToken: token ?? undefined, // ✅ send to backend
-    }).unwrap();
-
-    await dispatch(persistUser(user));
-    Toast.show({ type: "success", text1: "Logged In Successful" });
-    router.replace("/");
-  } catch (error: any) {
-    console.log("❌ Login error:", error);
-    Toast.show({ type: "error", text1: "Login Failed" });
-  }
-};
-
-useEffect(() => {
-  const receivedSub = Notifications.addNotificationReceivedListener(
-    (notification) => {
-      console.log("📩 Notification received in foreground:", notification);
+  // -----------------------------
+  // Normal email/password login
+  // -----------------------------
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Toast.show({ type: "error", text1: "Please enter email and password." });
+      return;
     }
-  );
 
-  const responseSub = Notifications.addNotificationResponseReceivedListener(
-    (response) => {
-      console.log("📲 User tapped notification:", response);
+    try {
+      const fcmToken = await registerForPushNotificationsAsync();
+      console.log("📲 Device token:", fcmToken);
+
+      const user = await login({
+        email,
+        password,
+        fcmToken: fcmToken ?? undefined,
+      }).unwrap();
+
+      await dispatch(persistUser(user));
+      Toast.show({ type: "success", text1: "Logged In Successfully" });
+      router.replace("/");
+    } catch (error: any) {
+      console.log("❌ Login error details:", error);
+      Toast.show({ type: "error", text1: "Login Failed" });
     }
-  );
-
-  return () => {
-    receivedSub.remove();
-    responseSub.remove();
   };
-}, []);
-
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });

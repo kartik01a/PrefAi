@@ -226,6 +226,17 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: { accessToken, fcmToken },
       }),
     }),
+      updateUserToken: builder.mutation<
+      ApiResponse<AuthResponse>,
+      { id: string; fcmToken: string }
+    >({
+      query: ({ id, fcmToken }) => ({
+        url: `${USERS_URL}/${id}/token`,
+        method: "PATCH",
+        body: { fcmToken },
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
@@ -242,4 +253,5 @@ export const {
   useCreateFolderMutation,
   useSocialLoginFacebookMutation,
   useSocialLoginGoogleMutation,
+  useUpdateUserTokenMutation,
 } = usersApiSlice;
