@@ -21,12 +21,12 @@
       "autoIncrement": true,
       "distribution": "store",
       "android": {
-        "buildType": "apk",
-        "hooks": {
-          "prebuild": "node ./scripts/decodeGsf.js"
-        }
+        "buildType": "apk"
       }
     }
+  },
+  "hooks": {
+    "prebuild": "node ./scripts/decodeGsf.js"
   },
   "submit": {
     "production": {}
