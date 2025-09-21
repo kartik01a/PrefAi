@@ -8,12 +8,6 @@
     "scheme": "prefai",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "notification": {
-      "icon": "./assets/images/icon.png",
-      "color": "#ffffff",
-      "androidMode": "default",
-      "androidCollapsedTitle": "#{unread_notifications} new interactions"
-    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -24,6 +18,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "allowBackup": false,
+      "googleServicesFile": "./google-services.json",
       "manifest": {
         "xmlns:tools": "http://schemas.android.com/tools",
         "application": {
@@ -32,24 +27,25 @@
             "android:appComponentFactory": "androidx.core.app.CoreComponentFactory",
             "android:extractNativeLibs": "false"
           }
-        }
+        },
+        "meta-data": [
+          {
+            "android:name": "com.google.firebase.messaging.default_notification_color",
+            "android:resource": "@color/white",
+            "tools:replace": "android:resource"
+          }
+        ]
       },
       "permissions": [
         "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_VIDEO", 
         "READ_MEDIA_AUDIO",
         "RECORD_AUDIO",
         "INTERNET",
         "ACCESS_NETWORK_STATE",
         "POST_NOTIFICATIONS"
       ],
-      "package": "com.anonymous.prefai",
-      "googleServicesFile": "./google-services.json",
-      "notification": {
-        "icon": "./assets/images/icon.png",
-        "color": "#ffffff"
-      }
-
+      "package": "com.anonymous.prefai"
     },
     "web": {
       "bundler": "metro",
