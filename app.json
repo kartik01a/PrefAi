@@ -8,6 +8,12 @@
     "scheme": "prefai",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "notification": {
+      "icon": "./assets/images/icon.png",
+      "color": "#ffffff",
+      "androidMode": "default",
+      "androidCollapsedTitle": "#{unread_notifications} new interactions"
+    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -38,7 +44,12 @@
         "POST_NOTIFICATIONS"
       ],
       "package": "com.anonymous.prefai",
-      "googleServicesFile": "./android/app/google-services.json"
+      "googleServicesFile": "./android/app/google-services.json",
+      "notification": {
+        "icon": "./assets/images/icon.png",
+        "color": "#ffffff"
+      }
+
     },
     "web": {
       "bundler": "metro",
