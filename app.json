@@ -19,10 +19,12 @@
       "edgeToEdgeEnabled": true,
       "allowBackup": false,
       "manifest": {
+        "xmlns:tools": "http://schemas.android.com/tools",
         "application": {
           "attributes": {
-            "tools:replace": "android:appComponentFactory",
-            "android:appComponentFactory": "androidx.core.app.CoreComponentFactory"
+            "tools:replace": "android:allowBackup,android:appComponentFactory,android:extractNativeLibs",
+            "android:appComponentFactory": "androidx.core.app.CoreComponentFactory",
+            "android:extractNativeLibs": "false"
           }
         }
       },
@@ -30,7 +32,6 @@
         "READ_MEDIA_IMAGES",
         "READ_MEDIA_VIDEO",
         "READ_MEDIA_AUDIO",
-        "READ_EXTERNAL_STORAGE",
         "RECORD_AUDIO",
         "INTERNET",
         "ACCESS_NETWORK_STATE",
@@ -72,14 +73,10 @@
           "savePhotosPermission": "Allow access to save PDFs to your device"
         }
       ],
-      "expo-web-browser",
-         [
+      [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
           "color": "#ffffff",
-          "defaultChannel": "default",
-          "sounds": [],
           "enableBackgroundRemoteNotifications": true
         }
       ]
