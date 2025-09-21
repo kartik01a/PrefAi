@@ -19,16 +19,10 @@
       "edgeToEdgeEnabled": true,
       "allowBackup": false,
       "permissions": [
-        "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO",
-        "READ_MEDIA_AUDIO",
-        "READ_EXTERNAL_STORAGE",
-        "RECORD_AUDIO",
         "INTERNET",
         "ACCESS_NETWORK_STATE",
         "POST_NOTIFICATIONS"
       ],
-      "googleServicesFile": "./android/app/google-services.json",
       "package": "com.anonymous.prefai"
     },
     "web": {
@@ -37,7 +31,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "./plugins/withGoogleServices.js",
       "expo-router",
       "./withJetifier",
       "expo-localization",
