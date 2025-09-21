@@ -1,11 +1,8 @@
 // import { registerForPushNotificationsAsync } from "@/services/pushNotificationService";
-import {
-  registerForPushNotificationsAsync
-} from "@/services/pushNotificationService";
+import { registerForFCM } from "@/services/pushNotificationService";
 import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import { LinearGradient } from "expo-linear-gradient";
-import * as Notifications from "expo-notifications";
 import { router, useNavigation } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -65,59 +62,13 @@ const SignIn = () => {
     }),
   });
 
-  // -----------------------------
-  // Notification Hook
-  // -----------------------------
-  const useNotifications = (user?: any) => {
-    useEffect(() => {
-      if (!user) return;
-
-      const syncPushToken = async () => {
-        const token = await registerForPushNotificationsAsync();
-        if (token && user.fcmToken !== token) {
-          console.log("🔄 Updating stale push token:", token);
-          try {
-            await updateUserToken({ id: user._id, fcmToken: token }).unwrap();
-            dispatch(persistUser({ ...user, fcmToken: token }));
-          } catch (err) {
-            console.log("⚠️ Failed to update token:", err);
-          }
-        }
-      };
-      syncPushToken();
-
-      const receivedSub = Notifications.addNotificationReceivedListener(
-        (notification) => {
-          console.log("📩 Notification received (foreground):", notification);
-        }
-      );
-
-      const responseSub = Notifications.addNotificationResponseReceivedListener(
-        (response) => {
-          console.log("📲 User tapped notification:", response);
-        }
-      );
-
-      return () => {
-        receivedSub.remove();
-        responseSub.remove();
-      };
-    }, [user]);
-  };
-
-  // ✅ Call the hook at the top level
-  useNotifications(userInfo);
-
-  // -----------------------------
-  // Google login effect
-  // -----------------------------
   useEffect(() => {
     const handleGoogleResponse = async () => {
       if (responseGoogle?.type === "success") {
         const idToken = responseGoogle.params.id_token;
         if (idToken) {
           try {
-            const fcmToken = await registerForPushNotificationsAsync();
+            const fcmToken = await registerForFCM();
 
             const user = await socialLoginGoogle({
               idToken,
@@ -147,7 +98,7 @@ const SignIn = () => {
     }
 
     try {
-      const fcmToken = await registerForPushNotificationsAsync();
+      const fcmToken = await registerForFCM();
       console.log("📲 Device token:", fcmToken);
 
       const user = await login({

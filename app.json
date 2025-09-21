@@ -37,7 +37,7 @@
         "POST_NOTIFICATIONS"
       ],
       "package": "com.anonymous.prefai",
-      "googleServicesFile": "./android/app/google-services.json"
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -55,6 +55,8 @@
           "speechRecognitionPermission": "This app uses speech recognition to translate your speech."
         }
       ],
+      ["@react-native-firebase/app", {}],
+      ["@react-native-firebase/messaging", {}],
       [
         "expo-splash-screen",
         {
@@ -73,7 +75,7 @@
         }
       ],
       "expo-web-browser",
-         [
+      [
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
