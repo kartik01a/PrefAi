@@ -1,7 +1,8 @@
 import BaseLayout from "@/components/BaseLayout";
 import { Ionicons } from "@expo/vector-icons";
+import * as Notifications from "expo-notifications";
 import moment from "moment";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -26,7 +27,6 @@ import {
   useUpdateEventMutation,
 } from "../../slices/calendarApiSlice";
 import { RootState } from "../store";
-import * as Notifications from "expo-notifications";
 
 // Configure calendar locale
 LocaleConfig.locales["en"] = {
@@ -44,8 +44,29 @@ LocaleConfig.locales["en"] = {
     "November",
     "December",
   ],
-  monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-  dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  monthNamesShort: [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ],
+  dayNames: [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ],
   dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
 };
 LocaleConfig.defaultLocale = "en";
@@ -56,6 +77,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -147,7 +170,10 @@ const CalendarScreen: React.FC = () => {
     Object.values(eventsById).forEach((ev) => {
       const dayKey = moment(ev.startDateISO).format("YYYY-MM-DD");
       if (!marks[dayKey]) {
-        marks[dayKey] = { marked: true, dots: [{ key: ev.id, color: "#5E81AC" }] };
+        marks[dayKey] = {
+          marked: true,
+          dots: [{ key: ev.id, color: "#5E81AC" }],
+        };
       } else {
         if (!marks[dayKey].dots) marks[dayKey].dots = [];
         marks[dayKey].dots.push({ key: ev.id, color: "#5E81AC" });
@@ -166,14 +192,18 @@ const CalendarScreen: React.FC = () => {
   const resetModalState = (dateString?: string) => {
     setEditingEventId(null);
     setTitle("");
-    const base = moment(dateString || selectedDay).startOf("day").toDate();
+    const base = moment(dateString || selectedDay)
+      .startOf("day")
+      .toDate();
     setStartDate(base);
     setEndDate(base);
     setStartTime(new Date());
   };
 
   const openCreateModal = (dateString?: string) => {
-    const base = moment(dateString || selectedDay).startOf("day").toDate();
+    const base = moment(dateString || selectedDay)
+      .startOf("day")
+      .toDate();
     setEditingEventId(null);
     setTitle("");
     setStartDate(base);
@@ -215,7 +245,10 @@ const CalendarScreen: React.FC = () => {
     const startTimestamp = startDate.getTime();
     const endTimestamp = endDate.getTime();
 
-    const difference = (new Date(startTime.getTime() + 1000).getTime() - new Date(Date.now() + 2000).getTime()) - (30 * 60 * 1000);
+    const difference =
+      new Date(startTime.getTime() + 1000).getTime() -
+      new Date(Date.now() + 2000).getTime() -
+      30 * 60 * 1000;
 
     await Notifications.scheduleNotificationAsync({
       content: {
@@ -256,7 +289,8 @@ const CalendarScreen: React.FC = () => {
       setEditingEventId(null);
     } catch (err: any) {
       console.error("Save failed", err);
-      const errorMessage = err?.data?.message || err?.message || "Failed to save event";
+      const errorMessage =
+        err?.data?.message || err?.message || "Failed to save event";
       alert(errorMessage);
     }
   };
@@ -271,7 +305,8 @@ const CalendarScreen: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Delete failed", err);
-      const errorMessage = err?.data?.message || err?.message || "Failed to delete event";
+      const errorMessage =
+        err?.data?.message || err?.message || "Failed to delete event";
       alert(errorMessage);
     }
   };
@@ -293,7 +328,7 @@ const CalendarScreen: React.FC = () => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "📢 Reminder!",
-        body: 'This is a scheduled notification.',
+        body: "This is a scheduled notification.",
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -307,7 +342,9 @@ const CalendarScreen: React.FC = () => {
       <BaseLayout>
         <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
           <Text style={styles.headerTitle}>Appointments Guide</Text>
-          <Text style={styles.headerSubtitle}>{moment().format("MMMM YYYY")}</Text>
+          <Text style={styles.headerSubtitle}>
+            {moment().format("MMMM YYYY")}
+          </Text>
         </Animated.View>
 
         <View style={styles.calendarContainer}>
@@ -337,13 +374,23 @@ const CalendarScreen: React.FC = () => {
             }}
           />
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.createButton} onPress={() => openCreateModal("")}>
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={() => openCreateModal("")}
+            >
               <Ionicons name="add" size={24} color="#2479CF" />
               <Text style={styles.createButtonText}>Create Appointment</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.createButton} onPress={() => TestNotification()}>
-              <Ionicons name="notifications-outline" size={24} color="#2479CF" />
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={() => TestNotification()}
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color="#2479CF"
+              />
               <Text style={styles.createButtonText}>Test Notification</Text>
             </TouchableOpacity>
           </View>
@@ -355,12 +402,12 @@ const CalendarScreen: React.FC = () => {
               {isLoading
                 ? "Loading events..."
                 : isCreating
-                  ? "Creating event..."
-                  : isUpdating
-                    ? "Updating event..."
-                    : isDeleting
-                      ? "Deleting event..."
-                      : "Processing..."}
+                ? "Creating event..."
+                : isUpdating
+                ? "Updating event..."
+                : isDeleting
+                ? "Deleting event..."
+                : "Processing..."}
             </Text>
           </View>
         )}
@@ -486,8 +533,8 @@ const CalendarScreen: React.FC = () => {
                     {isCreating
                       ? "Creating..."
                       : isUpdating
-                        ? "Updating..."
-                        : "Save"}
+                      ? "Updating..."
+                      : "Save"}
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.buttonSpacer} />
@@ -510,8 +557,8 @@ const CalendarScreen: React.FC = () => {
           showPicker.field === "end"
             ? endDate
             : showPicker.field === "startTime"
-              ? startTime
-              : startDate
+            ? startTime
+            : startDate
         }
         onConfirm={(dt: Date) => {
           if (showPicker.field === "start" && showPicker.mode === "date") {
