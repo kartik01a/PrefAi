@@ -18,6 +18,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { Provider as ReduxProvider } from "react-redux";
 import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
 
 SplashScreen.preventAutoHideAsync();
 
