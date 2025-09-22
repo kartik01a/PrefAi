@@ -1,7 +1,7 @@
 import BaseLayout from "@/components/BaseLayout";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Animated,
   Dimensions,
@@ -28,7 +28,7 @@ import {
 import { RootState } from "../store";
 import * as Notifications from "expo-notifications";
 
-// Optionally configure calendar locale if needed
+// Configure calendar locale
 LocaleConfig.locales["en"] = {
   monthNames: [
     "January",
@@ -44,32 +44,20 @@ LocaleConfig.locales["en"] = {
     "November",
     "December",
   ],
-  monthNamesShort: [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ],
-  dayNames: [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ],
+  monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
   dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
 };
 LocaleConfig.defaultLocale = "en";
+
+// Setup notifications handler (foreground)
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 type EventItem = {
   id: string;
@@ -83,7 +71,6 @@ type EventItem = {
 const { width } = Dimensions.get("window");
 
 const CalendarScreen: React.FC = () => {
-  // In real app get userId from redux/auth context
   const userId = useSelector((state: RootState) => state.auth.userInfo?._id)!;
 
   // RTK Query hooks
@@ -91,7 +78,6 @@ const CalendarScreen: React.FC = () => {
     data: eventsData,
     refetch,
     isLoading,
-    error,
   } = useGetEventsQuery(userId, {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
@@ -116,12 +102,24 @@ const CalendarScreen: React.FC = () => {
 
   const [fadeAnim] = useState(new Animated.Value(0));
 
-  React.useEffect(() => {
+  // Animate fade-in
+  useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
     }).start();
+  }, []);
+
+  // Request notification permissions
+  useEffect(() => {
+    const setupNotifications = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Enable notifications in settings to get reminders!");
+      }
+    };
+    setupNotifications();
   }, []);
 
   const eventsById: Record<string, EventItem> = useMemo(() => {
@@ -149,10 +147,7 @@ const CalendarScreen: React.FC = () => {
     Object.values(eventsById).forEach((ev) => {
       const dayKey = moment(ev.startDateISO).format("YYYY-MM-DD");
       if (!marks[dayKey]) {
-        marks[dayKey] = {
-          marked: true,
-          dots: [{ key: ev.id, color: "#5E81AC" }],
-        };
+        marks[dayKey] = { marked: true, dots: [{ key: ev.id, color: "#5E81AC" }] };
       } else {
         if (!marks[dayKey].dots) marks[dayKey].dots = [];
         marks[dayKey].dots.push({ key: ev.id, color: "#5E81AC" });
@@ -171,18 +166,14 @@ const CalendarScreen: React.FC = () => {
   const resetModalState = (dateString?: string) => {
     setEditingEventId(null);
     setTitle("");
-    const base = moment(dateString || selectedDay)
-      .startOf("day")
-      .toDate();
+    const base = moment(dateString || selectedDay).startOf("day").toDate();
     setStartDate(base);
     setEndDate(base);
     setStartTime(new Date());
   };
 
   const openCreateModal = (dateString?: string) => {
-    const base = moment(dateString || selectedDay)
-      .startOf("day")
-      .toDate();
+    const base = moment(dateString || selectedDay).startOf("day").toDate();
     setEditingEventId(null);
     setTitle("");
     setStartDate(base);
@@ -193,7 +184,6 @@ const CalendarScreen: React.FC = () => {
 
   const openEditModalForEvent = (id: string) => {
     resetModalState();
-
     const ev = eventsById[id];
     if (!ev) return;
 
@@ -220,14 +210,32 @@ const CalendarScreen: React.FC = () => {
       return;
     }
 
-    // const currentTime = moment();
     const startTimeString = moment(startTime).format("HH:mm");
     const endTime = "23:59"; // 11:59 PM
     const startTimestamp = startDate.getTime();
     const endTimestamp = endDate.getTime();
+
+    console.log("Date", new Date(Date.now() + 1000));
+    console.log("startTime", new Date(startTime.getTime() + 1000));
+
+    const difference = (new Date(startTime.getTime() + 1000).getTime() - new Date(Date.now() + 2000).getTime()) - (1 * 60 * 1000);
+    console.log("difference", difference);
+    console.log("new Date(Date.now() + difference)", new Date(Date.now() + difference));
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "⏰ Event Reminder",
+        body: `Your appointment "${title.trim()}" starts in 1 minute!`,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(Date.now() + difference),
+        // date: new Date(startTime.getTime() + 1000),
+      },
+    });
+
     try {
       if (editingEventId) {
-        // Update existing event
         await updateEvent({
           id: editingEventId,
           title: title.trim(),
@@ -237,7 +245,6 @@ const CalendarScreen: React.FC = () => {
           endTime: endTime,
         }).unwrap();
       } else {
-        // Create new event
         await createEvent({
           title: title.trim(),
           startDate: startTimestamp,
@@ -250,26 +257,12 @@ const CalendarScreen: React.FC = () => {
 
       await refetch();
 
-      // Schedule notification for the event
-      const eventStartDateTime = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate(),
-        startTime.getHours(),
-        startTime.getMinutes()
-      );
-
-      scheduleEventNotification(title.trim(), eventStartDateTime);
-
       setModalVisible(false);
-
-      // Reset form
       setTitle("");
       setEditingEventId(null);
     } catch (err: any) {
       console.error("Save failed", err);
-      const errorMessage =
-        err?.data?.message || err?.message || "Failed to save event";
+      const errorMessage = err?.data?.message || err?.message || "Failed to save event";
       alert(errorMessage);
     }
   };
@@ -278,24 +271,16 @@ const CalendarScreen: React.FC = () => {
     try {
       await deleteEventApi(id).unwrap();
       await refetch();
-
       if (editingEventId === id) {
         setModalVisible(false);
         setEditingEventId(null);
       }
     } catch (err: any) {
       console.error("Delete failed", err);
-      const errorMessage =
-        err?.data?.message || err?.message || "Failed to delete event";
+      const errorMessage = err?.data?.message || err?.message || "Failed to delete event";
       alert(errorMessage);
     }
   };
-
-  const eventsOnSelectedDay = useMemo(() => {
-    return Object.values(eventsById).filter(
-      (ev) => moment(ev.startDateISO).format("YYYY-MM-DD") === selectedDay
-    );
-  }, [eventsById, selectedDay]);
 
   const showEventsModal = (dateString?: string) => {
     const day = dateString || selectedDay;
@@ -304,62 +289,37 @@ const CalendarScreen: React.FC = () => {
     );
 
     if (events.length === 0) {
-      openCreateModal(day); // pass day directly
+      openCreateModal(day);
       return;
     }
     openEditModalForEvent(events[0].id);
   };
 
-  const scheduleEventNotification = async (eventTitle: string, startDateTime: Date) => {
-    try {
-      // Trigger time = 1 mins before event
-      const triggerTime = new Date(startDateTime.getTime() - 1 * 60 * 1000);
-
-      console.log("startDateTime", startDateTime);
-      console.log("triggerTime", triggerTime);
-
-      // log startDateTime and triggerTime in IST
-      console.log("startDateTime in IST", startDateTime.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-      console.log("triggerTime in IST", triggerTime.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-
-      // Do not schedule past notifications
-      if (triggerTime <= new Date()) return;
-
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "⏰ Event Reminder",
-          body: `Your appointment "${eventTitle}" starts in 1 minute!`,
-          sound: true,
-          priority: Notifications.AndroidNotificationPriority.HIGH,
-          color: "#FF231F7C"
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DATE,
-          date: triggerTime,
-        },
-      });
-
-      console.log("✅ Notification scheduled for", triggerTime);
-    } catch (err) {
-      console.error("Failed to schedule notification:", err);
-    }
-  };
+  async function TestNotification() {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "📢 Reminder!",
+        body: 'This is a scheduled notification.',
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(Date.now() + 10), // Triggers after 10 seconds
+      },
+    });
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <BaseLayout>
         <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
           <Text style={styles.headerTitle}>Appointments Guide</Text>
-          <Text style={styles.headerSubtitle}>
-            {moment().format("MMMM YYYY")}
-          </Text>
+          <Text style={styles.headerSubtitle}>{moment().format("MMMM YYYY")}</Text>
         </Animated.View>
 
         <View style={styles.calendarContainer}>
           <Calendar
             onDayPress={(day) => {
               setSelectedDay(day.dateString);
-              // resetModalState(day.dateString);
               showEventsModal(day.dateString);
             }}
             markedDates={markedDates}
@@ -383,18 +343,18 @@ const CalendarScreen: React.FC = () => {
             }}
           />
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={() => openCreateModal("")}
-              activeOpacity={0.8}
-            >
+            <TouchableOpacity style={styles.createButton} onPress={() => openCreateModal("")}>
               <Ionicons name="add" size={24} color="#2479CF" />
               <Text style={styles.createButtonText}>Create Appointment</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.createButton} onPress={() => TestNotification()}>
+              <Ionicons name="notifications-outline" size={24} color="#2479CF" />
+              <Text style={styles.createButtonText}>Test Notification</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Show loading indicator */}
         {(isLoading || isCreating || isUpdating || isDeleting) && (
           <View style={styles.loadingOverlay}>
             <Text style={styles.loadingText}>
