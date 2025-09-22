@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "92290098468",
-    "project_id": "prefai-82286",
-    "storage_bucket": "prefai-82286.firebasestorage.app"
+    "project_number": "39818654092",
+    "project_id": "prefai-da43e",
+    "storage_bucket": "prefai-da43e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:92290098468:android:3b766d9c77ec19d61abfb1",
+        "mobilesdk_app_id": "1:39818654092:android:e4682ebbf1cc97aa31a6a9",
         "android_client_info": {
           "package_name": "com.anonymous.prefai"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCE-dHou8GlPx-UVj8uiPkb3SceYOGkrb8"
+          "current_key": "AIzaSyBnEjRFIQwcG0QAaN5IO932cpOsFrl4JW4"
         }
       ],
       "services": {
