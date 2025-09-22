@@ -12,7 +12,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { I18nManager, View } from "react-native";
+import { I18nManager, View, Alert } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -21,6 +21,17 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 
 SplashScreen.preventAutoHideAsync();
+
+// Configure notification display behavior
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+})
 
 export default function RootLayout() {
   const [isI18nReady, setIsI18nReady] = useState(false);
@@ -33,18 +44,43 @@ export default function RootLayout() {
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
   });
-  
 
-// Configure notification display behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-})
+
+  // Configure notification display behavior
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  })
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  // Request permission
+  async function registerForPushNotificationsAsync() {
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        Alert.alert("Failed to get push token!");
+        return;
+      }
+    } else {
+      Alert.alert("Must use physical device for Push Notifications");
+    }
+  }
 
   useEffect(() => {
     const setupApp = async () => {

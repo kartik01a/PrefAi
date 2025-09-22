@@ -26,6 +26,7 @@ import {
   useUpdateEventMutation,
 } from "../../slices/calendarApiSlice";
 import { RootState } from "../store";
+import * as Notifications from "expo-notifications";
 
 // Optionally configure calendar locale if needed
 LocaleConfig.locales["en"] = {
@@ -248,6 +249,18 @@ const CalendarScreen: React.FC = () => {
       }
 
       await refetch();
+
+      // Schedule notification for the event
+      const eventStartDateTime = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate(),
+        startTime.getHours(),
+        startTime.getMinutes()
+      );
+
+      scheduleEventNotification(title.trim(), eventStartDateTime);
+
       setModalVisible(false);
 
       // Reset form
@@ -295,6 +308,41 @@ const CalendarScreen: React.FC = () => {
       return;
     }
     openEditModalForEvent(events[0].id);
+  };
+
+  const scheduleEventNotification = async (eventTitle: string, startDateTime: Date) => {
+    try {
+      // Trigger time = 1 mins before event
+      const triggerTime = new Date(startDateTime.getTime() - 1 * 60 * 1000);
+
+      console.log("startDateTime", startDateTime);
+      console.log("triggerTime", triggerTime);
+
+      // log startDateTime and triggerTime in IST
+      console.log("startDateTime in IST", startDateTime.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+      console.log("triggerTime in IST", triggerTime.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+
+      // Do not schedule past notifications
+      if (triggerTime <= new Date()) return;
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "⏰ Event Reminder",
+          body: `Your appointment "${eventTitle}" starts in 1 minute!`,
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+          color: "#FF231F7C"
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: triggerTime,
+        },
+      });
+
+      console.log("✅ Notification scheduled for", triggerTime);
+    } catch (err) {
+      console.error("Failed to schedule notification:", err);
+    }
   };
 
   return (
@@ -353,12 +401,12 @@ const CalendarScreen: React.FC = () => {
               {isLoading
                 ? "Loading events..."
                 : isCreating
-                ? "Creating event..."
-                : isUpdating
-                ? "Updating event..."
-                : isDeleting
-                ? "Deleting event..."
-                : "Processing..."}
+                  ? "Creating event..."
+                  : isUpdating
+                    ? "Updating event..."
+                    : isDeleting
+                      ? "Deleting event..."
+                      : "Processing..."}
             </Text>
           </View>
         )}
@@ -484,8 +532,8 @@ const CalendarScreen: React.FC = () => {
                     {isCreating
                       ? "Creating..."
                       : isUpdating
-                      ? "Updating..."
-                      : "Save"}
+                        ? "Updating..."
+                        : "Save"}
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.buttonSpacer} />
@@ -508,8 +556,8 @@ const CalendarScreen: React.FC = () => {
           showPicker.field === "end"
             ? endDate
             : showPicker.field === "startTime"
-            ? startTime
-            : startDate
+              ? startTime
+              : startDate
         }
         onConfirm={(dt: Date) => {
           if (showPicker.field === "start" && showPicker.mode === "date") {
