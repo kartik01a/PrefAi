@@ -21,6 +21,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -133,53 +134,67 @@ const SignIn = () => {
     handleGoogleResponse();
   }, [dispatch, responseGoogle, socialLoginGoogle]);
 
-  // --- NORMAL LOGIN HANDLER ---
-const handleLogin = async () => {
-  if (!email || !password) {
-    Toast.show({
-      type: "error",
-      text1: "Please enter email and password.",
-    });
-    return;
-  }
-
-  try {
-    // Get Expo push token
-    const expoPushToken = await registerForPushNotificationsAsync();
-
-    const user = await login({
-      email,
-      password,
-      fcmToken: expoPushToken ?? undefined, // ✅ send to backend
-    }).unwrap();
-
-    await dispatch(persistUser(user));
-    Toast.show({ type: "success", text1: "Logged In Successful" });
-    router.replace("/");
-  } catch (error: any) {
-    console.log("❌ Login error:", error);
-    Toast.show({ type: "error", text1: "Login Failed" });
-  }
-};
-
-useEffect(() => {
-  const receivedSub = Notifications.addNotificationReceivedListener(
-    (notification) => {
-      console.log("📩 Notification received in foreground:", notification);
+  const sendTestNotification = async () => {
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "✅ Test Notification",
+          body: "Test Notification was successful",
+        },
+        trigger: null,
+      });
+    } catch (error: any) {
+      Alert.alert("Error sending notification", error.message);
     }
-  );
-
-  const responseSub = Notifications.addNotificationResponseReceivedListener(
-    (response) => {
-      console.log("📲 User tapped notification:", response);
-    }
-  );
-
-  return () => {
-    receivedSub.remove();
-    responseSub.remove();
   };
-}, []);
+
+  // --- NORMAL LOGIN HANDLER ---
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Toast.show({
+        type: "error",
+        text1: "Please enter email and password.",
+      });
+      return;
+    }
+
+    try {
+      // Get Expo push token
+      const expoPushToken = await registerForPushNotificationsAsync();
+
+      const user = await login({
+        email,
+        password,
+        fcmToken: expoPushToken ?? undefined, // ✅ send to backend
+      }).unwrap();
+
+      await dispatch(persistUser(user));
+      Toast.show({ type: "success", text1: "Logged In Successful" });
+      router.replace("/");
+    } catch (error: any) {
+      console.log("❌ Login error:", error);
+      Toast.show({ type: "error", text1: "Login Failed" });
+    }
+  };
+
+  useEffect(() => {
+    const receivedSub = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        console.log("📩 Notification received in foreground:", notification);
+      }
+    );
+
+    const responseSub = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        console.log("📲 User tapped notification:", response);
+      }
+    );
+
+    return () => {
+      receivedSub.remove();
+      responseSub.remove();
+    };
+  }, []);
 
 
   useLayoutEffect(() => {
@@ -232,8 +247,8 @@ useEffect(() => {
               {/* Facebook */}
               <TouchableOpacity
                 style={styles.socialButton}
-                // onPress={() => promptFb()}
-                // disabled={!requestFb}
+              // onPress={() => promptFb()}
+              // disabled={!requestFb}
               >
                 <Image
                   source={require("../../assets/images/facebook.png")}
@@ -299,6 +314,10 @@ useEffect(() => {
               )}
             </TouchableOpacity>
           </View>
+
+          {/* <TouchableOpacity onPress={sendTestNotification} style={{ marginTop: 10, alignSelf: "center", backgroundColor: "red", padding: 10, borderRadius: 10, marginBottom: 100 }}>
+            <Text>Send Test Notification</Text>
+          </TouchableOpacity> */}
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>

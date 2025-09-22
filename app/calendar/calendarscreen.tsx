@@ -1,7 +1,8 @@
 import BaseLayout from "@/components/BaseLayout";
 import { Ionicons } from "@expo/vector-icons";
+import * as Notifications from "expo-notifications";
 import moment from "moment";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -27,7 +28,7 @@ import {
 } from "../../slices/calendarApiSlice";
 import { RootState } from "../store";
 
-// Optionally configure calendar locale if needed
+// Configure calendar locale
 LocaleConfig.locales["en"] = {
   monthNames: [
     "January",
@@ -70,6 +71,17 @@ LocaleConfig.locales["en"] = {
 };
 LocaleConfig.defaultLocale = "en";
 
+// Setup notifications handler (foreground)
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
 type EventItem = {
   id: string;
   title: string;
@@ -82,7 +94,6 @@ type EventItem = {
 const { width } = Dimensions.get("window");
 
 const CalendarScreen: React.FC = () => {
-  // In real app get userId from redux/auth context
   const userId = useSelector((state: RootState) => state.auth.userInfo?._id)!;
 
   // RTK Query hooks
@@ -90,7 +101,6 @@ const CalendarScreen: React.FC = () => {
     data: eventsData,
     refetch,
     isLoading,
-    error,
   } = useGetEventsQuery(userId, {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
@@ -115,12 +125,24 @@ const CalendarScreen: React.FC = () => {
 
   const [fadeAnim] = useState(new Animated.Value(0));
 
-  React.useEffect(() => {
+  // Animate fade-in
+  useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
     }).start();
+  }, []);
+
+  // Request notification permissions
+  useEffect(() => {
+    const setupNotifications = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Enable notifications in settings to get reminders!");
+      }
+    };
+    setupNotifications();
   }, []);
 
   const eventsById: Record<string, EventItem> = useMemo(() => {
@@ -192,7 +214,6 @@ const CalendarScreen: React.FC = () => {
 
   const openEditModalForEvent = (id: string) => {
     resetModalState();
-
     const ev = eventsById[id];
     if (!ev) return;
 
@@ -219,14 +240,29 @@ const CalendarScreen: React.FC = () => {
       return;
     }
 
-    // const currentTime = moment();
     const startTimeString = moment(startTime).format("HH:mm");
     const endTime = "23:59"; // 11:59 PM
     const startTimestamp = startDate.getTime();
     const endTimestamp = endDate.getTime();
+
+    const difference =
+      new Date(startTime.getTime() + 1000).getTime() -
+      new Date(Date.now() + 2000).getTime() -
+      30 * 60 * 1000;
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "⏰ Event Reminder",
+        body: `Your appointment "${title.trim()}" starts in 30 minutes!`,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(Date.now() + difference),
+      },
+    });
+
     try {
       if (editingEventId) {
-        // Update existing event
         await updateEvent({
           id: editingEventId,
           title: title.trim(),
@@ -236,7 +272,6 @@ const CalendarScreen: React.FC = () => {
           endTime: endTime,
         }).unwrap();
       } else {
-        // Create new event
         await createEvent({
           title: title.trim(),
           startDate: startTimestamp,
@@ -248,9 +283,8 @@ const CalendarScreen: React.FC = () => {
       }
 
       await refetch();
-      setModalVisible(false);
 
-      // Reset form
+      setModalVisible(false);
       setTitle("");
       setEditingEventId(null);
     } catch (err: any) {
@@ -265,7 +299,6 @@ const CalendarScreen: React.FC = () => {
     try {
       await deleteEventApi(id).unwrap();
       await refetch();
-
       if (editingEventId === id) {
         setModalVisible(false);
         setEditingEventId(null);
@@ -278,12 +311,6 @@ const CalendarScreen: React.FC = () => {
     }
   };
 
-  const eventsOnSelectedDay = useMemo(() => {
-    return Object.values(eventsById).filter(
-      (ev) => moment(ev.startDateISO).format("YYYY-MM-DD") === selectedDay
-    );
-  }, [eventsById, selectedDay]);
-
   const showEventsModal = (dateString?: string) => {
     const day = dateString || selectedDay;
     const events = Object.values(eventsById).filter(
@@ -291,11 +318,24 @@ const CalendarScreen: React.FC = () => {
     );
 
     if (events.length === 0) {
-      openCreateModal(day); // pass day directly
+      openCreateModal(day);
       return;
     }
     openEditModalForEvent(events[0].id);
   };
+
+  async function TestNotification() {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "📢 Reminder!",
+        body: "This is a scheduled notification.",
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(Date.now() + 10), // Triggers after 10 seconds
+      },
+    });
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -311,7 +351,6 @@ const CalendarScreen: React.FC = () => {
           <Calendar
             onDayPress={(day) => {
               setSelectedDay(day.dateString);
-              // resetModalState(day.dateString);
               showEventsModal(day.dateString);
             }}
             markedDates={markedDates}
@@ -338,15 +377,25 @@ const CalendarScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.createButton}
               onPress={() => openCreateModal("")}
-              activeOpacity={0.8}
             >
               <Ionicons name="add" size={24} color="#2479CF" />
               <Text style={styles.createButtonText}>Create Appointment</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={() => TestNotification()}
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color="#2479CF"
+              />
+              <Text style={styles.createButtonText}>Test Notification</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
-        {/* Show loading indicator */}
         {(isLoading || isCreating || isUpdating || isDeleting) && (
           <View style={styles.loadingOverlay}>
             <Text style={styles.loadingText}>

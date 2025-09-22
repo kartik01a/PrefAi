@@ -31,9 +31,15 @@
         "READ_MEDIA_VIDEO",
         "READ_MEDIA_AUDIO",
         "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
         "RECORD_AUDIO",
         "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "ACCESS_NETWORK_STATE",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE",
+        "RECEIVE_BOOT_COMPLETED",
+        "POST_NOTIFICATIONS"
       ],
       "package": "com.anonymous.prefai",
       "googleServicesFile": "./android/app/google-services.json"
@@ -81,9 +87,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "193989f8-3ac9-4d67-a12f-946c4e311ecf"
+        "projectId": "422c70ec-3493-4289-bdc4-17604ef6a1ec"
       }
     },
-    "owner": "kartik_01a"
+    "owner": "kartik_01sb"
   }
 }
