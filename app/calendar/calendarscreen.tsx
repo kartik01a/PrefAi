@@ -215,22 +215,16 @@ const CalendarScreen: React.FC = () => {
     const startTimestamp = startDate.getTime();
     const endTimestamp = endDate.getTime();
 
-    console.log("Date", new Date(Date.now() + 1000));
-    console.log("startTime", new Date(startTime.getTime() + 1000));
-
-    const difference = (new Date(startTime.getTime() + 1000).getTime() - new Date(Date.now() + 2000).getTime()) - (1 * 60 * 1000);
-    console.log("difference", difference);
-    console.log("new Date(Date.now() + difference)", new Date(Date.now() + difference));
+    const difference = (new Date(startTime.getTime() + 1000).getTime() - new Date(Date.now() + 2000).getTime()) - (30 * 60 * 1000);
 
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "⏰ Event Reminder",
-        body: `Your appointment "${title.trim()}" starts in 1 minute!`,
+        body: `Your appointment "${title.trim()}" starts in 30 minutes!`,
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: new Date(Date.now() + difference),
-        // date: new Date(startTime.getTime() + 1000),
       },
     });
 
